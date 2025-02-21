@@ -1,0 +1,16 @@
+# Maven / Gradle build output
+target/
+
+# IDE or Editor specific files
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Environment files (optional)
+.env

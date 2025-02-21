@@ -1,0 +1,20 @@
+# Exclude node_modules from both frontend and backend
+node_modules/
+
+# Exclude build output (if any is in the root)
+dist/
+build/
+
+# Exclude environment files
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE or editor specific files
+.vscode/
+.idea/
+
+# Logs
+*.log
