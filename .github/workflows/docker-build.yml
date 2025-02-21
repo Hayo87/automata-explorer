@@ -1,0 +1,35 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main # Trigger workflow on pushes to 'main'
+  pull_request:
+    branches:
+      - main # Trigger workflow on pull requests targeting 'main'
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      # Step 3: Build and push backend Docker image
+      - name: Build and push backend image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend
+
+      # Step 4: Build and push frontend Docker image
+      - name: Build and push frontend image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend
