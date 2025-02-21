@@ -8,11 +8,11 @@
 		<version>3.4.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>ou.nl</groupId>
-	<artifactId>VisDiff-Backend</artifactId>
+	<groupId>io.github.Hayo87</groupId>
+	<artifactId>AutomataExplorer-Backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>VisDiff-Backend</name>
-	<description>Backend for the VisDiffFSMs tool</description>
+	<name>AutomataExplorer-Backend</name>
+	<description>Backend for the AutomataExplorer</description>
 	<url/>
 	<licenses>
 		<license/>
