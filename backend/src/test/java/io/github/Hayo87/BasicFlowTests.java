@@ -46,7 +46,7 @@ public class BasicFlowTests {
     @Order(1)
     public void testCreateSession(String referenceGraph, String subjectGraph) {
         try {
-            // Escape only when serializing the full JSON request
+            // Escape for JSON request
             String requestBody = objectMapper.writeValueAsString(new DotRequest(referenceGraph, subjectGraph));
     
             String sessionId =
@@ -65,12 +65,15 @@ public class BasicFlowTests {
     
             // Call build test immediately after creating session
             testGetBuildForSession(sessionId);
+
+            // Call session deletion
+            testCloseSession(sessionId);
+
         } catch (Exception e) {
             throw new RuntimeException("Error serializing request body", e);
         }
     }
     
-
     // Step 2: Get Build Using The Generated Session
     private void testGetBuildForSession(String sessionId) {
         assumeTrue(sessionId != null, "Session ID must be available");
@@ -81,6 +84,19 @@ public class BasicFlowTests {
             .get("/api/session/{sessionId}/build", sessionId) 
             .then()
             .statusCode(200) // Validate response
+            .body(not(empty())); // Ensure data is returned
+    }
+
+    // Step 3: Close the session after build test
+    private void testCloseSession(String sessionId) {
+        assumeTrue(sessionId != null, "Session ID must be available");
+
+        given()
+            .port(port)
+            .when()
+            .delete("/api/session/{sessionId}", sessionId) // Call DELETE API
+            .then()
+            .statusCode(200) // Expect success
             .body(not(empty())); // Ensure data is returned
     }
 
