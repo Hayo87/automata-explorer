@@ -27,7 +27,7 @@ jobs:
 
     # Step 3: Permissions
       - name: Set File Permissions
-        run: chmod -R 755 ./backend/src/test/resources    
+        run: chmod -R 755 ./backend/src/test/java/io/github/Hayo87/resources   
 
       # Step 4: Run Maven tests
       - name: Run backend tests
