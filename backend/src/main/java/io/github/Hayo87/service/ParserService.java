@@ -69,7 +69,6 @@ public class ParserService {
      */
     public DiffAutomaton<String> parseToDiffAutomaton(String dotContent, Boolean reference) throws IOException {
         JsonNode graphJson = processDotWithGraphviz(dotContent);
-        System.out.println(graphJson);
     
         // Initialize variables
         DiffAutomaton<String> automaton = new DiffAutomaton<>();
