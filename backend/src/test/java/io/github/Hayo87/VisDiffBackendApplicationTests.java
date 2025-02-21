@@ -1,4 +1,4 @@
-package ou.nl.VisDiff_Backend;
+package io.github.Hayo87;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
