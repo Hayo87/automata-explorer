@@ -1,4 +1,4 @@
-package io.github.Hayo87.resources;
+package io.github.Hayo87;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.TestInstance;
@@ -119,7 +119,9 @@ public class BasicFlowTests {
 
     // Helper class to ensure correct JSON structure
     private static class DotRequest {
+        @SuppressWarnings("unused")
         public String reference;
+        @SuppressWarnings("unused")
         public String subject;
 
         public DotRequest(String reference, String subject) {
