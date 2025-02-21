@@ -1,7 +1,7 @@
 
 # AutomataExplorer
 
-This is a starting template for the StateMachineExplorer application.
+This is the AutomateExplorer
 
 ## Features
 - Full-stack application with a Spring Boot backend and a React frontend.
