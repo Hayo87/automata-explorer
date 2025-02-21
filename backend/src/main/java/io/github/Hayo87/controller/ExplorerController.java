@@ -3,6 +3,7 @@ package io.github.Hayo87.controller;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,6 +44,22 @@ public class ExplorerController {
         Map<String, String> response = Map.of("sessionId", sessionId);
         
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Deletes a session and clears its history.
+     *
+     * @param sessionId The ID of the session to be deleted.
+     * @return ResponseEntity indicating success or failure.
+     */
+    @DeleteMapping("/session/{sessionId}")
+    public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
+        try {
+            sessionService.terminateSession(sessionId);
+            return ResponseEntity.ok("Session " + sessionId + " deleted successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     /**

@@ -93,5 +93,18 @@ public class SessionService {
         }
         return history.get(history.size() - 1); // Get the last element
     }
+
+    /**
+     * Terminates a session by removing it from session history.
+     *
+     * @param sessionId The ID of the session to be removed.
+     */
+    public void terminateSession(String sessionId) {
+        if (!sessionHistory.containsKey(sessionId)) {
+            throw new IllegalArgumentException("Session ID not found.");
+        }
+        sessionHistory.remove(sessionId);
+    }
+
 }
 
