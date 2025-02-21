@@ -1,4 +1,4 @@
-package ou.nl.VisDiff_Backend;
+package io.github.Hayo87;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
