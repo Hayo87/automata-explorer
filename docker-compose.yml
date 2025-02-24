@@ -9,8 +9,8 @@ services:
       - backend
     networks:
       - app-network
-    environment:
-      - VITE_API_BASE_URL=http://backend:8080/api 
+    env_file: 
+      - .env
 
   backend:
     build:
