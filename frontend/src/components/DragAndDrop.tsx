@@ -49,7 +49,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ setFile, label }) => {
         <p className="drop-text">
           {uploadedFile ? uploadedFile.name : "Drag and drop a file here, or click to select one"}
         </p>
-        <input type="file" onChange={handleFileSelect} className="hidden-input" id={label} />
+        <input type="file" accept=".dot" onChange={handleFileSelect} className="hidden-input" id={label} />
         <label htmlFor={label} className="file-label">
           Select a File
         </label>
