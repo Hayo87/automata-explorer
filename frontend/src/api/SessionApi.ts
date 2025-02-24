@@ -38,3 +38,14 @@ export const uploadFiles = async (file1: File, file2: File): Promise<string> => 
     throw error;
   }
 };
+
+  // Fetch visualization data for a session
+export const fetchSessionData = async (sessionId: string): Promise<any> => {
+  const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch visualization data.");
+  }
+
+  return await response.json();
+};
