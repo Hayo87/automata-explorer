@@ -2,11 +2,10 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
   
   color: #213547; 
   background-color: #ffffff;
-
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -17,14 +16,10 @@ body {
   background-color: #ffffff; 
   color: #213547; 
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center; 
-  min-width: 320px;
-  min-height: 100vh;
+  /* For pages that use full viewport layout, we won't use flex on body */
 }
 
-/* Links */
+/* Generic link, heading, and button styles */
 a {
   font-weight: 500;
   color: #007bff; 
@@ -34,14 +29,12 @@ a:hover {
   color: #0056b3;
 }
 
-/* Headings */
 h1 {
   font-size: 2.5rem;
   line-height: 1.1;
   color: #333; 
 }
 
-/* Buttons */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -62,16 +55,6 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-/* Ensure that light mode is always enforced */
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  button {
-    background-color: #4CAF50;
-  }
-}
 
 .button {
   margin-top: 30px;
@@ -84,20 +67,11 @@ button:focus-visible {
   font-size: 1rem;
   transition: background-color 0.3s;
 }
-
 .button:hover {
   background-color: #388E3C;
 }
 
-.container {
-  display: flex;
-  flex-direction: column; 
-  justify-content: center; 
-  align-items: center; 
-  gap: 20px; 
-  width: 100%;
-  max-width: 800px;
-}
+
 
 .upload-container {
   display: flex;
@@ -108,14 +82,37 @@ button:focus-visible {
   max-width: 800px;
 }
 
+
+.vis-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.small-logo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 250px; 
+  z-index: 10;
+}
+
 .logo {
-  width: 450px; 
+  width: 550px; 
   height: auto; 
   display: block;
   margin: 0 auto 20px auto;
 }
 
-/* Drag-and-Drop Container */
+
+.cytoscape-container {
+  width: 100%;
+  height: 100%;
+}
+
+
 .drag-drop-container {
   display: flex;
   flex-direction: column;
@@ -123,15 +120,11 @@ button:focus-visible {
   justify-content: center;
   margin-bottom: 20px;
 }
-
-/* Header inside Drag and Drop */
 .drag-drop-header {
   font-size: 1.2rem;
   color: #333;
   margin-bottom: 10px;
 }
-
-/* Drop Zone */
 .drop-zone {
   width: 300px;
   height: 150px;
@@ -145,28 +138,20 @@ button:focus-visible {
   cursor: pointer;
   transition: border-color 0.3s, background-color 0.3s;
   text-align: center;
-  background-color: #ffffff; /* Default background */
+  background-color: #ffffff;
 }
-
-/* When Dragging a File Over */
 .drop-zone.drag-over {
   border-color: #4CAF50;
   background-color: #f9f9f9;
 }
-
-/*  Text Inside Drop Zone */
 .drop-text {
   color: #555;
   font-size: 1rem;
   padding: 0 10px;
 }
-
-/* Hidden File Input */
 .hidden-input {
   display: none;
 }
-
-/*  File Input Label */
 .file-label {
   color: #4CAF50;
   font-weight: bold;
@@ -176,11 +161,12 @@ button:focus-visible {
   margin-top: 10px;
 }
 
-/* Visualization container */
-.d3-visualization {
-  display: block;
-  margin: 20px auto;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+
+.upload-page-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centers vertically */
+  align-items: center;     /* centers horizontally */
+  height: 100vh;           /* fill entire viewport height */
+  width: 100%;
 }
