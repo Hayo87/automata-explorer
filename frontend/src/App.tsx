@@ -1,17 +1,15 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import UploadPage from "./pages/UploadPage.tsx";
-import VisualizationPage from "./pages/VisualizationPage.tsx";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import UploadPage from './pages/UploadPage';
+import VisualizationPage from './pages/VisualizationPage';
 
-function App() {
+const App = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<UploadPage />} />
-        {/* Add a route with the session token as a parameter */}
-        <Route path="/visualization/:sessionId" element={<VisualizationPage />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<UploadPage />} />
+      <Route path="/visualization/:sessionId" element={<VisualizationPage />} />
+    </Routes>
   );
-}
+};
 
 export default App;
