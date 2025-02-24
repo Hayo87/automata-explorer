@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL; 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+
+console.log(" Using API Base URL in Frontend:", API_BASE_URL); // Debugging
 
 // Function to read a .dot file as plain text
 const readDotFileAsText = (file: File): Promise<string> => {
@@ -28,24 +30,38 @@ export const uploadFiles = async (file1: File, file2: File): Promise<string> => 
     });
 
     if (!response.ok) {
-      throw new Error("Failed to create session.");
+      const errorText = await response.text(); // Read error message if any
+      throw new Error(`Failed to create session. Status: ${response.status}, Message: ${errorText}`);
     }
 
-    const { sessionId } = await response.json();
-    return sessionId;
+    try {
+      const jsonResponse = await response.json();
+      if (!jsonResponse.sessionId) {
+        throw new Error("Invalid response: Missing sessionId");
+      }
+      return jsonResponse.sessionId;
+    } catch (error) {
+      throw new Error("Failed to parse JSON response.");
+    }
   } catch (error) {
     console.error("Upload error:", error);
     throw error;
   }
 };
 
-  // Fetch visualization data for a session
+// Fetch visualization data for a session
 export const fetchSessionData = async (sessionId: string): Promise<any> => {
-  const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`);
+  try {
+    const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`);
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch visualization data.");
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch visualization data. Status: ${response.status}, Message: ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Fetch session data error:", error);
+    throw error;
   }
-
-  return await response.json();
 };
