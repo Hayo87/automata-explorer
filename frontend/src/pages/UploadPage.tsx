@@ -25,13 +25,13 @@ const UploadPage: React.FC = () => {
   };
 
   return (
-    <div className="container">
+    <div className="upload-page-container">
       <img src="/logo.svg" alt="Logo" className="logo" />
-      <h1 className="h1">Upload Your Finite State Machines</h1>
+      <h1 className="h1">Upload your Finite State Machines</h1>
 
       <div className="upload-container">
-        <DragAndDrop setFile={setFile1} label="File 1" />
-        <DragAndDrop setFile={setFile2} label="File 2" />
+        <DragAndDrop setFile={setFile1} label="Reference" />
+        <DragAndDrop setFile={setFile2} label="Subject" />
       </div>
 
       {file1 && file2 && (
