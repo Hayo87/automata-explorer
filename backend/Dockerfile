@@ -7,6 +7,9 @@ RUN chmod +x ./mvnw
 # Run the Maven build
 RUN ./mvnw package -DskipTests
 
+# Install Graphviz inside the container
+RUN apt-get update && apt-get install -y graphviz
+
 # Step 2: Prepare the runtime image
 FROM eclipse-temurin:17-jre
 WORKDIR /app
