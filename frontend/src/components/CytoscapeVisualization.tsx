@@ -27,9 +27,9 @@ interface CytoscapeVisualizationProps {
 
 const getColor = (diffKind: string): string => {
   switch (diffKind) {
-    case "REMOVED":
-      return "#00cc00"; // green
     case "ADDED":
+      return "#00cc00"; // green
+    case "REMOVED":
       return "#ff4040"; // red
     default:
       return "#000000"; // black
