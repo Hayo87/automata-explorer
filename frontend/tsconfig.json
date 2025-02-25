@@ -4,10 +4,10 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
-  "compilerOptions": {
-    "skipLibCheck": true,
-    "paths": {
-      "cytoscape/dist/cytoscape.esm.mjs": ["node_modules/cytoscape/index.d.ts"]
+    "compilerOptions": {
+      "skipLibCheck": true,
+      "paths": {
+        "cytoscape": ["node_modules/cytoscape/index.d.ts"]
+      }
     }
-  }
 }
