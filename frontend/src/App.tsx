@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import UploadPage from './pages/UploadPage';
 import VisualizationPage from './pages/VisualizationPage';
