@@ -21,7 +21,7 @@ import io.github.Hayo87.service.SessionService;
  */
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:8080"})
 public class ExplorerController {
     private final SessionService sessionService;
     private final BuildService buildService;
