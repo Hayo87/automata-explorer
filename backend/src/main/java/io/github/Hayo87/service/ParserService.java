@@ -24,7 +24,6 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
-import com.github.tno.gltsdiff.writers.DotRenderer;
 import com.github.tno.gltsdiff.writers.DotWriter;
 
 @Service
@@ -143,36 +142,6 @@ public class ParserService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to convert automaton to DOT format", e);
         }
-    }
-
-        /**
-     * Converts a BaseAutomaton to its SVG representation.
-     *
-     * @param automaton The automaton to convert.
-     * @param writer The writer instance to use for conversion.
-     * @return A string containing the SVG representation.
-     * @throws IOException If writing or rendering fails.
-     */
-    public String convertToSvg(DiffAutomaton<String> automaton, 
-        DotWriter<DiffAutomatonStateProperty,DiffProperty<String>, DiffAutomaton<String>> writer) throws IOException {
-        // Get the DOT representation from the helper method
-        String dotContent = convertToDot(automaton, writer);
-
-        // Create a temporary DOT file
-        Path tempDotFile = Files.createTempFile("automaton", ".dot");
-        Files.writeString(tempDotFile, dotContent);
-
-        // Render DOT to SVG
-        Path tempSvgFile = DotRenderer.renderDot(tempDotFile);
-
-        // Read SVG content as a string
-        String svgContent = Files.readString(tempSvgFile);
-
-        // Cleanup
-        Files.deleteIfExists(tempDotFile);
-        Files.deleteIfExists(tempSvgFile);
-
-        return svgContent;
     }
 }
     
