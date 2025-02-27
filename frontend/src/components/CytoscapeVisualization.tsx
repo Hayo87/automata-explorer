@@ -1,113 +1,126 @@
-import React, { useEffect, useRef } from 'react';
-import cytoscape from 'cytoscape';
-import dagre from 'cytoscape-dagre';
+import React, { useEffect, useRef } from "react";
+import cytoscape from "cytoscape";
+import dagre from "cytoscape-dagre";
+import useTransformGraph from "../hooks/useTransformGraph";
+import { GraphData } from "../hooks/useTransformGraph";
+
 cytoscape.use(dagre);
-
-interface Transition {
-  from: number;
-  to: number;
-  label: string;
-  diffKind: string;
-}
-
-interface State {
-  id: number;
-  initial: boolean;
-  diffKind: string;
-}
-
-interface GraphData {
-  transitions: Transition[];
-  states: State[];
-}
 
 interface CytoscapeVisualizationProps {
   data: GraphData;
 }
 
-const getColor = (diffKind: string): string => {
-  switch (diffKind) {
-    case "ADDED":
-      return "#00cc00"; // green
-    case "REMOVED":
-      return "#ff4040"; // red
-    default:
-      return "#000000"; // black
-  }
-};
-
 const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const transformedData = useTransformGraph(data);
+
+  // Convert states to nodes
+  const nodes = transformedData.nodes.map(node => ({
+    group: "nodes",
+    data: {
+      id: node.data.id,
+      label: node.data.label,
+      parent: undefined,
+      color: node.style.backgroundColor,
+      height: node.style.height,
+      width: node.style.width,
+      shape: node.style.shape
+    },
+    position: node.position,
+    selectable: true,
+    grabbable: true,
+    locked: false,
+    pannable: false,
+    classes:  [],
+  }));
+
+  // Convert transitions to edges
+  const edges = transformedData.edges.map((edge, index) => ({
+    group: "edges",
+    data: {
+      id: `edge${index}`,
+      source: edge.data.source,
+      target: edge.data.target,
+      label: edge.data.label,
+      color: edge.style.lineColor,
+      curve: edge.style.curveStyle
+    },
+    pannable: true,
+  }));
+
+  const elements = [...nodes, ...edges];
 
   useEffect(() => {
-    if (!data || !containerRef.current) return;
-
-    // Convert states to nodes
-    const nodes = data.states.map(state => ({
-      data: {
-        id: state.id.toString(),
-        label: `State ${state.id}`,
-        color: getColor(state.diffKind)
-      }
-    }));
-
-    // Convert transitions to edges
-    const edges = data.transitions.map((transition, index) => ({
-      data: {
-        id: `edge${index}`,
-        source: transition.from.toString(),
-        target: transition.to.toString(),
-        label: transition.label,
-        color: getColor(transition.diffKind)
-      }
-    }));
-
-    const elements = [...nodes, ...edges];
+    if (!containerRef.current) return;
 
     const cy = cytoscape({
       container: containerRef.current,
-      elements: elements,
+      elements,
+      layout: {
+        name: "preset",
+      },
       style: [
         {
-          selector: 'node',
+          selector: "node",
           style: {
-            'background-color': 'data(color)',
-            'label': 'data(label)',
-            'text-valign': 'center',
-            'color': '#fff',
-            'font-size': '12px',
-            'width': '40px',
-            'height': '40px'
-          }
+            "label": "data(label)",
+            "text-valign": "center",
+            "color": "black",
+            "background-color": "white",
+            "font-size": "12px",
+            "width": "data(width)",
+            "height": "data(height)",
+            "border-width" : 2,
+            "border-style": "solid",
+            "border-color": "data(color)"
+          },
         },
         {
-          selector: 'edge',
+          selector: "edge",
           style: {
-            'width': 2,
-            'line-color': 'data(color)',
-            'target-arrow-color': 'data(color)',
-            'target-arrow-shape': 'triangle',
-            'curve-style': 'bezier',
-            'label': 'data(label)',
-            'font-size': '10px',
-            'text-rotation': 'autorotate',
-            'text-margin-y': -10
-          }
-        }
+            "width": 2,
+            "line-color": "data(color)",
+            "target-arrow-color": "data(color)",
+            "target-arrow-shape": "triangle",
+            "curve-style": "bezier",
+            "label": "data(label)",
+            "font-size": "10px",
+            "text-rotation": "autorotate",
+            "text-margin-y": -10,
+          },
+        },
       ],
-      layout: {
-        name: 'dagre',
-        padding: 30
-      }
+      zoom: 1,
+      pan: { x: 0, y: 0 },
+      minZoom: 1e-50,
+      maxZoom: 1e50,
+      zoomingEnabled: true,
+      userZoomingEnabled: true,
+      panningEnabled: true,
+      userPanningEnabled: true,
+      boxSelectionEnabled: true,
+      selectionType: "single",
+      touchTapThreshold: 8,
+      desktopTapThreshold: 4,
+      autolock: false,
+      autoungrabify: false,
+      autounselectify: false,
+      multiClickDebounceTime: 250,
+      headless: false,
+      styleEnabled: true,
+      hideEdgesOnViewport: false,
+      textureOnViewport: false,
+      motionBlur: false,
+      motionBlurOpacity: 0.2,
+      pixelRatio: "auto",
     });
 
     return () => {
       cy.destroy();
     };
-  }, [data]);
+  }, [elements]);
 
   return <div ref={containerRef} className="cytoscape-container"></div>;
-  
 };
 
 export default CytoscapeVisualization;
