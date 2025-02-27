@@ -2,9 +2,11 @@ package io.github.Hayo87.service;
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -100,32 +102,44 @@ public class ParserService {
     
 
 
-    public Map<String, Object> convertToJson(DiffAutomaton<String> automaton) {
-        Map<String, Object> jsonAutomaton = new HashMap<>();
-    
-        // Extract states
-        List<Map<String, Object>> states = automaton.getStates().stream().map(state -> {
-            Map<String, Object> stateJson = new HashMap<>();
-            stateJson.put("id", state.getId());
-            stateJson.put("initial", state.getProperty().isInitial());
-            stateJson.put("diffKind", state.getProperty().getStateDiffKind().toString());
-            return stateJson;
-        }).toList();
-    
-        // Extract transitions
-        List<Map<String, Object>> transitions = automaton.getTransitions().stream().map(transition -> {
-            Map<String, Object> transitionJson = new HashMap<>();
-            transitionJson.put("from", transition.getSource().getId());
-            transitionJson.put("to", transition.getTarget().getId());
-            transitionJson.put("label", transition.getProperty().getProperty());
-            transitionJson.put("diffKind", transition.getProperty().getDiffKind().toString());
-            return transitionJson;
-        }).toList();
-    
-        jsonAutomaton.put("transitions", transitions);
-        jsonAutomaton.put("states", states);
-        return jsonAutomaton;
-    }  
+    public Map<String, Object> convertToJson(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
+    try {
+        // Convert automaton to DOT format
+        String dotContent = convertToDot(automaton, writer);
+        
+        // Create a process
+        ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tjson0");
+        processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        
+        Process process = processBuilder.start();
+        
+        try (BufferedWriter writerPipe = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            
+            // Inject dotContent as input
+            writerPipe.write(dotContent);
+            writerPipe.flush();
+            writerPipe.close();
+            
+            // Read result as JsonNode
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(reader);
+            
+            // Return result
+            return generalizeJson(jsonNode);
+            
+        }
+    } catch (IOException e) {
+        throw new RuntimeException("Failed to convert automaton to JSON", e);
+    }
+}
+
+
+    public Map<String, Object> generalizeJson(JsonNode tJson) {
+        
+    }
+
 
 
     /**
