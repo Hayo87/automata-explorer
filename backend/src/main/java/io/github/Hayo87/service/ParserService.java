@@ -84,8 +84,6 @@ public class ParserService {
             String shape = node.get("shape").asText();
             Boolean startState = "doublecircle".equals(shape);
 
-            System.out.println("SHAPE: " + shape);
-
             State<DiffAutomatonStateProperty> state = automaton.addState(
                  new DiffAutomatonStateProperty(startState, diffKind, Optional.empty())
             );
@@ -161,7 +159,6 @@ public class ParserService {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             writer.write(automaton, outputStream);
 
-            System.out.println(outputStream.toString(StandardCharsets.UTF_8));
             return outputStream.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("Failed to convert automaton to DOT format", e);
