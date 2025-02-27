@@ -55,13 +55,13 @@ public class BuildService {
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
         builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>("[skip]"));
         var comparator = builder.createComparator();
+        var writer = builder.createWriter();
 
-        // Apply structural comparison to the two input automata.
+        // Apply structural comparison to the two input automata and store
         DiffAutomaton<String> result = comparator.compare(reference, subject);
-
-        // Put in session history
         sessionService.store(sessionId,result);
 
-        return parserService.convertToJson(result);
+        // Delegate processing to parserService
+        return parserService.convertToJson(subject, writer); 
     }
-}
+}        
