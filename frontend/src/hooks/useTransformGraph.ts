@@ -1,31 +1,34 @@
 import { useMemo } from "react";
+import DOMPurify from "dompurify";
 
 export interface NodeData {
-  id: string;
-  label: string;
-  position: string;
-  style: {
-    shape: string;
-    color: string;
-    width: number;
-    height: number;
-  };
+  _gvid: string,
+  name: string,
+  fillcolor:  string,
+  fontcolor:  string,
+  height: number,
+  label:  string,
+  pos: string,
+  shape: string,
+  style: string,
+  width: number, 
 }
 
 export interface EdgeData {
-  id: string;
-  source: string;
-  target: string;
-  label: string;
-  style: {
-    "line-color": string;
-    "curve-style": string;
+  _gvid: string,
+  tail: string,
+  head: string,
+  color: string,
+  id: string,
+  label: string,
+  lp: string,
+  pos: string,
   };
-}
 
 export interface GraphData {
-  nodes: NodeData[];
-  edges: EdgeData[];
+  name: string, 
+  objects: NodeData[],
+  edges: EdgeData[],
 }
 
 interface TransformedNode {
@@ -40,6 +43,7 @@ interface TransformedNode {
   style: {
     shape: string;
     backgroundColor: string;
+    fontColor: string,
     width: number;
     height: number;
   };
@@ -54,7 +58,8 @@ interface TransformedEdge {
   };
   style: {
     lineColor: string;
-    curveStyle: string;
+    labelColor: string;
+
   };
 }
 
@@ -62,19 +67,20 @@ const useTransformGraph = (backendData: GraphData | null) => {
   return useMemo(() => {
     if (!backendData) return { nodes: [], edges: [] };
 
-    const nodes: TransformedNode[] = backendData.nodes.map((node) => {
-      const [x, y] = node.position.split(",").map(parseFloat);
+    const nodes: TransformedNode[] = backendData.objects.map((node) => {
+      const [x, y] = node.pos.split(",").map(parseFloat);
       return {
         data: {
-          id: node.id,
+          id: node._gvid,
           label: node.label,
         },
         position: { x, y },
         style: {
-          shape: node.style.shape,
-          backgroundColor: node.style.color,
-          width: node.style.width * 50, 
-          height: node.style.height * 50,
+          shape: node.shape,
+          backgroundColor: node.fillcolor,
+          fontColor: node.fontcolor,
+          width: node.width * 50, 
+          height: node.height * 50,
         },
       };
     });
@@ -82,13 +88,13 @@ const useTransformGraph = (backendData: GraphData | null) => {
     const edges: TransformedEdge[] = backendData.edges.map((edge) => ({
       data: {
         id: edge.id,
-        source: edge.source,
-        target: edge.target,
-        label: edge.label,
+        source: edge.tail,
+        target: edge.head,
+        label: DOMPurify.sanitize(edge.label, { ALLOWED_TAGS: [] })
       },
       style: {
-        lineColor: edge.style["line-color"],
-        curveStyle: edge.style["curve-style"],
+        lineColor: edge.color,
+        labelColor: edge.color
       },
     }));
 
