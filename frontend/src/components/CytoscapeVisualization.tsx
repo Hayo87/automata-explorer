@@ -65,14 +65,14 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data })
           style: {
             "label": "data(label)",
             "text-valign": "center",
-            "color": "black",
-            "background-color": "white",
+            "color": "white",
+            "background-color": "data(color)",
             "font-size": "12px",
             "width": "data(width)",
             "height": "data(height)",
             "border-width" : 2,
             "border-style": "solid",
-            "border-color": "data(color)"
+            "border-color": "black"
           },
         },
         {
