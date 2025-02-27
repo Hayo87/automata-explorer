@@ -40,6 +40,7 @@ public class ParserService {
      * @return JSON representation for the dot. 
      * @throws IOException If an error occurs.
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     private JsonNode processDotWithGraphviz(String dotContent) throws IOException {
         Path tempFile = Files.createTempFile("graph", ".dot");
         Files.write(tempFile, dotContent.getBytes(), StandardOpenOption.WRITE);
