@@ -1,5 +1,6 @@
 package io.github.Hayo87.service;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class BuildService {
             sessionService.store(sessionId, refAutomaton);   
             sessionService.store(sessionId, subAutomaton);      
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Parsing failed: " + e.getMessage());
             throw new IllegalArgumentException("Invalid DOT file format.");
         }
