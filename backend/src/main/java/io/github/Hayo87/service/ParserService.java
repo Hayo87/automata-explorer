@@ -81,9 +81,14 @@ public class ParserService {
         // Parse nodes
         for (JsonNode node : graphJson.get("objects")) {
             String stateId = node.get("_gvid").asText();
-            String shape = node.get("shape").asText();
-            Boolean startState = "doublecircle".equals(shape);
 
+            Boolean startState = false;
+            JsonNode shapeNode = node.get("shape");
+            if (shapeNode != null) {
+                String shape = node.get("shape").asText();
+                startState = "doublecircle".equals(shape);
+            }
+           
             State<DiffAutomatonStateProperty> state = automaton.addState(
                  new DiffAutomatonStateProperty(startState, diffKind, Optional.empty())
             );
