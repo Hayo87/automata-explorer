@@ -21,6 +21,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tno.gltsdiff.glts.State;
@@ -87,6 +88,8 @@ public class ParserService {
             String shape = node.get("shape").asText();
             Boolean startState = "doublecircle".equals(shape);
 
+            System.out.println("SHAPE: " + shape);
+
             State<DiffAutomatonStateProperty> state = automaton.addState(
                  new DiffAutomatonStateProperty(startState, diffKind, Optional.empty())
             );
@@ -147,74 +150,10 @@ public class ParserService {
      * @return A structured Map<String, Object> representation.
      */
     public Map<String, Object> generalizeJson(JsonNode tJson) {
-        Map<String, Object> generalizedMap = new HashMap<>();
-        
-        // Extract graph-level information
-        List<String> graphKeys = List.of("name", "directed", "strict");
-        graphKeys.forEach(key -> {
-            if (tJson.has(key)) {
-                generalizedMap.put(key, tJson.get(key).isBoolean() ? tJson.get(key).asBoolean() : tJson.get(key).asText());
-            }
-        });
-        
-        List<Map<String, Object>> nodes = new ArrayList<>();
-        List<Map<String, Object>> edges = new ArrayList<>();
-        
-        if (tJson.has("objects")) {
-            for (JsonNode obj : tJson.get("objects")) {
-                Map<String, Object> node = new HashMap<>();
-
-                // Extract meta information
-                node.put("id", obj.get("_gvid").asText());
-                node.put("label", obj.has("label") ? obj.get("label").asText() : "");
-                node.put("position", obj.has("pos") ? obj.get("pos").asText() : ",");
-                
-                // Extract styling information
-                Map<String, Object> style = new HashMap<>();
-                style.put("shape", obj.has("shape") ? obj.get("shape").asText() : "unknown");
-                style.put("color", obj.has("_draw_") ? obj.get("_draw_").get(0).get("color").asText() : "#000000");
-                style.put("width", obj.has("width") ? obj.get("width").asDouble() : 0.0);
-                style.put("height", obj.has("height") ? obj.get("height").asDouble() : 0.0);
-                node.put("style", style);
-                
-                nodes.add(node);
-            }
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(tJson, new TypeReference<Map<String, Object>>() {});
         }
         
-        if (tJson.has("edges")) {
-            for (JsonNode obj : tJson.get("edges")) {
-                Map<String, Object> edge = new HashMap<>();
-        
-                // Extract meta information
-                edge.put("id", obj.has("id") ? obj.get("id").asText() : obj.get("tail").asText() + "-" + obj.get("head").asText());
-                edge.put("source", obj.get("tail").asText());
-                edge.put("target", obj.get("head").asText());
-
-                String parsedLabel = Jsoup.parse(obj.get("label").asText()).text();
-                String cleanLabel = Jsoup.clean(parsedLabel, Safelist.none());
-                edge.put("label", obj.has("label") ? cleanLabel : "");
-
-                // Extract styling information
-                Map<String, Object> style = new HashMap<>();
-                style.put("line-color", obj.has("color") ? obj.get("color").asText() : "#000000");
-        
-                if (obj.has("pos")) {
-                    style.put("controlPoints", obj.get("pos"));
-                    style.put("curve-style", "unbundled-bezier");
-                }
-                edge.put("style", style);
-        
-                edges.add(edge);
-            }
-        }
-     
-        generalizedMap.put("nodes", nodes);
-        generalizedMap.put("edges", edges);
-        
-        return generalizedMap;
-    }
-
-
     /**
      * Converts a DiffAutomaton to its DOT representation without writing to a file.
      *
@@ -225,6 +164,8 @@ public class ParserService {
     public <T> String convertToDot(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             writer.write(automaton, outputStream);
+
+            System.out.println(outputStream.toString(StandardCharsets.UTF_8));
             return outputStream.toString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new RuntimeException("Failed to convert automaton to DOT format", e);
