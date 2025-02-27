@@ -1,5 +1,6 @@
 package io.github.Hayo87.service;
 
+import java.io.IOException;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class BuildService {
             sessionService.store(sessionId, refAutomaton);   
             sessionService.store(sessionId, subAutomaton);      
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("Parsing failed: " + e.getMessage());
             throw new IllegalArgumentException("Invalid DOT file format.");
         }
@@ -55,13 +56,13 @@ public class BuildService {
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
         builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>("[skip]"));
         var comparator = builder.createComparator();
+        var writer = builder.createWriter();
 
-        // Apply structural comparison to the two input automata.
+        // Apply structural comparison to the two input automata and store
         DiffAutomaton<String> result = comparator.compare(reference, subject);
-
-        // Put in session history
         sessionService.store(sessionId,result);
 
-        return parserService.convertToJson(result);
+        // Delegate processing to parserService
+        return parserService.convertToJson(result, writer); 
     }
-}
+}        

@@ -1,29 +1,31 @@
 package io.github.Hayo87.service;
 
-
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tno.gltsdiff.glts.State;
-import com.github.tno.gltsdiff.writers.DotRenderer;
-import com.github.tno.gltsdiff.writers.DotWriter;
-import org.springframework.stereotype.Service;
-
-
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tno.gltsdiff.glts.State;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
+import com.github.tno.gltsdiff.writers.DotWriter;
 
 @Service
 public class ParserService {
@@ -35,6 +37,7 @@ public class ParserService {
      * @return JSON representation for the dot. 
      * @throws IOException If an error occurs.
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     private JsonNode processDotWithGraphviz(String dotContent) throws IOException {
         Path tempFile = Files.createTempFile("graph", ".dot");
         Files.write(tempFile, dotContent.getBytes(), StandardOpenOption.WRITE);
@@ -78,11 +81,18 @@ public class ParserService {
         // Parse nodes
         for (JsonNode node : graphJson.get("objects")) {
             String stateId = node.get("_gvid").asText();
+
+            Boolean startState = false;
+            JsonNode shapeNode = node.get("shape");
+            if (shapeNode != null) {
+                String shape = node.get("shape").asText();
+                startState = "doublecircle".equals(shape);
+            }
+           
             State<DiffAutomatonStateProperty> state = automaton.addState(
-                 new DiffAutomatonStateProperty(false, diffKind, Optional.empty())
+                 new DiffAutomatonStateProperty(startState, diffKind, Optional.empty())
             );
-            stateMap.put(stateId, state);
-            
+            stateMap.put(stateId, state); 
         }
     
         // Parse edges
@@ -99,89 +109,65 @@ public class ParserService {
     
 
 
-    public Map<String, Object> convertToJson(DiffAutomaton<String> automaton) {
-        Map<String, Object> jsonAutomaton = new HashMap<>();
-    
-        // Extract states
-        List<Map<String, Object>> states = automaton.getStates().stream().map(state -> {
-            Map<String, Object> stateJson = new HashMap<>();
-            stateJson.put("id", state.getId());
-            stateJson.put("initial", state.getProperty().isInitial());
-            stateJson.put("diffKind", state.getProperty().getStateDiffKind().toString());
-            return stateJson;
-        }).toList();
-    
-        // Extract transitions
-        List<Map<String, Object>> transitions = automaton.getTransitions().stream().map(transition -> {
-            Map<String, Object> transitionJson = new HashMap<>();
-            transitionJson.put("from", transition.getSource().getId());
-            transitionJson.put("to", transition.getTarget().getId());
-            transitionJson.put("label", transition.getProperty().getProperty());
-            transitionJson.put("diffKind", transition.getProperty().getDiffKind().toString());
-            return transitionJson;
-        }).toList();
-    
-        jsonAutomaton.put("transitions", transitions);
-        jsonAutomaton.put("states", states);
-        return jsonAutomaton;
-    }  
-
-
-
+    public Map<String, Object> convertToJson(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
+    try {
+        // Convert automaton to DOT format
+        String dotContent = convertToDot(automaton, writer);
+        
+        // Create a process
+        ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tjson0");
+        processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        
+        Process process = processBuilder.start();
+        
+        try (BufferedWriter writerPipe = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            
+            // Inject dotContent as input
+            writerPipe.write(dotContent);
+            writerPipe.flush();
+            writerPipe.close();
+            
+            // Read result as JsonNode
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(reader);
+            
+            // Return result
+            return generalizeJson(jsonNode);
+            
+        }
+    } catch (IOException e) {
+        throw new RuntimeException("Failed to convert automaton to JSON", e);
+    }
+}
 
     /**
-     * Converts a DiffAutomaton to its DOT representation.
+     * Generalizes the JSON output from Graphviz by mapping it to a structured format including graph-level information.
+     *
+     * @param tJson The JSON output from Graphviz as a JsonNode.
+     * @return A structured Map<String, Object> representation.
+     */
+    public Map<String, Object> generalizeJson(JsonNode tJson) {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.convertValue(tJson, new TypeReference<Map<String, Object>>() {});
+        }
+        
+    /**
+     * Converts a DiffAutomaton to its DOT representation without writing to a file.
      *
      * @param automaton The automaton to convert.
      * @param writer The writer instance to use for conversion.
      * @return A string containing the DOT representation.
-     * @throws IOException If writing fails.
      */
-    public String convertToDot(DiffAutomaton<String> automaton, 
-        DotWriter<DiffAutomatonStateProperty,DiffProperty<String>, DiffAutomaton<String>> writer) throws IOException {
-        // Create a temporary DOT file
-        Path tempDotFile = Files.createTempFile("automaton", ".dot");
+    public <T> String convertToDot(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            writer.write(automaton, outputStream);
 
-        // Write automaton to DOT format using the given writer
-        writer.write(automaton, tempDotFile);
-
-        // Read the DOT content
-        String dotContent = Files.readString(tempDotFile);
-
-        // Cleanup
-        Files.deleteIfExists(tempDotFile);
-
-        return dotContent;
-    }
-
-        /**
-     * Converts a BaseAutomaton to its SVG representation.
-     *
-     * @param automaton The automaton to convert.
-     * @param writer The writer instance to use for conversion.
-     * @return A string containing the SVG representation.
-     * @throws IOException If writing or rendering fails.
-     */
-    public String convertToSvg(DiffAutomaton<String> automaton, 
-        DotWriter<DiffAutomatonStateProperty,DiffProperty<String>, DiffAutomaton<String>> writer) throws IOException {
-        // Get the DOT representation from the helper method
-        String dotContent = convertToDot(automaton, writer);
-
-        // Create a temporary DOT file
-        Path tempDotFile = Files.createTempFile("automaton", ".dot");
-        Files.writeString(tempDotFile, dotContent);
-
-        // Render DOT to SVG
-        Path tempSvgFile = DotRenderer.renderDot(tempDotFile);
-
-        // Read SVG content as a string
-        String svgContent = Files.readString(tempSvgFile);
-
-        // Cleanup
-        Files.deleteIfExists(tempDotFile);
-        Files.deleteIfExists(tempSvgFile);
-
-        return svgContent;
+            return outputStream.toString(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to convert automaton to DOT format", e);
+        }
     }
 }
     
