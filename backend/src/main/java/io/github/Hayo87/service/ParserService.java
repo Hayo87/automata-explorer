@@ -1,6 +1,5 @@
 package io.github.Hayo87.service;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -11,12 +10,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -135,11 +137,79 @@ public class ParserService {
     }
 }
 
-
+    /**
+     * Generalizes the JSON output from Graphviz by mapping it to a structured format including graph-level information.
+     *
+     * @param tJson The JSON output from Graphviz as a JsonNode.
+     * @return A structured Map<String, Object> representation.
+     */
     public Map<String, Object> generalizeJson(JsonNode tJson) {
+        Map<String, Object> generalizedMap = new HashMap<>();
         
-    }
+        // Extract graph-level information
+        List<String> graphKeys = List.of("name", "directed", "strict");
+        graphKeys.forEach(key -> {
+            if (tJson.has(key)) {
+                generalizedMap.put(key, tJson.get(key).isBoolean() ? tJson.get(key).asBoolean() : tJson.get(key).asText());
+            }
+        });
+        
+        List<Map<String, Object>> nodes = new ArrayList<>();
+        List<Map<String, Object>> edges = new ArrayList<>();
+        
+        if (tJson.has("objects")) {
+            for (JsonNode obj : tJson.get("objects")) {
+                Map<String, Object> node = new HashMap<>();
 
+                // Extract meta information
+                node.put("id", obj.get("_gvid").asText());
+                node.put("label", obj.has("label") ? obj.get("label").asText() : "");
+                node.put("position", obj.has("pos") ? obj.get("pos").asText() : ",");
+                
+                // Extract styling information
+                Map<String, Object> style = new HashMap<>();
+                style.put("shape", obj.has("shape") ? obj.get("shape").asText() : "unknown");
+                style.put("color", obj.has("_draw_") ? obj.get("_draw_").get(0).get("color").asText() : "#000000");
+                style.put("width", obj.has("width") ? obj.get("width").asDouble() : 0.0);
+                style.put("height", obj.has("height") ? obj.get("height").asDouble() : 0.0);
+                node.put("style", style);
+                
+                nodes.add(node);
+            }
+        }
+        
+        if (tJson.has("edges")) {
+            for (JsonNode obj : tJson.get("edges")) {
+                Map<String, Object> edge = new HashMap<>();
+        
+                // Extract meta information
+                edge.put("id", obj.has("id") ? obj.get("id").asText() : obj.get("tail").asText() + "-" + obj.get("head").asText());
+                edge.put("source", obj.get("tail").asText());
+                edge.put("target", obj.get("head").asText());
+
+                String parsedLabel = Jsoup.parse(obj.get("label").asText()).text();
+                String cleanLabel = Jsoup.clean(parsedLabel, Safelist.none());
+                edge.put("label", obj.has("label") ? cleanLabel : "");
+
+                // Extract styling information
+                Map<String, Object> style = new HashMap<>();
+                style.put("line-color", obj.has("color") ? obj.get("color").asText() : "#000000");
+        
+                if (obj.has("pos")) {
+                    style.put("controlPoints", obj.get("pos"));
+                    style.put("curve-style", "unbundled-bezier");
+                }
+                edge.put("style", style);
+        
+                edges.add(edge);
+            }
+        }
+     
+        generalizedMap.put("nodes", nodes);
+        generalizedMap.put("edges", edges);
+        
+        return generalizedMap;
+    }
 
 
     /**
