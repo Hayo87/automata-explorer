@@ -1,21 +1,11 @@
 package io.github.Hayo87.service;
 
 
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tno.gltsdiff.glts.State;
-import com.github.tno.gltsdiff.writers.DotRenderer;
-import com.github.tno.gltsdiff.writers.DotWriter;
-import org.springframework.stereotype.Service;
-
-
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -24,6 +14,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tno.gltsdiff.glts.State;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
+import com.github.tno.gltsdiff.writers.DotRenderer;
+import com.github.tno.gltsdiff.writers.DotWriter;
 
 @Service
 public class ParserService {
@@ -127,31 +129,20 @@ public class ParserService {
     }  
 
 
-
-
     /**
-     * Converts a DiffAutomaton to its DOT representation.
+     * Converts a DiffAutomaton to its DOT representation without writing to a file.
      *
      * @param automaton The automaton to convert.
      * @param writer The writer instance to use for conversion.
      * @return A string containing the DOT representation.
-     * @throws IOException If writing fails.
      */
-    public String convertToDot(DiffAutomaton<String> automaton, 
-        DotWriter<DiffAutomatonStateProperty,DiffProperty<String>, DiffAutomaton<String>> writer) throws IOException {
-        // Create a temporary DOT file
-        Path tempDotFile = Files.createTempFile("automaton", ".dot");
-
-        // Write automaton to DOT format using the given writer
-        writer.write(automaton, tempDotFile);
-
-        // Read the DOT content
-        String dotContent = Files.readString(tempDotFile);
-
-        // Cleanup
-        Files.deleteIfExists(tempDotFile);
-
-        return dotContent;
+    public <T> String convertToDot(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            writer.write(automaton, outputStream);
+            return outputStream.toString(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to convert automaton to DOT format", e);
+        }
     }
 
         /**
