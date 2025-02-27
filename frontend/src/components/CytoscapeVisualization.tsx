@@ -42,7 +42,7 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data })
       source: edge.data.source,
       target: edge.data.target,
       label: edge.data.label,
-      color: edge.style.lineColor,
+      color: edge.style.lineColor
     },
     pannable: true,
   }));

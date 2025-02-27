@@ -77,7 +77,7 @@ const useTransformGraph = (backendData: GraphData | null) => {
         position: { x, y },
         style: {
           shape: node.shape,
-          backgroundColor: node.fillcolor,
+          backgroundColor: node.fillcolor || "#000000",
           fontColor: node.fontcolor,
           width: node.width * 50, 
           height: node.height * 50,
@@ -93,8 +93,8 @@ const useTransformGraph = (backendData: GraphData | null) => {
         label: DOMPurify.sanitize(edge.label, { ALLOWED_TAGS: [] })
       },
       style: {
-        lineColor: edge.color,
-        labelColor: edge.color
+        lineColor: edge.color || "#000000",
+        labelColor: edge.color || "#000000"
       },
     }));
 
