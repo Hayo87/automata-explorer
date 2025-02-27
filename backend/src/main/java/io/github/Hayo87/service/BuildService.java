@@ -63,6 +63,6 @@ public class BuildService {
         sessionService.store(sessionId,result);
 
         // Delegate processing to parserService
-        return parserService.convertToJson(subject, writer); 
+        return parserService.convertToJson(result, writer); 
     }
 }        
