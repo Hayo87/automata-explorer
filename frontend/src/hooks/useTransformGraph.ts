@@ -74,7 +74,9 @@ const useTransformGraph = (backendData: GraphData | null) => {
           id: node._gvid,
           label: node.label,
         },
-        position: { x, y },
+        position: { 
+          x: x, 
+          y: y * -1 },
         style: {
           shape: node.shape,
           backgroundColor: node.fillcolor || "#000000",
