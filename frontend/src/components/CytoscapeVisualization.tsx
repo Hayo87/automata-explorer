@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import cytoscape from "cytoscape";
+import NodeSingular from "cytoscape"
 import dagre from "cytoscape-dagre";
 import useTransformGraph from "../hooks/useTransformGraph";
 import { GraphData } from "../hooks/useTransformGraph";
@@ -8,11 +9,15 @@ cytoscape.use(dagre);
 
 interface CytoscapeVisualizationProps {
   data: GraphData;
+  layout: string;
 }
 
-const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data }) => {
+const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, layout }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
+
+  const cyRef = useRef<cytoscape.Core | null>(null);
+  const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
   // Convert states to nodes
   const nodes = transformedData.nodes.map(node => ({
@@ -49,15 +54,14 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data })
 
   const elements = [...nodes, ...edges];
 
+  // Initialization effect
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const cy = cytoscape({
+    const cyInstance = cytoscape({
       container: containerRef.current,
       elements,
-      layout: {
-        name: "preset",
-      },
+      layout: {name: layout},
       style: [
         {
           selector: "node",
@@ -114,10 +118,43 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data })
       pixelRatio: "auto",
     });
 
+    // Store initial postions
+    cyInstance.nodes().forEach((node: NodeSingular) => {
+      const id = node.id();
+      const pos = node.position();
+      // Only store if not already stored.
+      if (!initialPositionsRef.current[id]) {
+        initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
+      }
+    });
+
+    cyRef.current = cyInstance;
+
+
     return () => {
-      cy.destroy();
+      cyInstance.destroy();
+      cyRef.current = null;
     };
   }, [elements]);
+
+  // Update effect
+  useEffect(() => {
+    if (!cyRef.current) return;
+    const cyInstance = cyRef.current;
+
+    if (layout === "preset") {
+      // Restore the original positions
+      cyInstance.nodes().forEach((node: NodeSingular) => {
+        const id = node.id();
+        if (initialPositionsRef.current[id]) {
+          node.position(initialPositionsRef.current[id]);
+        }
+      });
+    }
+
+    // Re-run the layout
+    cyInstance.layout({ name: layout }).run();
+  }, [layout]);
 
   return <div ref={containerRef} className="cytoscape-container"></div>;
 };

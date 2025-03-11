@@ -7,7 +7,7 @@ import '../index.css';
 const VisualizationPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { data, loadSessionData, loading } = useSession();
-  const [currentLayout, setCurrentLayout] = useState("dot");
+  const [currentLayout, setCurrentLayout] = useState("preset");
 
   useEffect(() => {
     if (sessionId) {
@@ -24,7 +24,7 @@ const VisualizationPage: React.FC = () => {
           {loading ? (
             <p>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization data={data} />
+            <CytoscapeVisualization data={data} layout={currentLayout}/>
           ) : (
             <p>No data available</p>
           )}
