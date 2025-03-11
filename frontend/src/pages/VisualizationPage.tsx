@@ -17,7 +17,7 @@ const VisualizationPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <img src="/logo.svg" alt="Logo" className="small-logo" />
+      <img src="/logo_small.svg" alt="Logo" className="small-logo" style={{ backgroundColor: "transparent" }} />
 
       <div className="content-container">
         <main className="graph-area">
@@ -31,7 +31,7 @@ const VisualizationPage: React.FC = () => {
         </main>
 
         <aside className="sidebar">
-          <button className="sidebar-button"  title="Exit this visualization" > <span className="material-icons">exit_to_app</span> </button>
+          <button className="sidebar-button" title="Exit this visualization" > <span className="material-icons">exit_to_app</span> </button>
           <hr></hr>
           <button className="sidebar-button" title= "Set dot layout" onClick={() => setCurrentLayout("preset")}> 
             <span className="material-icons">more_horiz</span> 
@@ -43,10 +43,12 @@ const VisualizationPage: React.FC = () => {
             <span className="material-icons">grid_view</span> 
           </button>
           <button className="sidebar-button" title = "Set dagre layout" onClick={() => setCurrentLayout("dagre")}> 
-            <span className="material-icons">graph_3</span> 
+            <span className="material-icons">home</span> 
           </button>
           <hr></hr>
-          <button className="sidebar-button" title= "Filter"> <span className="material-icons">filter_alt</span> </button>
+          <button className="sidebar-button" title= "Filter"> 
+            <span className="material-icons">filter_alt</span> 
+          </button>
           <hr></hr>
           <button className="sidebar-button" title= "Get input information"> <span className="material-icons">info</span> </button>
         </aside>

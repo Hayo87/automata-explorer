@@ -1,6 +1,6 @@
 <svg width="300" height="100" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
-  <rect width="300" height="100" fill="#f4f4f4"/>
+  <rect width="300" height="100" fill="none"/>
   
   <!-- Automata state nodes and connecting arrow -->
   <g transform="translate(20,20)">
