@@ -31,18 +31,25 @@ const VisualizationPage: React.FC = () => {
         </main>
 
         <aside className="sidebar">
-          <button className="sidebar-button"  title="Exit this visualization"> <span className="material-icons">exit_to_app</span> </button>
+          <button className="sidebar-button"  title="Exit this visualization" > <span className="material-icons">exit_to_app</span> </button>
           <hr></hr>
-          <button className="sidebar-button" title= "Set dot layout"> <span className="material-icons">more_horiz</span> </button>
-          <button className="sidebar-button" title = "Set circular layout"> <span className="material-icons">radio_button_unchecked</span> </button>
-          <button className="sidebar-button" title = "Set grid layout"> <span className="material-icons">grid_view</span> </button>
+          <button className="sidebar-button" title= "Set dot layout" onClick={() => setCurrentLayout("preset")}> 
+            <span className="material-icons">more_horiz</span> 
+          </button>
+          <button className="sidebar-button" title="Set circular layout" onClick={() => setCurrentLayout("avsdf")}>
+            <span className="material-icons">radio_button_unchecked</span>
+          </button>
+          <button className="sidebar-button" title = "Set grid layout" onClick={() => setCurrentLayout("grid")}> 
+            <span className="material-icons">grid_view</span> 
+          </button>
+          <button className="sidebar-button" title = "Set dagre layout" onClick={() => setCurrentLayout("dagre")}> 
+            <span className="material-icons">graph_3</span> 
+          </button>
           <hr></hr>
           <button className="sidebar-button" title= "Filter"> <span className="material-icons">filter_alt</span> </button>
           <hr></hr>
           <button className="sidebar-button" title= "Get input information"> <span className="material-icons">info</span> </button>
         </aside>
-
-
       </div>
     </div>
   );
