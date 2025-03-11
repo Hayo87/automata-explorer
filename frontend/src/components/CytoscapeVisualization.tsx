@@ -4,9 +4,14 @@ import NodeSingular from "cytoscape"
 import dagre from "cytoscape-dagre";
 import useTransformGraph from "../hooks/useTransformGraph";
 import { GraphData } from "../hooks/useTransformGraph";
+import coseBilkent from 'cytoscape-cose-bilkent';
+import avsdf from 'cytoscape-avsdf';
 
-cytoscape.use(dagre);
 
+
+cytoscape.use( coseBilkent)
+cytoscape.use( avsdf)
+cytoscape.use( dagre)
 interface CytoscapeVisualizationProps {
   data: GraphData;
   layout: string;
@@ -54,7 +59,6 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, l
 
   const elements = [...nodes, ...edges];
 
-  // Initialization effect
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -137,24 +141,44 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, l
     };
   }, [elements]);
 
-  // Update effect
   useEffect(() => {
     if (!cyRef.current) return;
     const cyInstance = cyRef.current;
 
-    if (layout === "preset") {
-      // Restore the original positions
+    switch (layout) {
+
+    case "preset":
+      // Restore positions
       cyInstance.nodes().forEach((node: NodeSingular) => {
         const id = node.id();
         if (initialPositionsRef.current[id]) {
           node.position(initialPositionsRef.current[id]);
         }
       });
-    }
+      cyInstance.layout({ name: "preset" }).run();
+      break;
 
-    // Re-run the layout
-    cyInstance.layout({ name: layout }).run();
-  }, [layout]);
+    case "avsdf":
+      {
+        const numNodes = cyInstance.nodes().length;
+        const spreadfactor = Math.max(100, numNodes * 20);
+        cyInstance.layout({ name: 'avsdf', nodeSeparation: spreadfactor},).run();
+      }
+      break;
+
+    case "dagre":
+      cyInstance.layout({ name: "dagre", fit: true }).run();
+      break;
+
+    case "grid":
+      cyInstance.layout({ name: "grid", fit: true}).run();
+      break;
+
+    default:
+      cyInstance.layout({ name: layout }).run();
+      break;
+  }
+}, [layout]);
 
   return <div ref={containerRef} className="cytoscape-container"></div>;
 };
