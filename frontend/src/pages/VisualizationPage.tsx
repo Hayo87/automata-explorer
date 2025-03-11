@@ -7,7 +7,7 @@ import '../index.css';
 const VisualizationPage: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const { data, loadSessionData, loading } = useSession();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [currentLayout, setCurrentLayout] = useState("dot");
 
   useEffect(() => {
     if (sessionId) {
