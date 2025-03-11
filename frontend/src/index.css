@@ -47,12 +47,22 @@ h1 {
   display: flex;
   flex: 1 1 auto; 
   flex-direction: row;
+  flex-grow: 1;
 }
 
 .graph-area {
   display: flex;
   flex: 1 1 auto; 
+  position: relative;
   background: #ffffff;
+}
+
+.small-logo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 250px; 
+  z-index: 10;
 }
 
 .cytoscape-container {
@@ -174,26 +184,27 @@ button:focus-visible {
 /* Sidebar styling */
 
 .sidebar {
-  width: 300px;
+  width: 50px;
+  display: flex;
+  flex-direction: column;
   background: #f4f4f4;
-  padding: 5px ;
-  overflow-y: auto;
+  padding: 10px ;
+  align-items: center;
   position: relative;
+  overflow: hidden;
+  gap: 5px;
 }
 
-.sidebar-content {
-  padding: 20px;
-}
-
-.static-metadata, .dynamic-content {
-  margin-top: 5px;
-  padding: 5px;
-  border-top: 1px solid #ddd;
-}
-
-.sidebar-logo {
-  width: 250px; 
-  height: auto;
+.sidebar-button {
+  width: 40;
+  height: 40px;
+  color: whitesmoke;
+  border: none;
+  padding: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 8%;
+  background: #4CAF50;
 }
 
 .reference-file-name {
