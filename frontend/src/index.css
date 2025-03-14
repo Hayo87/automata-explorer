@@ -16,10 +16,8 @@ body {
   background-color: #ffffff; 
   color: #213547; 
   margin: 0;
-  /* For pages that use full viewport layout, we won't use flex on body */
 }
 
-/* Generic link, heading, and button styles */
 a {
   font-weight: 500;
   color: #007bff; 
@@ -35,6 +33,45 @@ h1 {
   color: #333; 
 }
 
+
+/* Visualization page styling */
+
+.page-container {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+  flex: 1 1 auto; 
+}
+
+.content-container {
+  display: flex;
+  flex: 1 1 auto; 
+  flex-direction: row;
+  flex-grow: 1;
+}
+
+.graph-area {
+  display: flex;
+  flex: 1 1 auto; 
+  position: relative;
+  background: #ffffff;
+}
+
+.small-logo {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 250px; 
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.8); 
+}
+
+.cytoscape-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* Upload page styling */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -55,7 +92,6 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-
 .button {
   margin-top: 30px;
   padding: 12px 24px;
@@ -71,8 +107,6 @@ button:focus-visible {
   background-color: #388E3C;
 }
 
-
-
 .upload-container {
   display: flex;
   justify-content: center; 
@@ -83,35 +117,12 @@ button:focus-visible {
 }
 
 
-.vis-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-
-.small-logo {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 250px; 
-  z-index: 10;
-}
-
 .logo {
   width: 550px; 
   height: auto; 
   display: block;
   margin: 0 auto 20px auto;
 }
-
-
-.cytoscape-container {
-  width: 100%;
-  height: 100%;
-}
-
 
 .drag-drop-container {
   display: flex;
@@ -165,8 +176,57 @@ button:focus-visible {
 .upload-page-container {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* centers vertically */
-  align-items: center;     /* centers horizontally */
-  height: 100vh;           /* fill entire viewport height */
+  justify-content: center; 
+  align-items: center;     
+  height: 100vh;           
   width: 100%;
+}
+
+/* Sidebar styling */
+
+.sidebar {
+  width: 50px;
+  display: flex;
+  flex-direction: column;
+  background: #f4f4f4;
+  padding: 10px ;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  gap: 5px;
+}
+
+.sidebar-button {
+  width: 40;
+  height: 40px;
+  color: whitesmoke;
+  border: none;
+  padding: none;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 8%;
+  background: #4CAF50;
+}
+
+
+/* File name box styling */
+
+.bottom-left-info {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
+  padding: 5px;
+  font-size: 10px;
+  z-index: 1000; /* Ensure it appears above other content */
+  border-top-right-radius: 8px; /* Optional: a rounded corner on the top right */
+}
+
+
+
+.reference-file-name {
+  color: green; 
+}
+.subject-file-name {
+  color: red;
 }
