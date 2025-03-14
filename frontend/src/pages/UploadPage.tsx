@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DragAndDrop from "../components/DragAndDrop";
 import { useSession } from "../hooks/useSession"; 
-import "../index.css"; // Import global styles
+import "../index.css";
 
 const UploadPage: React.FC = () => {
   const { startSession, loading } = useSession(); 
@@ -16,7 +16,12 @@ const UploadPage: React.FC = () => {
     try {
       const sessionId = await startSession(file1, file2);
       if (sessionId) {
-        navigate(`/visualization/${sessionId}`);
+        navigate(`/visualization/${sessionId}`, {
+          state: {
+            reference: file1?.name,
+            subject: file2?.name,
+          }
+        });
       }
     } catch (error) {
       console.error("Error starting session:", error);
