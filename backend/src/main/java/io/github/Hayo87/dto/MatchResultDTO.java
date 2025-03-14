@@ -1,8 +1,10 @@
 package io.github.Hayo87.dto;
 
-public class MatchResultDTO {
-    private final int groups;  
-    private final Object data; 
+import java.io.Serializable;
+
+public class MatchResultDTO implements Serializable {
+    private final int groups;  // Total number of matched groups
+    private final Object data; // Holds the actual structured response
 
     public MatchResultDTO(int groups, Object data) {
         this.groups = groups;
