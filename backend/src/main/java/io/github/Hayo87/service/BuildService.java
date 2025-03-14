@@ -13,10 +13,12 @@ import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 public class BuildService {
     private final SessionService sessionService;
     private final ParserService parserService;
+    private final MatchService matchService; 
 
-    public BuildService(SessionService sessionService, ParserService parserService) {
+    public BuildService(SessionService sessionService, ParserService parserService, MatchService matchService) {
         this.sessionService = sessionService;
         this.parserService = parserService;
+        this.matchService = matchService;
     }
 
     
@@ -65,4 +67,17 @@ public class BuildService {
         // Delegate processing to parserService
         return parserService.convertToJson(result, writer); 
     }
-}        
+
+    /** 
+    * Reviews the changes in the DIFF machines and checks with differences are 
+    * possibly related using matchers and scores. 
+    * @param sessionId
+    * @return the JSON reprententation or the empty string in case of an error
+    */
+    public Map<String,Object> match(String sessionId) {
+        DiffAutomaton<String> diffMachine = sessionService.getLatestDiffAutomaton(sessionId);
+
+        return null; 
+
+    }        
+}
