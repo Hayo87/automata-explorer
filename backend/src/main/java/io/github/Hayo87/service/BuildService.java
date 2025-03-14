@@ -58,6 +58,12 @@ public class BuildService {
         }
     }
 
+    /**
+     * Build an input (difference) automaton
+     * @param sessionId
+     * @param input
+     * @param isReference
+     */
   
     private void buildInput(String sessionId, String input, Boolean isReference){
         try{
