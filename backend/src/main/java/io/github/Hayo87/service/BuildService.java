@@ -12,6 +12,7 @@ import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
+import io.github.Hayo87.dto.MatchResultDTO;
 
 @Service
 public class BuildService {
@@ -107,10 +108,8 @@ public class BuildService {
     * @param sessionId
     * @return the JSON reprententation or the empty string in case of an error
     */
-    public Map<String,Object> match(String sessionId) {
+    public MatchResultDTO match(String sessionId) {
         DiffAutomaton<String> diffMachine = sessionService.getLatestDiffAutomaton(sessionId);
-
-        return null; 
-
+        return matchService.match(diffMachine); 
     }        
 }
