@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { uploadFiles, fetchSessionData, closeSession } from "../api/SessionApi";
+import { uploadFiles, fetchSessionData } from "../api/SessionApi";
 
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -38,15 +38,5 @@ export const useSession = () => {
     }
   };
 
-  // Close session using the API's closeSession function.
-  const closeSessionHook = async (sessionId: string) => {
-    try {
-      await closeSession(sessionId);
-    } catch (err) {
-      setError((err as Error).message);
-      throw err;
-    }
-  };
-
-  return { sessionId, data, loading, error, startSession, loadSessionData, closeSession: closeSessionHook };
+  return { sessionId, data, loading, error, startSession, loadSessionData };
 };

@@ -1,30 +1,18 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
+import React, { useEffect, useRef } from "react";
 import cytoscape from "cytoscape";
-import NodeSingular from "cytoscape"
 import dagre from "cytoscape-dagre";
 import useTransformGraph from "../hooks/useTransformGraph";
 import { GraphData } from "../hooks/useTransformGraph";
-import coseBilkent from 'cytoscape-cose-bilkent';
-import avsdf from 'cytoscape-avsdf';
 
-cytoscape.use( coseBilkent)
-cytoscape.use( avsdf)
-cytoscape.use( dagre)
+cytoscape.use(dagre);
+
 interface CytoscapeVisualizationProps {
   data: GraphData;
-  layout: string;
 }
 
-export interface CytoscapeVisualizationRef {
-  exportPNG: () => string;
-}
-
-const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
-  ({ data, layout }, ref) => {
+const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
-  const cyRef = useRef<cytoscape.Core | null>(null);
-  const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
   // Convert states to nodes
   const nodes = transformedData.nodes.map(node => ({
@@ -64,10 +52,12 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const cyInstance = cytoscape({
+    const cy = cytoscape({
       container: containerRef.current,
       elements,
-      layout: {name: layout},
+      layout: {
+        name: "preset",
+      },
       style: [
         {
           selector: "node",
@@ -98,23 +88,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
             "text-margin-y": -10,
           },
         },
-        // Selection styles
-        {
-          selector: "node:selected",
-          style: {
-            "underlay-color": "#FFC107",
-            "underlay-padding": "4px",
-            "underlay-opacity": 0.5
-          }
-        },
-        {
-          selector: "edge:selected",
-          style: {
-            "underlay-color": "#FFC107",
-            "underlay-padding": "4px",
-            "underlay-opacity": 0.5
-          }
-        },    
       ],
       zoom: 1,
       pan: { x: 0, y: 0 },
@@ -125,7 +98,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       panningEnabled: true,
       userPanningEnabled: true,
       boxSelectionEnabled: true,
-      selectionType: "additive",
+      selectionType: "single",
       touchTapThreshold: 8,
       desktopTapThreshold: 4,
       autolock: false,
@@ -141,72 +114,12 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       pixelRatio: "auto",
     });
 
-    // Store initial postions
-    cyInstance.nodes().forEach((node: NodeSingular) => {
-      const id = node.id();
-      const pos = node.position();
-      // Only store if not already stored.
-      if (!initialPositionsRef.current[id]) {
-        initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
-      }
-    });
-
-    cyRef.current = cyInstance;
-
-
     return () => {
-      cyInstance.destroy();
-      cyRef.current = null;
+      cy.destroy();
     };
   }, [elements]);
 
-  useEffect(() => {
-    if (!cyRef.current) return;
-    const cyInstance = cyRef.current;
-
-    switch (layout) {
-
-    case "preset":
-      // Restore positions
-      cyInstance.nodes().forEach((node: NodeSingular) => {
-        const id = node.id();
-        if (initialPositionsRef.current[id]) {
-          node.position(initialPositionsRef.current[id]);
-        }
-      });
-      cyInstance.layout({ name: "preset" }).run();
-      break;
-
-    case "avsdf":
-      {
-        const numNodes = cyInstance.nodes().length;
-        const spreadfactor = Math.max(100, numNodes * 20);
-        cyInstance.layout({ name: 'avsdf', nodeSeparation: spreadfactor},).run();
-      }
-      break;
-
-    case "dagre":
-      cyInstance.layout({ name: "dagre", fit: true }).run();
-      break;
-
-    case "grid":
-      cyInstance.layout({ name: "grid", fit: true}).run();
-      break;
-
-    default:
-      cyInstance.layout({ name: layout }).run();
-      break;
-  }
-}, [layout]);
-
-  useImperativeHandle(ref, () => ({
-    exportPNG: (): string => {
-      if (!cyRef.current) return "";
-      return cyRef.current.png({ full: true, bg: "white" });
-    }
-  }));
-
   return <div ref={containerRef} className="cytoscape-container"></div>;
-});
+};
 
 export default CytoscapeVisualization;

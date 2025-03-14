@@ -65,15 +65,3 @@ export const fetchSessionData = async (sessionId: string): Promise<any> => {
     throw error;
   }
 };
-
-// Close session
-export const closeSession = async (sessionId: string): Promise<string> => {
-  const response = await fetch(`/session/${sessionId}`, {
-    method: "DELETE",
-  });
-  if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage);
-  }
-  return await response.text();
-};

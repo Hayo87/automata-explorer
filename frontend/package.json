@@ -13,8 +13,6 @@
     "@types/d3": "^7.4.3",
     "axios": "^1.7.9",
     "cytoscape": "^3.31.0",
-    "cytoscape-avsdf": "^1.0.0",
-    "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-dagre": "^2.5.0",
     "d3": "^7.9.0",
     "dagre": "^0.8.5",
