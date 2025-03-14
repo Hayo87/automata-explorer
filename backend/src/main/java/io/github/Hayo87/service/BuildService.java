@@ -3,11 +3,15 @@ package io.github.Hayo87.service;
 import java.io.IOException;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
+
+import io.github.Hayo87.dto.BuildRequestDTO;
+import io.github.Hayo87.dto.BuildResponseDTO;
 
 @Service
 public class BuildService {
@@ -22,20 +26,43 @@ public class BuildService {
     }
 
     
-    /**
-     * Generates the input differenceAutomaton from the DOT files.
-     * 
-     * @param sessionId
-     */
-    public void buildInput(String sessionId, String reference, String subject){
-        try{
-            // Attempt to parse DOT files
-            DiffAutomaton<String> refAutomaton = parserService.parseToDiffAutomaton(reference, true);
-            DiffAutomaton<String> subAutomaton = parserService.parseToDiffAutomaton(subject, false);
+    public ResponseEntity<BuildResponseDTO> processBuildAction(String sessionId, BuildRequestDTO request) {
+        String action = request.getAction().toLowerCase();
+        Object data = request.getData();
 
-            // Add to session history
-            sessionService.store(sessionId, refAutomaton);   
-            sessionService.store(sessionId, subAutomaton);      
+        switch (action) {
+
+            case "reference" -> {
+                buildInput(sessionId, (String) data, true);
+                return ResponseEntity.ok(new BuildResponseDTO("reference", "success", "Reference processed successfully"));
+            }
+
+            case "subject" -> {
+                buildInput(sessionId, (String) data, false);
+                return ResponseEntity.ok(new BuildResponseDTO("subject", "success", "Subject processed successfully"));
+            }
+
+            case "build" -> {
+                Object buildData = buildDefault(sessionId); 
+                return ResponseEntity.ok(new BuildResponseDTO("build", "success", "Build succesfull", buildData));
+            }
+
+            case "match" -> {
+                Object matchData = match(sessionId);
+                return ResponseEntity.ok(new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData));
+            }
+
+            default -> {
+                return ResponseEntity.badRequest().body(new BuildResponseDTO(action, "error", "Invalid action"));
+            }
+        }
+    }
+
+  
+    private void buildInput(String sessionId, String input, Boolean isReference){
+        try{
+            // Attemp parse and add to session history
+            sessionService.store(sessionId, parserService.parseToDiffAutomaton(input, isReference));   
 
         } catch (IOException e) {
             System.err.println("Parsing failed: " + e.getMessage());
