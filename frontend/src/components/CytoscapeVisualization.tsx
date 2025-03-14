@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef, useMemo } from "react";
+import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import cytoscape from "cytoscape";
 import NodeSingular from "cytoscape"
 import dagre from "cytoscape-dagre";
@@ -98,6 +98,23 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
             "text-margin-y": -10,
           },
         },
+        // Selection styles
+        {
+          selector: "node:selected",
+          style: {
+            "underlay-color": "#FFC107",
+            "underlay-padding": "4px",
+            "underlay-opacity": 0.5
+          }
+        },
+        {
+          selector: "edge:selected",
+          style: {
+            "underlay-color": "#FFC107",
+            "underlay-padding": "4px",
+            "underlay-opacity": 0.5
+          }
+        },    
       ],
       zoom: 1,
       pan: { x: 0, y: 0 },
