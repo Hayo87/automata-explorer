@@ -1,9 +1,16 @@
 package io.github.Hayo87.service;
 
-import org.springframework.stereotype.Service;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Service;
+
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
+
+import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 
 
 /**
@@ -98,13 +105,15 @@ public class SessionService {
      * Terminates a session by removing it from session history.
      *
      * @param sessionId The ID of the session to be removed.
+     * @return DeleteSessionResponseDTO 
      */
-    public void terminateSession(String sessionId) {
+    public DeleteSessionResponseDTO terminateSession(String sessionId) {
         if (!sessionHistory.containsKey(sessionId)) {
-            throw new IllegalArgumentException("Session ID not found.");
+            return new DeleteSessionResponseDTO("Session " + sessionId + " not found");
         }
-        sessionHistory.remove(sessionId);
+        else {  
+            return new DeleteSessionResponseDTO("Session " + sessionId + " deleted successfully.");
+        }
     }
-
 }
 
