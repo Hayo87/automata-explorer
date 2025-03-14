@@ -63,6 +63,7 @@ h1 {
   left: 10px;
   width: 250px; 
   z-index: 10;
+  background: rgba(255, 255, 255, 0.8); 
 }
 
 .cytoscape-container {
@@ -206,6 +207,22 @@ button:focus-visible {
   border-radius: 8%;
   background: #4CAF50;
 }
+
+
+/* File name box styling */
+
+.bottom-left-info {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
+  padding: 5px;
+  font-size: 10px;
+  z-index: 1000; /* Ensure it appears above other content */
+  border-top-right-radius: 8px; /* Optional: a rounded corner on the top right */
+}
+
+
 
 .reference-file-name {
   color: green; 

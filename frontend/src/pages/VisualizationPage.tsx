@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CytoscapeVisualization from '../components/CytoscapeVisualization';
 import { useSession} from '../hooks/useSession';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation  } from "react-router-dom";
 import '../index.css';
 
 const VisualizationPage: React.FC = () => {
-  const { sessionId } = useParams<{ sessionId: string }>();
+  const { sessionId} = useParams<{ sessionId: string }>();
+  const location = useLocation();
+  const { reference, subject } = location.state as { reference: string; subject: string };
+  
   const { data, loadSessionData, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
 
@@ -61,17 +64,38 @@ const VisualizationPage: React.FC = () => {
           <button className="sidebar-button" title = "Set dagre layout" onClick={() => setCurrentLayout("dagre")}> 
             <span className="material-icons">swap_horiz</span> 
           </button>
-          <button className="sidebar-button" title = "Set matrix layout" onClick={() => setCurrentLayout("dagre")}> 
-            <span className="material-icons">article</span> 
+          <button className="sidebar-button" title = "Set breadthfirst layout" onClick={() => setCurrentLayout("breadthfirst")}> 
+            <span className="material-icons">park</span> 
           </button>
 
           <hr></hr>
           <button className="sidebar-button" title= "Filter"> 
             <span className="material-icons">filter_alt</span> 
           </button>
+          <button className="sidebar-button" title= "Filter"> 
+            <span className="material-icons">filter_alt</span> 
+          </button>
+          <button className="sidebar-button" title= "Filter"> 
+            <span className="material-icons">filter_alt</span> 
+          </button>
+          <hr></hr>
+          <button className="sidebar-button" title= "Filter"> 
+            <span className="material-icons">track_changes</span> 
+          </button>
+          <hr></hr>
+          <button className="sidebar-button" title= "Filter"> 
+            <span className="material-icons">image</span> 
+          </button>
+          <button className="sidebar-button" title= "Filter"> 
+            <span className="material-icons">picture_as_pdf</span> 
+          </button>
           <hr></hr>
           <button className="sidebar-button" title= "Get input information"> <span className="material-icons">info</span> </button>
         </aside>
+      </div>
+      <div className="bottom-left-info">
+      <p> Reference: <span className="reference-file-name">{reference}</span> </p>
+      <p> Subject: <span className="subject-file-name">{reference}</span> </p>
       </div>
     </div>
   );
