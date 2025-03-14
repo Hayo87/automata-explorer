@@ -84,6 +84,21 @@ public class ExplorerController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    /**
+     * Initializes the matching and returns a matched list of changes
+     *
+     * @param sessionId The session ID.
+     * @return The matched changes JSON format.
+     */
+    @GetMapping("/session/{sessionId}/build/changes")
+    public ResponseEntity<Map<String, Object>> getMatching(@PathVariable String sessionId) {
+        try {
+            return ResponseEntity.ok(buildService.match(sessionId));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
     
 }
 
