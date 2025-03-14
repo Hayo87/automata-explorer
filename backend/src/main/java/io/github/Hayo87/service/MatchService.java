@@ -1,8 +1,9 @@
 package io.github.Hayo87.service;
 
-import java.util.ArrayList;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,9 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 
 import io.github.Hayo87.dto.MatchResultDTO;
+import io.github.Hayo87.model.SimpleEdge;
 
 @Service
 public class MatchService {
@@ -30,27 +30,22 @@ public class MatchService {
     public MatchResultDTO groupRelevantTransitions(
         Set<Transition<DiffAutomatonStateProperty, DiffProperty<String>>> edges) {
 
-    // { startId, endId } → List<Transitions>
-    Table<Integer, Integer, List<Transition<DiffAutomatonStateProperty, DiffProperty<String>>>> groups = HashBasedTable.create();
-
-    // Filter and group
-    edges.stream()
+    // Collect all `SimpleEdge` objects
+    List<SimpleEdge> simpleEdges = edges.stream()
             .filter(t -> t.getProperty().getDiffKind() == DiffKind.ADDED || t.getProperty().getDiffKind() == DiffKind.REMOVED)
-            .forEach(t -> {
-                int startId = t.getSource().getId();
-                int endId = t.getTarget().getId();
+            .map(t -> new SimpleEdge(t.getSource().getId(), t.getTarget().getId(), t.getProperty().getProperty(), t.getProperty().getDiffKind()))
+            .toList();
 
-                // Ensure the (startId, endId) entry exists
-                if (!groups.contains(startId, endId)) {
-                    groups.put(startId, endId, new ArrayList<>());
-                }
+    // Group `SimpleEdge` objects by (startId, endId)
+    List<List<SimpleEdge>> groupedEdges = simpleEdges.stream()
+            .collect(Collectors.groupingBy(e -> new AbstractMap.SimpleEntry<>(e.getStartId(), e.getEndId())))
+            .values().stream()
+            .toList();
 
-                // Add the transition to the list
-                groups.get(startId, endId).add(t);
-            });
-
-    return new MatchResultDTO(groups.size(), groups);
-    }
+    return new MatchResultDTO(groupedEdges.size(), groupedEdges);
 }
+
+}
+
         
 
