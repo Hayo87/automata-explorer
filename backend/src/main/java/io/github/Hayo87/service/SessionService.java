@@ -25,6 +25,9 @@ public class SessionService {
     public SessionService() {
     }
 
+
+
+
         /**
      * Creates a new (empty) session
      *
@@ -51,29 +54,14 @@ public class SessionService {
     }
 
     /**
-     * Retrieves a specific automata from session history.
-    *
-    * @param sessionId The session ID.
-    * @param index The index of the stored automaton.
-    * @return The requested automaton, or null if not found.
-    */
-    private DiffAutomaton<String> getAutomaton(String sessionId, int index) {
-        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
-
-        if (history == null || index < 0 || index >= history.size()) {
-            return null;
-        }
-        return history.get(index);
-    }
-
-    /**
      *  Retrieves the reference automata
      *
      * @param sessionId The session ID.
      * @return The reference automata.
      */
     public DiffAutomaton<String> getReferenceAutomata(String sessionId) {
-        return getAutomaton( sessionId, 0);
+        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
+        return  (history != null && !history.isEmpty()) ? history.get(0) : null;
     }
 
     /**
@@ -83,7 +71,8 @@ public class SessionService {
      * @return The subject automata
      */
     public DiffAutomaton<String> getSubjectAutomata(String sessionId) {
-        return getAutomaton( sessionId, 1);
+        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
+        return  (history != null && history.size() > 1) ? history.get(1) : null;
     }
     
     /**
