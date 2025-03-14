@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.Hayo87.dto.CreateSessionRequestDTO;
+import io.github.Hayo87.dto.CreateSessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
@@ -37,20 +39,18 @@ public class ExplorerController {
         this.buildService = buildService;
     }
 
-    /**
-     * Creates a new session and build the input
+   /**
+     * Creates a new session and builds the input.
      *
-     * @param input A map containing "reference" and "subject" DOT file content.
-     * @return A unique session ID.
+     * @param input A JSON object containing "reference" and "subject" DOT file content.
+     * @return A unique session ID wrapped in a DTO.
      */
     @PostMapping("/session")
-    public ResponseEntity<Map<String, String>> createSession(@RequestBody Map<String, String> input) {
+    public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
         String sessionId = sessionService.createSession();
-        buildService.buildInput(sessionId, input.get("reference"), input.get("subject"));
+        buildService.buildInput(sessionId, input.getReference(), input.getSubject());
 
-        // Create JSON response
-        Map<String, String> response = Map.of("sessionId", sessionId);
-        
+        CreateSessionResponseDTO response = new CreateSessionResponseDTO(sessionId);
         return ResponseEntity.ok(response);
     }
 
