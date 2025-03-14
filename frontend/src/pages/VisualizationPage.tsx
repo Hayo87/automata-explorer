@@ -95,7 +95,7 @@ const VisualizationPage: React.FC = () => {
       </div>
       <div className="bottom-left-info">
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
-      <p> Subject: <span className="subject-file-name">{reference}</span> </p>
+      <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
     </div>
   );
