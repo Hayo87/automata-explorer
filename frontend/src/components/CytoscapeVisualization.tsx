@@ -7,8 +7,6 @@ import { GraphData } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 
-
-
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
 cytoscape.use( dagre)
@@ -20,7 +18,6 @@ interface CytoscapeVisualizationProps {
 const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, layout }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
-
   const cyRef = useRef<cytoscape.Core | null>(null);
   const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
@@ -106,7 +103,7 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, l
       panningEnabled: true,
       userPanningEnabled: true,
       boxSelectionEnabled: true,
-      selectionType: "single",
+      selectionType: "additive",
       touchTapThreshold: 8,
       desktopTapThreshold: 4,
       autolock: false,
