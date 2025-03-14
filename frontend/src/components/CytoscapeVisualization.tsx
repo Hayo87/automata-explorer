@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useImperativeHandle, forwardRef, useMemo } from "react";
 import cytoscape from "cytoscape";
 import NodeSingular from "cytoscape"
 import dagre from "cytoscape-dagre";
@@ -15,7 +15,12 @@ interface CytoscapeVisualizationProps {
   layout: string;
 }
 
-const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, layout }) => {
+export interface CytoscapeVisualizationRef {
+  exportPNG: () => string;
+}
+
+const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
+  ({ data, layout }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
@@ -177,7 +182,14 @@ const CytoscapeVisualization: React.FC<CytoscapeVisualizationProps> = ({ data, l
   }
 }, [layout]);
 
+  useImperativeHandle(ref, () => ({
+    exportPNG: (): string => {
+      if (!cyRef.current) return "";
+      return cyRef.current.png({ full: true, bg: "white" });
+    }
+  }));
+
   return <div ref={containerRef} className="cytoscape-container"></div>;
-};
+});
 
 export default CytoscapeVisualization;

@@ -1,20 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import CytoscapeVisualization from '../components/CytoscapeVisualization';
+import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components/CytoscapeVisualization";
 import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
+
 import '../index.css';
 
 const VisualizationPage: React.FC = () => {
   const { sessionId} = useParams<{ sessionId: string }>();
   const location = useLocation();
   const { reference, subject } = location.state as { reference: string; subject: string };
-  
+  const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
+
   const { data, loadSessionData, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
 
   const navigate = useNavigate();
   const { closeSession } = useSession();
+
+  const handleExport = () => {
+    if (!cyVizRef.current) return;
+    const pngDataUrl = cyVizRef.current.exportPNG();
+
+    // Create a temporary link 
+    const link = document.createElement("a");
+    link.href = pngDataUrl;
+    // Set filename and download
+    link.download = `DiffMachine_${reference}_${subject}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   const handleExit = async () => {
     try {
@@ -43,7 +60,7 @@ const VisualizationPage: React.FC = () => {
           {loading ? (
             <p>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization data={data} layout={currentLayout}/>
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout}/>
           ) : (
             <p>No data available</p>
           )}
@@ -83,10 +100,10 @@ const VisualizationPage: React.FC = () => {
             <span className="material-icons">track_changes</span> 
           </button>
           <hr></hr>
-          <button className="sidebar-button" title= "Filter"> 
+          <button className="sidebar-button" title= "Export as PNG" onClick={handleExport}> 
             <span className="material-icons">image</span> 
           </button>
-          <button className="sidebar-button" title= "Filter"> 
+          <button className="sidebar-button" title= "Export as PDF"> 
             <span className="material-icons">picture_as_pdf</span> 
           </button>
           <hr></hr>
