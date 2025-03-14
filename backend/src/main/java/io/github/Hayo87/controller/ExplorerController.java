@@ -60,7 +60,7 @@ public class ExplorerController {
      * @param sessionId The ID of the session to be deleted.
      * @return ResponseEntity indicating success or failure.
      */
-    @DeleteMapping("/session/{sessionId}")
+    @DeleteMapping("/{sessionId}")
     public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
         try {
             sessionService.terminateSession(sessionId);

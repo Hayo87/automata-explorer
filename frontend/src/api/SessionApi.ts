@@ -67,13 +67,11 @@ export const fetchSessionData = async (sessionId: string): Promise<any> => {
 };
 
 // Close session
-export const closeSession = async (sessionId: string): Promise<string> => {
-  const response = await fetch(`/session/${sessionId}`, {
+export const closeSession = async (sessionId: string): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/session/${sessionId}`, {
     method: "DELETE",
   });
   if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage);
+    throw new Error(`Error: ${response.status} ${response.statusText}`);
   }
-  return await response.text();
 };
