@@ -6,10 +6,12 @@ import useTransformGraph from "../hooks/useTransformGraph";
 import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
+import cxtmenu from 'cytoscape-cxtmenu';
 
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
 cytoscape.use( dagre)
+cytoscape.use(cxtmenu);
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
@@ -85,6 +87,19 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
           },
         },
         {
+          selector: 'node.checked',
+          style: {
+            'opacity': 0.3,
+          }
+        },
+        {
+          selector: 'node.starred',
+          style: {
+            'opacity': 0.3,
+          }
+        }
+        ,
+        {
           selector: "edge",
           style: {
             "width": 2,
@@ -151,6 +166,39 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       }
     });
 
+    // Add the contect menu's 
+    cyInstance.cxtmenu({
+      selector: "node",
+      commands: [
+        {
+          content: '<span class="fa fa-check-circle-o fa-2x"></span>',
+          select: (ele: cytoscape.NodeSingular) => {
+          ele.toggleClass('checked');
+          },
+        },
+        {
+          content: '<span class="fa fa-star fa-2x"></span>',
+          select: (ele: cytoscape.NodeSingular) => {
+            ele.toggleClass('starred');
+          },
+        },
+        {
+          content: 'Info',
+          select: (ele: { data: () => any; }) => {
+            console.log("Node data:", ele.data());
+          },
+        },
+
+      ],
+      fillColor: "rgba(0, 0, 0, 0.75)",
+      activeFillColor: "rgba(0, 0, 0, 1)",
+      activePadding: 10,
+      indicatorSize: 24,
+      separatorWidth: 3,
+      spotlightPadding: 4,
+      minSpotlightRadius: 24,
+      maxSpotlightRadius: 38,
+    });
     cyRef.current = cyInstance;
 
 
