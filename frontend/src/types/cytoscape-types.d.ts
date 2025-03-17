@@ -1,6 +1,4 @@
 declare module 'cytoscape-avsdf';
-declare module 'cytoscape-overlays'
-declare module 'cytoscape-layers'
 declare module "cytoscape-dagre";
 declare module 'cytoscape-cxtmenu';
 declare module 'cytoscape-cose-bilkent';
