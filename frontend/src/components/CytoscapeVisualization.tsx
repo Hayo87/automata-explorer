@@ -7,13 +7,13 @@ import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
-import overlays from 'cytoscape.js-overlays';
 
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
 cytoscape.use( dagre)
 cytoscape.use(cxtmenu);
-cytoscape.use(overlays);
+
+
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
@@ -97,7 +97,16 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         {
           selector: 'node.starred',
           style: {
-            'opacity': 0.3,
+            'background-image': 'url(data:image/svg+xml;utf8,' + encodeURIComponent(`<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="yellow" d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.402 8.168L12 18.897l-7.336 3.864 1.402-8.168L.132 9.21l8.2-1.192z"/></svg>`) + ')',
+            'background-image-containment': 'over',
+            'background-position-x': '16px',
+            'background-position-y': '-6px',
+            'background-height': '50%',
+            'background-width': '50%',
+            'background-width-relative-to': 'inner', 
+            'background-clip': 'none',
+            'bounds-expansion': 20,
+            'background-repeat': 'no-repeat'
           }
         }
         ,
