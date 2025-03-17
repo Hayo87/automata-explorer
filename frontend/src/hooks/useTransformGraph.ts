@@ -75,7 +75,7 @@ const useTransformGraph = (backendData: GraphResponse | null) => {
     const { data: graphData } = backendData;
 
 
-    const nodes: TransformedNode[] = graphData.objects.map((node) => {
+    let nodes: TransformedNode[] = graphData.objects.map((node) => {
       const [x, y] = node.pos.split(",").map(parseFloat);
       return {
         data: {
@@ -95,7 +95,7 @@ const useTransformGraph = (backendData: GraphResponse | null) => {
       };
     });
 
-    const edges: TransformedEdge[] = graphData.edges.map((edge) => ({
+    let edges: TransformedEdge[] = graphData.edges.map((edge) => ({
       data: {
         id: edge.id,
         source: edge.tail,
@@ -107,6 +107,26 @@ const useTransformGraph = (backendData: GraphResponse | null) => {
         labelColor: edge.color || "#000000"
       },
     }));
+
+    // Post processing start state detection
+    const emptyEdge = edges.find(edge => edge.data.label.trim() === "");
+    if (emptyEdge) {
+      const sourceId = emptyEdge.data.source;
+      const targetId = emptyEdge.data.target;
+
+    const connectedEdges = edges.filter(
+      e => e.data.source === sourceId || e.data.target === sourceId
+    );
+
+    if (connectedEdges.length === 1) {
+      nodes = nodes.filter(node => node.data.id !== sourceId);
+      edges = edges.filter(edge => edge.data.id !== emptyEdge.data.id);
+    }
+    const targetNode = nodes.find(node => node.data.id === targetId);
+        if (targetNode) {
+          targetNode.style.shape = "doublecircle";
+        }
+    }
 
     return { nodes, edges };
   }, [backendData]);
