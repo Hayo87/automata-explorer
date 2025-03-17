@@ -91,9 +91,10 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         {
           selector: 'node.start',
           style: {
-            'background-color': '#91378a',
-            'border-width': 3,
-            'border-color': '#000000'
+            'underlay-color': 'blue',
+            'underlay-padding': '4px',
+            'underlay-opacity': 0.5,
+            'underlay-shape' : 'ellipse'
           }
         },
         {
