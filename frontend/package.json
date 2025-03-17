@@ -20,9 +20,11 @@
     "d3": "^7.9.0",
     "dagre": "^0.8.5",
     "dompurify": "^3.2.4",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-draggable": "^4.4.6",
+    "react-draggable-lite": "^1.0.0",
     "react-modal": "^3.16.3"
   },
   "devDependencies": {

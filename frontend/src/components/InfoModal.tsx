@@ -1,7 +1,5 @@
+import React, { useState, useRef } from 'react';
 import Modal from 'react-modal';
-import Draggable from 'react-draggable';
-
-Modal.setAppElement('#root');
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -10,6 +8,8 @@ interface InfoModalProps {
 }
 
 export function InfoModal({ isOpen, onClose, nodeData }: InfoModalProps) {
+  if (!isOpen || !nodeData) return null;
+
   return (
     <Modal
       isOpen={isOpen}
@@ -28,46 +28,85 @@ export function InfoModal({ isOpen, onClose, nodeData }: InfoModalProps) {
         },
       }}
     >
-      <Draggable handle=".modal-header">
-        <div
-          style={{
-            backgroundColor: 'white',
-            border: '1px solid #333',
-            padding: '20px',
-            boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-            maxWidth: '90%',
-            maxHeight: '80%',
-            overflowY: 'auto',
-          }}
-        >
-          <div className="modal-header" style={{ cursor: 'move', marginBottom: '10px' }}>
-            <h2>Node Information</h2>
+      {/* Center container with context menu prevention */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        <DraggableContainer>
+          <div
+            style={{
+              backgroundColor: 'white',
+              border: '1px solid #333',
+              padding: '20px',
+              boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+              maxWidth: '90%',
+              maxHeight: '80%',
+              overflowY: 'auto',
+              cursor: 'move',
+            }}
+          >
+            <div style={{ marginBottom: '10px' }}>
+              <h2>{nodeData?.label || 'No Label'}</h2>
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+              <button onClick={onClose}>Close</button>
+            </div>
           </div>
-          <div className="modal-content">
-            {/* Render your node data here. For example, a table: */}
-            <table border={1} style={{ borderCollapse: 'collapse', width: '100%' }}>
-              <tbody>
-                <tr>
-                  <td>ID</td>
-                  <td>{nodeData.id}</td>
-                </tr>
-                <tr>
-                  <td>Label</td>
-                  <td>{nodeData.label || 'N/A'}</td>
-                </tr>
-                <tr>
-                  <td>Transitions</td>
-                  <td>{nodeData.transitions || 'N/A'}</td>
-                </tr>
-                {/* Add additional rows as needed */}
-              </tbody>
-            </table>
-          </div>
-          <div style={{ textAlign: 'center', marginTop: '10px' }}>
-            <button onClick={onClose}>Close</button>
-          </div>
-        </div>
-      </Draggable>
+        </DraggableContainer>
+      </div>
     </Modal>
   );
 }
+
+interface DraggableContainerProps {
+  children: React.ReactNode;
+}
+
+const DraggableContainer: React.FC<DraggableContainerProps> = ({ children }) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+  const startPos = useRef({ x: 0, y: 0 });
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    isDragging.current = true;
+    startPos.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  };
+
+  const onMouseMove = (e: MouseEvent) => {
+    if (!isDragging.current) return;
+    setPosition({
+      x: e.clientX - startPos.current.x,
+      y: e.clientY - startPos.current.y,
+    });
+  };
+
+  const onMouseUp = () => {
+    isDragging.current = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  return (
+    <div
+      onMouseDown={onMouseDown}
+      style={{
+        position: 'relative',
+        left: position.x,
+        top: position.y,
+      }}
+    >
+      {children}
+    </div>
+  );
+};

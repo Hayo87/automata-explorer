@@ -7,6 +7,7 @@ import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
+import { InfoModal } from './InfoModal';
 
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
@@ -17,6 +18,7 @@ cytoscape.use(cxtmenu);
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
+  openModal: (nodeData: any) => void;
 }
 
 export interface CytoscapeVisualizationRef {
@@ -24,7 +26,7 @@ export interface CytoscapeVisualizationRef {
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
-  ({ data, layout }, ref) => {
+  ({ data, layout, openModal }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
@@ -219,10 +221,12 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         },
         {
           content: 'Info',
-          select: (ele: { data: () => any; }) => {
-            console.log("Node data:", ele.data());
-          },
+          select: (ele: { data: () => any }) => {
+            const nodeData = ele.data();
+            openModal(nodeData);
+          }
         },
+
         {
           content: 'Pie',
           select: (ele: cytoscape.NodeSingular) => {
@@ -238,11 +242,28 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
               counts[edgeColor] = (counts[edgeColor] || 0) + 1;
             });
 
-            // Convert counts into slices (as percentages).
-            let slices = Object.entries(counts)
+            const computedSlices = Object.entries(counts)
               .map(([color, count]) => ({ color, size: (count / total) * 100 }))
               .sort((a, b) => b.size - a.size)
               .slice(0, 3);
+
+              // Initialize slices with defaults
+              let slices = [
+                { color: 'gray', size: 0 },
+                { color: 'gray', size: 0 },
+                { color: 'gray', size: 0 },
+              ];
+
+              // Compute 
+              computedSlices.forEach((slice, i) => {
+                slices[i] = slice;
+              });
+
+              // Only present pie if at least 2 colors
+              const nonDefaultColors = computedSlices.filter(slice => slice.color !== 'gray');
+              if (nonDefaultColors.length < 2) {
+                return;
+              }
 
               ele.data({
                 slice1Color: slices[0].color,
@@ -275,6 +296,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       cyRef.current = null;
     };
   }, [elements]);
+
 
   useEffect(() => {
     if (!cyRef.current) return;

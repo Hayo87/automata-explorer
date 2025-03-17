@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components/CytoscapeVisualization";
 import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
+import { InfoModal } from '../components/InfoModal';
+
 
 import '../index.css';
 
@@ -17,6 +19,21 @@ const VisualizationPage: React.FC = () => {
 
   const navigate = useNavigate();
   const { closeSession } = useSession();
+
+  // Modal state for InfoModal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalNodeData, setModalNodeData] = useState<any>(null);
+
+  // openModal and closeModal functions
+  const openModal = (nodeData: any) => {
+    setModalNodeData(nodeData);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setModalNodeData(null);
+  };
 
   const handleExport = () => {
     if (!cyVizRef.current) return;
@@ -54,15 +71,16 @@ const VisualizationPage: React.FC = () => {
   return (
     <div className="page-container">
       <img src="/logo_nofill.svg" alt="Logo" className="small-logo" style={{ backgroundColor: "transparent" }} />
-
+      
       <div className="content-container">
         <main className="graph-area">
           {loading ? (
-            <p>Loading visualization...</p>
+            <p style={{ textAlign: "center" }}>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout}/>
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
           ) : (
-            <p>No data available</p>
+            <p style={{ textAlign: "center" }}>No data available</p>
+
           )}
         </main>
 
@@ -114,6 +132,7 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} nodeData={modalNodeData} />
     </div>
   );
 };
