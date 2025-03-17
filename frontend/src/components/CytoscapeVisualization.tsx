@@ -7,7 +7,6 @@ import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
-import { InfoModal } from './InfoModal';
 
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
