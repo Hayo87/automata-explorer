@@ -221,9 +221,8 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         },
         {
           content: 'Info',
-          select: (ele: { data: () => any }) => {
-            const nodeData = ele.data();
-            openModal(nodeData);
+          select: (ele: cytoscape.NodeSingular ) => {
+          openModal(ele);
           }
         },
 

@@ -132,7 +132,7 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} nodeData={modalNodeData} />
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} node={modalNodeData} />
     </div>
   );
 };

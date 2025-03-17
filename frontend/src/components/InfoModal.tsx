@@ -1,14 +1,15 @@
 import React, { useState, useRef } from 'react';
 import Modal from 'react-modal';
+import cytoscape from 'cytoscape';
 
 interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  nodeData: any;
+  node: cytoscape.NodeSingular | null;
 }
 
-export function InfoModal({ isOpen, onClose, nodeData }: InfoModalProps) {
-  if (!isOpen || !nodeData) return null;
+export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
+  if (!isOpen || !node) return null;
 
   return (
     <Modal
@@ -52,7 +53,8 @@ export function InfoModal({ isOpen, onClose, nodeData }: InfoModalProps) {
             }}
           >
             <div style={{ marginBottom: '10px' }}>
-              <h2>{nodeData?.label || 'No Label'}</h2>
+              <h2>Informatie Node {node.data('label') || 'No Label'}</h2>
+              <h3>nuttige info</h3>
             </div>
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
               <button onClick={onClose}>Close</button>
