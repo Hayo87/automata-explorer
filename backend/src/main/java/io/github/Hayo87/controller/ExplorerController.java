@@ -69,14 +69,14 @@ public class ExplorerController {
      * @param sessionId The ID of the session to be deleted.
      * @return ResponseEntity indicating success or failure.
      */
-    @DeleteMapping("/{sessionId}")
+    @DeleteMapping("/session/{sessionId}")
     public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
         try {
             sessionService.terminateSession(sessionId);
-            return ResponseEntity.ok("Session " + sessionId + " deleted successfully.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            
         }
+        return ResponseEntity.ok("Session " + sessionId + " deleted successfully."); 
     }
 
     /**
