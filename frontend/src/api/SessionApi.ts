@@ -52,7 +52,13 @@ export const uploadFiles = async (file1: File, file2: File): Promise<string> => 
 // Fetch visualization data for a session
 export const fetchSessionData = async (sessionId: string): Promise<any> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`);
+    const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action: "build" }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
