@@ -1,9 +1,16 @@
 package io.github.Hayo87.service;
 
-import org.springframework.stereotype.Service;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Service;
+
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
+
+import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 
 
 /**
@@ -17,6 +24,9 @@ public class SessionService {
 
     public SessionService() {
     }
+
+
+
 
         /**
      * Creates a new (empty) session
@@ -44,29 +54,14 @@ public class SessionService {
     }
 
     /**
-     * Retrieves a specific automata from session history.
-    *
-    * @param sessionId The session ID.
-    * @param index The index of the stored automaton.
-    * @return The requested automaton, or null if not found.
-    */
-    private DiffAutomaton<String> getAutomaton(String sessionId, int index) {
-        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
-
-        if (history == null || index < 0 || index >= history.size()) {
-            return null;
-        }
-        return history.get(index);
-    }
-
-    /**
      *  Retrieves the reference automata
      *
      * @param sessionId The session ID.
      * @return The reference automata.
      */
     public DiffAutomaton<String> getReferenceAutomata(String sessionId) {
-        return getAutomaton( sessionId, 0);
+        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
+        return  (history != null && !history.isEmpty()) ? history.get(0) : null;
     }
 
     /**
@@ -76,7 +71,8 @@ public class SessionService {
      * @return The subject automata
      */
     public DiffAutomaton<String> getSubjectAutomata(String sessionId) {
-        return getAutomaton( sessionId, 1);
+        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
+        return  (history != null && history.size() > 1) ? history.get(1) : null;
     }
     
     /**
@@ -98,13 +94,15 @@ public class SessionService {
      * Terminates a session by removing it from session history.
      *
      * @param sessionId The ID of the session to be removed.
+     * @return DeleteSessionResponseDTO 
      */
-    public void terminateSession(String sessionId) {
+    public DeleteSessionResponseDTO terminateSession(String sessionId) {
         if (!sessionHistory.containsKey(sessionId)) {
-            throw new IllegalArgumentException("Session ID not found.");
+            return new DeleteSessionResponseDTO("Session " + sessionId + " not found");
         }
-        sessionHistory.remove(sessionId);
+        else {  
+            return new DeleteSessionResponseDTO("Session " + sessionId + " deleted successfully.");
+        }
     }
-
 }
 

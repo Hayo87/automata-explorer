@@ -1,33 +1,32 @@
 package io.github.Hayo87;
 
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
-
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.web.server.LocalServerPort;
-
-import io.restassured.http.ContentType;
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.empty;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.stream.Stream;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import static io.restassured.RestAssured.given;
+import io.restassured.http.ContentType;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -80,11 +79,13 @@ public class BasicFlowTests {
 
         given()
             .port(port)
+            .contentType("application/json")
+            .body("{\"action\": \"build\"}")
             .when()
-            .get("/api/session/{sessionId}/build", sessionId) 
+            .post("/api/session/{sessionId}/build", sessionId)
             .then()
-            .statusCode(200) // Validate response
-            .body(not(empty())); // Ensure data is returned
+            .statusCode(200) 
+            .body(not(empty())); 
     }
 
     // Step 3: Close the session after build test
@@ -94,10 +95,10 @@ public class BasicFlowTests {
         given()
             .port(port)
             .when()
-            .delete("/api/session/{sessionId}", sessionId) // Call DELETE API
+            .delete("/api/session/{sessionId}", sessionId)
             .then()
-            .statusCode(200) // Expect success
-            .body(not(empty())); // Ensure data is returned
+            .statusCode(200) 
+            .body(not(empty())); 
     }
 
     // Load DOT files dynamically from the directory

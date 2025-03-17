@@ -1,18 +1,19 @@
 package io.github.Hayo87.controller;
 
-import java.util.Map;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.github.Hayo87.dto.BuildRequestDTO;
+import io.github.Hayo87.dto.BuildResponseDTO;
+import io.github.Hayo87.dto.CreateSessionRequestDTO;
+import io.github.Hayo87.dto.CreateSessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
@@ -37,23 +38,31 @@ public class ExplorerController {
         this.buildService = buildService;
     }
 
-    /**
-     * Creates a new session and build the input
+   /**
+     * Creates a new session and builds the input.
      *
-     * @param input A map containing "reference" and "subject" DOT file content.
-     * @return A unique session ID.
+     * @param input A JSON object containing "reference" and "subject" DOT file content.
+     * @return A unique session ID wrapped in a DTO.
      */
     @PostMapping("/session")
-    public ResponseEntity<Map<String, String>> createSession(@RequestBody Map<String, String> input) {
+    public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
         String sessionId = sessionService.createSession();
-        buildService.buildInput(sessionId, input.get("reference"), input.get("subject"));
-
-        // Create JSON response
-        Map<String, String> response = Map.of("sessionId", sessionId);
-        
-        return ResponseEntity.ok(response);
+    
+        try {
+            buildService.processBuildAction(sessionId, new BuildRequestDTO("reference", input.getReference()));
+            buildService.processBuildAction(sessionId, new BuildRequestDTO("subject", input.getSubject()));
+    
+            return ResponseEntity.ok(new CreateSessionResponseDTO(sessionId));
+    
+        } catch (Exception e) {
+            
+            sessionService.terminateSession(sessionId);
+    
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new CreateSessionResponseDTO("Error processing session: " + e.getMessage()));
+        }
     }
-
+    
     /**
      * Deletes a session and clears its history.
      *
@@ -64,26 +73,32 @@ public class ExplorerController {
     public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
         try {
             sessionService.terminateSession(sessionId);
-            return ResponseEntity.ok("Session " + sessionId + " deleted successfully.");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            
         }
+        return ResponseEntity.ok("Session " + sessionId + " deleted successfully."); 
     }
 
     /**
-     * Initializes the build and returns the DiffMachine in JSON format
+     * Handles build-related actions for a given session.
      *
-     * @param sessionId The session ID.
-     * @return The latest diff automaton in JSON format.
+     * @param sessionId The unique identifier of the session.
+     * @param request The {@link BuildRequestDTO} containing the action to perform.
+     *                - action = "reference" → Builds the reference automata.
+     *                - action = "subject" → Builds the subject automata.
+     *                - action = "build" → Builds the DiffAutomata 
+     *                - action = "match" → Starts a matching process.
+     * @return A {@link ResponseEntity} indicating the success or failure of the action.
+     *         - HTTP 200 OK → Action executed successfully.
+     *         - HTTP 400 Bad Request → Invalid action provided.
      */
-    @GetMapping("/session/{sessionId}/build")
-    public ResponseEntity<Map<String, Object>> getDiffAsJson(@PathVariable String sessionId) {
-        try {
-            return ResponseEntity.ok(buildService.buildDefault(sessionId));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+
+    @PostMapping("/session/{sessionId}/build")
+    public ResponseEntity<BuildResponseDTO> handleBuildRequest(
+            @PathVariable String sessionId, 
+            @RequestBody BuildRequestDTO request) {
+        
+        return buildService.processBuildAction(sessionId, request);
     }
-    
 }
 

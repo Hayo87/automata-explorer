@@ -107,7 +107,12 @@ public class ParserService {
         return automaton;
     }
     
-
+    /**
+     * Convert the differenece automaton to the TJson (Graphviz)  representation
+     * @param automaton
+     * @param writer, the writer to be used
+     * @return
+     */
 
     public Map<String, Object> convertToJson(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
     try {
@@ -148,7 +153,7 @@ public class ParserService {
      * @param tJson The JSON output from Graphviz as a JsonNode.
      * @return A structured Map<String, Object> representation.
      */
-    public Map<String, Object> generalizeJson(JsonNode tJson) {
+    private Map<String, Object> generalizeJson(JsonNode tJson) {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.convertValue(tJson, new TypeReference<Map<String, Object>>() {});
         }
@@ -160,7 +165,7 @@ public class ParserService {
      * @param writer The writer instance to use for conversion.
      * @return A string containing the DOT representation.
      */
-    public <T> String convertToDot(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
+    private <T> String convertToDot(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
             writer.write(automaton, outputStream);
 

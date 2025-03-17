@@ -25,6 +25,12 @@ export interface EdgeData {
   pos: string,
   };
 
+export interface GraphResponse {
+  action: string;
+  status: string;
+  message: string;
+  data: GraphData;
+}
 export interface GraphData {
   name: string, 
   objects: NodeData[],
@@ -63,11 +69,13 @@ interface TransformedEdge {
   };
 }
 
-const useTransformGraph = (backendData: GraphData | null) => {
+const useTransformGraph = (backendData: GraphResponse | null) => {
   return useMemo(() => {
     if (!backendData) return { nodes: [], edges: [] };
+    const { data: graphData } = backendData;
 
-    const nodes: TransformedNode[] = backendData.objects.map((node) => {
+
+    const nodes: TransformedNode[] = graphData.objects.map((node) => {
       const [x, y] = node.pos.split(",").map(parseFloat);
       return {
         data: {
@@ -87,7 +95,7 @@ const useTransformGraph = (backendData: GraphData | null) => {
       };
     });
 
-    const edges: TransformedEdge[] = backendData.edges.map((edge) => ({
+    const edges: TransformedEdge[] = graphData.edges.map((edge) => ({
       data: {
         id: edge.id,
         source: edge.tail,
