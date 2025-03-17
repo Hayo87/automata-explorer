@@ -1,3 +1,4 @@
+declare module 'react-modal';
 declare module 'cytoscape-avsdf';
 declare module "cytoscape-dagre";
 declare module 'cytoscape-cxtmenu';

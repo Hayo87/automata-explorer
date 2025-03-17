@@ -21,7 +21,9 @@
     "dagre": "^0.8.5",
     "dompurify": "^3.2.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-draggable": "^4.4.6",
+    "react-modal": "^3.16.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
