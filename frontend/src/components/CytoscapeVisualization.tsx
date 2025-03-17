@@ -3,7 +3,7 @@ import cytoscape from "cytoscape";
 import NodeSingular from "cytoscape"
 import dagre from "cytoscape-dagre";
 import useTransformGraph from "../hooks/useTransformGraph";
-import { GraphData } from "../hooks/useTransformGraph";
+import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 
@@ -11,7 +11,7 @@ cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
 cytoscape.use( dagre)
 interface CytoscapeVisualizationProps {
-  data: GraphData;
+  data: GraphResponse;
   layout: string;
 }
 
