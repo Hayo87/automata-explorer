@@ -15,6 +15,7 @@
     "cytoscape": "^3.31.0",
     "cytoscape-avsdf": "^1.0.0",
     "cytoscape-cose-bilkent": "^4.1.0",
+    "cytoscape-cxtmenu": "^3.5.0",
     "cytoscape-dagre": "^2.5.0",
     "d3": "^7.9.0",
     "dagre": "^0.8.5",
