@@ -47,7 +47,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     grabbable: true,
     locked: false,
     pannable: false,
-    classes:  [],
+    classes:  node.style.shape === "doublecircle" ? "start" : ""
   }));
 
   // Convert transitions to edges
@@ -87,6 +87,14 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
             "border-style": "solid",
             "border-color": "black"
           },
+        },
+        {
+          selector: 'node.start',
+          style: {
+            'background-color': '#91378a',
+            'border-width': 3,
+            'border-color': '#000000'
+          }
         },
         {
           selector: 'node.checked',
