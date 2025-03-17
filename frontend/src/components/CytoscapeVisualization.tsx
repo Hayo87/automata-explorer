@@ -99,8 +99,8 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
           style: {
             'background-image': 'url(data:image/svg+xml;utf8,' + encodeURIComponent(`<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE svg><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="yellow" d="M12 .587l3.668 7.431 8.2 1.192-5.934 5.787 1.402 8.168L12 18.897l-7.336 3.864 1.402-8.168L.132 9.21l8.2-1.192z"/></svg>`) + ')',
             'background-image-containment': 'over',
-            'background-position-x': '16px',
-            'background-position-y': '-6px',
+            'background-position-x': '140%',
+            'background-position-y': '-10%',
             'background-height': '50%',
             'background-width': '50%',
             'background-width-relative-to': 'inner', 
@@ -108,8 +108,23 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
             'bounds-expansion': 20,
             'background-repeat': 'no-repeat'
           }
-        }
-        ,
+        },
+        {
+          selector: 'node.pie',
+          style: {
+            "width": "60px",
+            "height": "60px",
+            'pie-size': '90%',                           
+            'pie-1-background-color': 'data(slice1Color)',
+            'pie-1-background-size': 'data(slice1Size)',
+            'pie-2-background-color': 'data(slice2Color)',
+            'pie-2-background-size': 'data(slice2Size)',
+            'pie-3-background-color': 'data(slice3Color)',
+            'pie-3-background-size': 'data(slice3Size)',
+            'background-color': '#ccc'
+
+          }
+        },
         {
           selector: "edge",
           style: {
@@ -177,7 +192,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       }
     });
 
-    // Add the contect menu's 
+    // Add the context menu's 
     cyInstance.cxtmenu({
       selector: "node",
       commands: [
@@ -197,6 +212,39 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
           content: 'Info',
           select: (ele: { data: () => any; }) => {
             console.log("Node data:", ele.data());
+          },
+        },
+        {
+          content: 'Pie',
+          select: (ele: cytoscape.NodeSingular) => {
+
+            // Combine incoming and outgoing edges.
+            const edges = ele.incomers('edge').union(ele.outgoers('edge'));
+            const total = edges.length;
+
+            // Tally edge colors.
+            const counts: { [color: string]: number } = {};
+            edges.forEach((edge: cytoscape.EdgeSingular)  => {
+              const edgeColor = edge.style('line-color');
+              counts[edgeColor] = (counts[edgeColor] || 0) + 1;
+            });
+
+            // Convert counts into slices (as percentages).
+            let slices = Object.entries(counts)
+              .map(([color, count]) => ({ color, size: (count / total) * 100 }))
+              .sort((a, b) => b.size - a.size)
+              .slice(0, 3);
+
+              ele.data({
+                slice1Color: slices[0].color,
+                slice1Size: slices[0].size,
+                slice2Color: slices[1].color,
+                slice2Size: slices[1].size,
+                slice3Color: slices[2].color,
+                slice3Size: slices[2].size,
+              });
+              
+            ele.toggleClass('pie');
           },
         },
 
