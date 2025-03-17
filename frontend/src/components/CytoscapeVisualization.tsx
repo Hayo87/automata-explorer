@@ -7,11 +7,13 @@ import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
+import overlays from 'cytoscape.js-overlays';
 
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
 cytoscape.use( dagre)
 cytoscape.use(cxtmenu);
+cytoscape.use(overlays);
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
