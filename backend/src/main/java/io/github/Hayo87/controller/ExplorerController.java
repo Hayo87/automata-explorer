@@ -18,7 +18,10 @@ import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
 /**
- * REST Controller for session management and building diff automata.
+ * REST Controller for session management, and the building and exploring of 
+ * Difference Automata(Diff Machine) based on the gLTSDiff library.
+ * 
+ * @author Marijn Verheul
  */
 @RestController
 @RequestMapping("/api")
@@ -31,7 +34,7 @@ public class ExplorerController {
      * Constructor - Injects required services.
      * 
      * @param sessionService Manages session storage.
-     * @param buildService Builds the diff automaton.
+     * @param buildService Builds diff automaton.
      */
     public ExplorerController(SessionService sessionService, BuildService buildService) {
         this.sessionService = sessionService;
@@ -67,7 +70,7 @@ public class ExplorerController {
      * Deletes a session and clears its history.
      *
      * @param sessionId The ID of the session to be deleted.
-     * @return ResponseEntity indicating success or failure.
+     * @return ResponseEntity (idempotent, always succes).
      */
     @DeleteMapping("/session/{sessionId}")
     public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
@@ -89,7 +92,7 @@ public class ExplorerController {
      *                - action = "build" → Builds the DiffAutomata 
      *                - action = "match" → Starts a matching process.
      * @return A {@link ResponseEntity} indicating the success or failure of the action.
-     *         - HTTP 200 OK → Action executed successfully.
+     *         - HTTP 200 OK → Action executed successfully, results returned in DTO.
      *         - HTTP 400 Bad Request → Invalid action provided.
      */
 
