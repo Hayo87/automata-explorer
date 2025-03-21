@@ -14,6 +14,7 @@ import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.CreateSessionRequestDTO;
 import io.github.Hayo87.dto.CreateSessionResponseDTO;
+import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
@@ -73,13 +74,8 @@ public class ExplorerController {
      * @return ResponseEntity (idempotent, always succes).
      */
     @DeleteMapping("/session/{sessionId}")
-    public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
-        try {
-            sessionService.terminateSession(sessionId);
-        } catch (IllegalArgumentException e) {
-            
-        }
-        return ResponseEntity.ok("Session " + sessionId + " deleted successfully."); 
+    public ResponseEntity<DeleteSessionResponseDTO> deleteSession(@PathVariable String sessionId) {        
+        return ResponseEntity.ok(sessionService.terminateSession(sessionId)); 
     }
 
     /**
