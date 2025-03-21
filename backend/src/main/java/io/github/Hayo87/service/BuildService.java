@@ -14,7 +14,12 @@ import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.MatchResultDTO;
 
-@Service
+/**
+ * Manages all build related actions and information request 
+ * for Difference Automata's.
+ * 
+/** */
+ @Service
 public class BuildService {
     private final SessionService sessionService;
     private final ParserService parserService;
@@ -26,7 +31,13 @@ public class BuildService {
         this.matchService = matchService;
     }
 
-    
+    /**
+     * General method to process build actions.
+     * 
+     * @param sessionId the session ID for the build action.
+     * @param request the BuildRequestDTO with the build action and build data.
+     * @return result of the action wrapped in a responseDTO.
+     */
     public ResponseEntity<BuildResponseDTO> processBuildAction(String sessionId, BuildRequestDTO request) {
         String action = request.getAction().toLowerCase();
         Object data = request.getData();
@@ -60,12 +71,13 @@ public class BuildService {
     }
 
     /**
-     * Build an input (difference) automaton
-     * @param sessionId
-     * @param input
-     * @param isReference
+     * Build an input (difference) automaton based on the input and 
+     * stores the result in the session history.
+     * 
+     * @param sessionId the sessionID for the build
+     * @param input the input string
+     * @param isReference wheter the input is the reference automata
      */
-  
     private void buildInput(String sessionId, String input, Boolean isReference){
         try{
             // Attemp parse and add to session history
@@ -77,7 +89,6 @@ public class BuildService {
         }
     }
 
-  
     /**
      * Builds the default differenceAutomaton based on the sessions intput
      * @param sessionId

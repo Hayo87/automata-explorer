@@ -27,6 +27,11 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 import com.github.tno.gltsdiff.writers.DotWriter;
 
+/**
+ * Manages all parsing and data transformation actions.
+ * 
+ * @author Marijn Verheul 
+ */
 @Service
 public class ParserService {
 
