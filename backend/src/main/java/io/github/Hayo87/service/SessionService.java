@@ -12,10 +12,10 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
 import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 
-
 /**
- * Manages session storage and history tracking.
- * Each session maintains history for undo/redo functionality.
+ * Manages session creation, storage and deletion
+ * 
+ * @author Marijn Verheul
  */
 @Service
 public class SessionService {
@@ -25,13 +25,10 @@ public class SessionService {
     public SessionService() {
     }
 
-
-
-
         /**
      * Creates a new (empty) session
      *
-     * @return A unique session ID.
+     * @return A string with the unique session ID.
      */
     public String createSession() {
         String sessionId = UUID.randomUUID().toString();
@@ -101,6 +98,7 @@ public class SessionService {
             return new DeleteSessionResponseDTO("Session " + sessionId + " not found");
         }
         else {  
+            sessionHistory.remove(sessionId);
             return new DeleteSessionResponseDTO("Session " + sessionId + " deleted successfully.");
         }
     }
