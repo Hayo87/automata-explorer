@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Modal from 'react-modal';
 import cytoscape from 'cytoscape';
+import Portal from './Portal';
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -29,39 +30,40 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
         },
       }}
     >
-      {/* Center container with context menu prevention */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-        onContextMenu={(e) => e.preventDefault()}
-      >
-        <DraggableContainer>
-          <div
-            style={{
-              backgroundColor: 'white',
-              border: '1px solid #333',
-              padding: '20px',
-              boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-              maxWidth: '90%',
-              maxHeight: '80%',
-              overflowY: 'auto',
-              cursor: 'move',
-            }}
-          >
-            <div style={{ marginBottom: '10px' }}>
-              <h2>Informatie Node {node.data('label') || 'No Label'}</h2>
-              <h3>nuttige info</h3>
+      <Portal>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <DraggableContainer>
+            <div
+              style={{
+                backgroundColor: 'white',
+                border: '1px solid #333',
+                padding: '20px',
+                boxShadow: '0 0 10px rgba(0,0,0,0.5)',
+                maxWidth: '90%',
+                maxHeight: '80%',
+                overflowY: 'auto',
+                cursor: 'move',
+              }}
+            >
+              <div style={{ marginBottom: '10px' }}>
+                <h2>Informatie Node {node.data('label') || 'No Label'}</h2>
+                <h3>nuttige info</h3>
+              </div>
+              <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <button onClick={onClose}>Close</button>
+              </div>
             </div>
-            <div style={{ textAlign: 'center', marginTop: '10px' }}>
-              <button onClick={onClose}>Close</button>
-            </div>
-          </div>
-        </DraggableContainer>
-      </div>
+          </DraggableContainer>
+        </div>
+      </Portal>
     </Modal>
   );
 }
@@ -112,3 +114,5 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({ children }) => 
     </div>
   );
 };
+
+export default InfoModal;
