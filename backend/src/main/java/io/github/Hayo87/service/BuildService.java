@@ -1,10 +1,10 @@
 package io.github.Hayo87.service;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
@@ -94,7 +94,7 @@ public class BuildService {
      * @return the JSON reprententation or the empty string in case of an error
      */
 
-    public Map<String,Object> buildDefault(String sessionId) {
+    public JsonNode buildDefault(String sessionId) {
         DiffAutomaton<String> reference = sessionService.getReferenceAutomata(sessionId);
         DiffAutomaton<String> subject = sessionService.getSubjectAutomata(sessionId);
 

@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tno.gltsdiff.glts.State;
@@ -119,7 +118,7 @@ public class ParserService {
      * @return
      */
 
-    public Map<String, Object> convertToJson(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
+    public JsonNode convertToJson(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
     try {
         // Convert automaton to DOT format
         String dotContent = convertToDot(automaton, writer);
@@ -141,10 +140,7 @@ public class ParserService {
             
             // Read result as JsonNode
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(reader);
-            
-            // Return result
-            return generalizeJson(jsonNode);
+            return objectMapper.readTree(reader);
             
         }
     } catch (IOException e) {
@@ -152,17 +148,6 @@ public class ParserService {
     }
 }
 
-    /**
-     * Generalizes the JSON output from Graphviz by mapping it to a structured format including graph-level information.
-     *
-     * @param tJson The JSON output from Graphviz as a JsonNode.
-     * @return A structured Map<String, Object> representation.
-     */
-    private Map<String, Object> generalizeJson(JsonNode tJson) {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.convertValue(tJson, new TypeReference<Map<String, Object>>() {});
-        }
-        
     /**
      * Converts a DiffAutomaton to its DOT representation without writing to a file.
      *
