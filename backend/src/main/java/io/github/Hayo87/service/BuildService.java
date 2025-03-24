@@ -80,7 +80,7 @@ public class BuildService {
     private void buildInput(String sessionId, String input, Boolean isReference){
         try{
             // Attemp parse and add to session history
-            sessionService.store(sessionId, parserService.parseToDiffAutomaton(input, isReference));   
+            sessionService.store(sessionId, parserService.convertDotStringToDiffAutomaton(input, isReference));   
 
         } catch (IOException e) {
             System.err.println("Parsing failed: " + e.getMessage());
@@ -109,7 +109,7 @@ public class BuildService {
         sessionService.store(sessionId,result);
 
         // Delegate processing to parserService
-        return parserService.convertToJson(result, writer); 
+        return parserService.convertJsonToDiffAutomaton(result, writer); 
     }
 
     /** 
