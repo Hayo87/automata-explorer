@@ -3,7 +3,6 @@ package io.github.Hayo87.service;
 import java.io.IOException;
 import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
@@ -38,7 +37,7 @@ public class BuildService {
      * @param request the BuildRequestDTO with the build action and build data.
      * @return result of the action wrapped in a responseDTO.
      */
-    public ResponseEntity<BuildResponseDTO> processBuildAction(String sessionId, BuildRequestDTO request) {
+    public BuildResponseDTO processBuildAction(String sessionId, BuildRequestDTO request) {
         String action = request.getAction().toLowerCase();
         Object data = request.getData();
 
@@ -46,26 +45,26 @@ public class BuildService {
 
             case "reference" -> {
                 buildInput(sessionId, (String) data, true);
-                return ResponseEntity.ok(new BuildResponseDTO("reference", "success", "Reference processed successfully"));
+                return new BuildResponseDTO("reference", "success", "Reference processed successfully");
             }
 
             case "subject" -> {
                 buildInput(sessionId, (String) data, false);
-                return ResponseEntity.ok(new BuildResponseDTO("subject", "success", "Subject processed successfully"));
+                return new BuildResponseDTO("subject", "success", "Subject processed successfully");
             }
 
             case "build" -> {
                 Object buildData = buildDefault(sessionId); 
-                return ResponseEntity.ok(new BuildResponseDTO("build", "success", "Build succesfull", buildData));
+                return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
             }
 
             case "match" -> {
                 Object matchData = match(sessionId);
-                return ResponseEntity.ok(new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData));
+                return new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData);
             }
 
             default -> {
-                return ResponseEntity.badRequest().body(new BuildResponseDTO(action, "error", "Invalid action"));
+                return new BuildResponseDTO(action, "Error processing", "Invalid action");
             }
         }
     }

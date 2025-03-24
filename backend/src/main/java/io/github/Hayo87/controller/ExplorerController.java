@@ -96,8 +96,18 @@ public class ExplorerController {
     public ResponseEntity<BuildResponseDTO> handleBuildRequest(
             @PathVariable String sessionId, 
             @RequestBody BuildRequestDTO request) {
-        
-        return buildService.processBuildAction(sessionId, request);
+
+        try {
+            BuildResponseDTO response = buildService.processBuildAction(sessionId, request);
+
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new BuildResponseDTO("Error processing", e.getMessage()));
+        }
+         
     }
 }
 
