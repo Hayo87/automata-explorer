@@ -52,8 +52,22 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
             }}
           >
             <div style={{ marginBottom: '10px' }}>
-              <h2>Informatie Node {node.data('label') || 'No Label'}</h2>
-              <h3>nuttige info</h3>
+            <h2>Informatie {node.isNode() ? 'Node' : 'Edge'} {node.data('label') || 'No Label'}</h2>
+
+            {node.isNode() && (
+              <>
+                <p>Node ID: {node.id()}</p>
+                <p>Type: {node.data('type')}</p>
+              </>
+            )}
+
+            {node.isEdge() && (
+              <>
+                <p>From: {node.source().id()}</p>
+                <p>To: {node.target().id()}</p>
+                <p>Edge Label: {node.data('label')}</p>
+              </>
+            )}
             </div>
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
               <button onClick={onClose}>Close</button>
