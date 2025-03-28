@@ -13,23 +13,22 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
 
   return (
     <Modal
-      isOpen={isOpen}
-      onRequestClose={onClose}
-      contentLabel="Node Info"
-      style={{
-        overlay: {
-          backgroundColor: 'transparent',
-        },
-        content: {
-          position: 'static',
-          inset: 'unset',
-          padding: 0,
-          border: 'none',
-          background: 'none',
-        },
-      }}
-    >
-      {/* Center container with context menu prevention */}
+    isOpen={isOpen}
+    onRequestClose={onClose}
+    contentLabel="Node Info"
+    bodyOpenClassName=""
+    htmlOpenClassName=""
+    style={{
+      overlay: { backgroundColor: 'transparent' },
+      content: {
+        position: 'static',
+        inset: 'unset',
+        padding: 0,
+        border: 'none',
+        background: 'none',
+      },
+    }}
+  >
       <div
         style={{
           display: 'flex',
@@ -53,8 +52,22 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
             }}
           >
             <div style={{ marginBottom: '10px' }}>
-              <h2>Informatie Node {node.data('label') || 'No Label'}</h2>
-              <h3>nuttige info</h3>
+            <h2>Informatie {node.isNode() ? 'Node' : 'Edge'} {node.data('label') || 'No Label'}</h2>
+
+            {node.isNode() && (
+              <>
+                <p>Node ID: {node.id()}</p>
+                <p>Type: {node.data('type')}</p>
+              </>
+            )}
+
+            {node.isEdge() && (
+              <>
+                <p>From: {node.source().id()}</p>
+                <p>To: {node.target().id()}</p>
+                <p>Edge Label: {node.data('label')}</p>
+              </>
+            )}
             </div>
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
               <button onClick={onClose}>Close</button>
@@ -62,7 +75,7 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
           </div>
         </DraggableContainer>
       </div>
-    </Modal>
+  </Modal>
   );
 }
 
@@ -112,3 +125,5 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({ children }) => 
     </div>
   );
 };
+
+export default InfoModal;

@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components/CytoscapeVisualization";
 import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
-import { InfoModal } from '../components/InfoModal';
+import  InfoModal from '../components/InfoModal';
 
 
 import '../index.css';

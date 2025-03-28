@@ -6,6 +6,11 @@ public class BuildResponseDTO {
     private String message;
     private Object data;
 
+    public BuildResponseDTO(String status, String message){
+        this.status = status;
+        this.message = message;
+    }
+
     public BuildResponseDTO(String action, String status, String message) {
         this.action = action;
         this.status = status;

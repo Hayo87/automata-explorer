@@ -14,11 +14,15 @@ import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.CreateSessionRequestDTO;
 import io.github.Hayo87.dto.CreateSessionResponseDTO;
+import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
 /**
- * REST Controller for session management and building diff automata.
+ * REST Controller for session management, and the building and exploring of 
+ * Difference Automata(Diff Machine) based on the gLTSDiff library.
+ * 
+ * @author Marijn Verheul
  */
 @RestController
 @RequestMapping("/api")
@@ -31,7 +35,7 @@ public class ExplorerController {
      * Constructor - Injects required services.
      * 
      * @param sessionService Manages session storage.
-     * @param buildService Builds the diff automaton.
+     * @param buildService Builds diff automaton.
      */
     public ExplorerController(SessionService sessionService, BuildService buildService) {
         this.sessionService = sessionService;
@@ -67,16 +71,11 @@ public class ExplorerController {
      * Deletes a session and clears its history.
      *
      * @param sessionId The ID of the session to be deleted.
-     * @return ResponseEntity indicating success or failure.
+     * @return ResponseEntity (idempotent, always succes).
      */
     @DeleteMapping("/session/{sessionId}")
-    public ResponseEntity<String> deleteSession(@PathVariable String sessionId) {
-        try {
-            sessionService.terminateSession(sessionId);
-        } catch (IllegalArgumentException e) {
-            
-        }
-        return ResponseEntity.ok("Session " + sessionId + " deleted successfully."); 
+    public ResponseEntity<DeleteSessionResponseDTO> deleteSession(@PathVariable String sessionId) {        
+        return ResponseEntity.ok(sessionService.terminateSession(sessionId)); 
     }
 
     /**
@@ -89,7 +88,7 @@ public class ExplorerController {
      *                - action = "build" → Builds the DiffAutomata 
      *                - action = "match" → Starts a matching process.
      * @return A {@link ResponseEntity} indicating the success or failure of the action.
-     *         - HTTP 200 OK → Action executed successfully.
+     *         - HTTP 200 OK → Action executed successfully, results returned in DTO.
      *         - HTTP 400 Bad Request → Invalid action provided.
      */
 
@@ -97,8 +96,18 @@ public class ExplorerController {
     public ResponseEntity<BuildResponseDTO> handleBuildRequest(
             @PathVariable String sessionId, 
             @RequestBody BuildRequestDTO request) {
-        
-        return buildService.processBuildAction(sessionId, request);
+
+        try {
+            BuildResponseDTO response = buildService.processBuildAction(sessionId, request);
+
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new BuildResponseDTO("Error processing", e.getMessage()));
+        }
+         
     }
 }
 

@@ -7,17 +7,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tno.gltsdiff.glts.State;
@@ -27,42 +22,65 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 import com.github.tno.gltsdiff.writers.DotWriter;
 
+/**
+ * Manages all parsing and data transformation actions.
+ * 
+ * @author Marijn Verheul 
+ */
 @Service
 public class ParserService {
 
     /**
-     * Runs Graphviz CLI to convert DOT content into a plain text representation.
+     * Converts DOT file (String) to a Json representaton using the Graphviz CLI.
      *
      * @param dotContent The DOT file content.
-     * @return JSON representation for the dot. 
+     * @return JSON representation for the file 
      * @throws IOException If an error occurs.
      */
     @SuppressWarnings("CallToPrintStackTrace")
-    private JsonNode processDotWithGraphviz(String dotContent) throws IOException {
-        Path tempFile = Files.createTempFile("graph", ".dot");
-        Files.write(tempFile, dotContent.getBytes(), StandardOpenOption.WRITE);
+    private JsonNode convertDotStringToJson(String dotContent) throws IOException {
 
-        ProcessBuilder builder = new ProcessBuilder("dot", "-Tdot_json", tempFile.toString());
-        Process process = builder.start();
-
-        String output;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            output = reader.lines().collect(Collectors.joining("\n"));
+        
+        // Create and start process
+        ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tjson0");
+        processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);   
+        Process process = processBuilder.start();
+        
+        try (BufferedWriter writerPipe = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            
+            // Inject dotContent as input
+            writerPipe.write(dotContent);
+            writerPipe.flush();
+            writerPipe.close();
+            
+            // Read result as JsonNode
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readTree(reader);    
         }
-
-        try {
-            process.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        catch (IOException e) {
+            throw new RuntimeException("Failed to convert dotString to Json", e);
         }
-        Files.deleteIfExists(tempFile);
-
-        // Convert JSON string output to JsonNode
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readTree(output);
     }
 
-    
+    /**
+     * Converts a DiffAutomaton to its DOT representation (String).
+     *
+     * @param automaton The automaton to convert.
+     * @param writer The writer instance to use for conversion.
+     * @return A string, the DOT file representation.
+     */
+    private <T> String convertDiffAutomatonToDotString(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            writer.write(automaton, outputStream);
+
+            return outputStream.toString(StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to convert automaton to dotString", e);
+        }
+    }
+ 
     /**
      * Parses a DOT string and converts it into a DiffAutomaton.
      *
@@ -70,8 +88,8 @@ public class ParserService {
      * @return Parsed DiffAutomaton object.
      * @throws IOException If parsing fails.
      */
-    public DiffAutomaton<String> parseToDiffAutomaton(String dotContent, Boolean reference) throws IOException {
-        JsonNode graphJson = processDotWithGraphviz(dotContent);
+    public DiffAutomaton<String> convertDotStringToDiffAutomaton(String dotContent, Boolean reference) throws IOException {
+        JsonNode graphJson = convertDotStringToJson(dotContent);
     
         // Initialize variables
         DiffAutomaton<String> automaton = new DiffAutomaton<>();
@@ -108,71 +126,22 @@ public class ParserService {
     }
     
     /**
-     * Convert the differenece automaton to the TJson (Graphviz)  representation
+     * Convert the differenece automaton to the TJson (Graphviz) representation
      * @param automaton
      * @param writer, the writer to be used
      * @return
      */
 
-    public Map<String, Object> convertToJson(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
-    try {
+    public JsonNode convertJsonToDiffAutomaton(DiffAutomaton<String> automaton, DotWriter<?, ?, DiffAutomaton<String>> writer) {
         // Convert automaton to DOT format
-        String dotContent = convertToDot(automaton, writer);
-        
-        // Create a process
-        ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tjson0");
-        processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);
-        
-        Process process = processBuilder.start();
-        
-        try (BufferedWriter writerPipe = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            
-            // Inject dotContent as input
-            writerPipe.write(dotContent);
-            writerPipe.flush();
-            writerPipe.close();
-            
-            // Read result as JsonNode
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(reader);
-            
-            // Return result
-            return generalizeJson(jsonNode);
-            
-        }
-    } catch (IOException e) {
-        throw new RuntimeException("Failed to convert automaton to JSON", e);
-    }
-}
+        String dotContent = convertDiffAutomatonToDotString(automaton, writer);
 
-    /**
-     * Generalizes the JSON output from Graphviz by mapping it to a structured format including graph-level information.
-     *
-     * @param tJson The JSON output from Graphviz as a JsonNode.
-     * @return A structured Map<String, Object> representation.
-     */
-    private Map<String, Object> generalizeJson(JsonNode tJson) {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.convertValue(tJson, new TypeReference<Map<String, Object>>() {});
+        try {
+            return convertDotStringToJson(dotContent);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to convert automaton to Json", e);
         }
-        
-    /**
-     * Converts a DiffAutomaton to its DOT representation without writing to a file.
-     *
-     * @param automaton The automaton to convert.
-     * @param writer The writer instance to use for conversion.
-     * @return A string containing the DOT representation.
-     */
-    private <T> String convertToDot(DiffAutomaton<T> automaton, DotWriter<?, ?, DiffAutomaton<T>> writer) {
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            writer.write(automaton, outputStream);
-
-            return outputStream.toString(StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to convert automaton to DOT format", e);
-        }
+                  
     }
 }
     
