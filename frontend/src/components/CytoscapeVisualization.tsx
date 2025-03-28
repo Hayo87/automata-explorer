@@ -149,6 +149,12 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
             "text-margin-y": -10,
           },
         },
+        {
+          selector: 'edge.checked',
+          style: {
+            'opacity': 0.3,
+          }
+        },
         // Selection styles
         {
           selector: "node:selected",
@@ -286,6 +292,33 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       minSpotlightRadius: 24,
       maxSpotlightRadius: 38,
     });
+
+    cyInstance.cxtmenu({
+      selector: "edge",
+      commands: [
+        {
+          content: '<span class="fa fa-check-circle-o fa-2x"></span>',
+          select: (ele: cytoscape.EdgeSingular) => {
+          ele.toggleClass('checked');
+          },
+        },
+        {
+          content: 'Info',
+          select: (ele: cytoscape.EdgeSingular) => {
+          openModal(ele);
+          }
+        },
+      ],
+      fillColor: "rgba(0, 0, 0, 0.75)",
+      activeFillColor: "rgba(0, 0, 0, 1)",
+      activePadding: 10,
+      indicatorSize: 24,
+      separatorWidth: 3,
+      spotlightPadding: 4,
+      minSpotlightRadius: 24,
+      maxSpotlightRadius: 38,
+    });
+    
     cyRef.current = cyInstance;
 
 
