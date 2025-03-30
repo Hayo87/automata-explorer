@@ -188,7 +188,7 @@ button:focus-visible {
   width: 50px;
   display: flex;
   flex-direction: column;
-  background: #f4f4f4;
+  background: rgba(255, 255, 255, 0.8) !important;
   padding: 10px ;
   align-items: center;
   position: relative;
@@ -217,9 +217,12 @@ button:focus-visible {
   left: 0;
   background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
   padding: 5px;
-  font-size: 10px;
-  z-index: 1000; /* Ensure it appears above other content */
-  border-top-right-radius: 8px; /* Optional: a rounded corner on the top right */
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 1000; 
+  border-top-right-radius: 8px;
 }
 
 
@@ -229,4 +232,20 @@ button:focus-visible {
 }
 .subject-file-name {
   color: red;
+}
+
+.sidebar-label {
+  font-size: 0.7rem;
+  color: #888;
+  margin: 12px 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;      
+  width: 100%;          
+}
+
+.sidebar-button.active {
+  background-color: #9fc4a1 !important;
+  color: white;
+  border: 2px solid black;
 }

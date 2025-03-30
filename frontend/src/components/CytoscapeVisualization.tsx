@@ -7,22 +7,50 @@ import { GraphResponse } from "../hooks/useTransformGraph";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
+import popper from 'cytoscape-popper';
+import tippy, { Props, Instance } from 'tippy.js';
+import 'tippy.js/dist/tippy.css'; // optional: tippy styling
+import type { VirtualElement } from '@popperjs/core';
+import ElementInfo from '../components/ElementInfo';
 
+// Register extensions 
 cytoscape.use( coseBilkent)
 cytoscape.use( avsdf)
 cytoscape.use( dagre)
 cytoscape.use(cxtmenu);
 
 
+function tippyFactory(ref: VirtualElement, content: HTMLElement): Instance<Props> {
+  const dummyDomEle = document.createElement('div');
+
+  const tip = tippy(dummyDomEle, {
+    getReferenceClientRect: ref.getBoundingClientRect,
+    trigger: 'manual',
+    content, 
+    arrow: true,
+    placement: 'bottom',
+    hideOnClick: false,
+    sticky: 'reference',
+    interactive: true,
+    appendTo: document.body,
+  });
+
+  return tip;
+}
+
+cytoscape.use(popper(tippyFactory));
+
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
-  openModal: (nodeData: any) => void;
+  openModal: (modalContent: any) => void;
 }
 
 export interface CytoscapeVisualizationRef {
   exportPNG: () => string;
 }
+
+
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
   ({ data, layout, openModal }, ref) => {
@@ -214,25 +242,25 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       commands: [
         {
           content: '<span class="fa fa-check-circle-o fa-2x"></span>',
-          select: (ele: cytoscape.NodeSingular) => {
-          ele.toggleClass('checked');
+          select: (node: cytoscape.NodeSingular) => {
+          node.toggleClass('checked');
           },
         },
         {
           content: '<span class="fa fa-star fa-2x"></span>',
-          select: (ele: cytoscape.NodeSingular) => {
-            ele.toggleClass('starred');
+          select: (node: cytoscape.NodeSingular) => {
+            node.toggleClass('starred');
           },
         },
         {
-          content: 'Info',
-          select: (ele: cytoscape.NodeSingular ) => {
-          openModal(ele);
+          content: '<span class="fa fa-info-circle fa-2x"></span>',
+          select: (node: cytoscape.NodeSingular ) => {
+          openModal(<ElementInfo element={node} />);
           }
         },
 
         {
-          content: 'Pie',
+          content: '<span class="fa fa-pie-chart fa-2x"></span>',
           select: (ele: cytoscape.NodeSingular) => {
 
             // Combine incoming and outgoing edges.
@@ -298,14 +326,34 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       commands: [
         {
           content: '<span class="fa fa-check-circle-o fa-2x"></span>',
-          select: (ele: cytoscape.EdgeSingular) => {
-          ele.toggleClass('checked');
+          select: (edge: cytoscape.EdgeSingular) => {
+          edge.toggleClass('checked');
           },
         },
         {
-          content: 'Info',
-          select: (ele: cytoscape.EdgeSingular) => {
-          openModal(ele);
+          content: '<span class="fa fa-info-circle fa-2x"></span>',
+          select: (edge: cytoscape.EdgeSingular) => {
+          openModal(<ElementInfo element={edge} />);
+          }
+        },
+        {
+          content: '<span class="fa fa-cogs fa-2x"></span>',
+          select: (edge: cytoscape.EdgeSingular) => {
+            if (edge.tippyInstance) {
+              edge.tippyInstance.destroy();
+              delete edge.tippyInstance;
+            } else {
+              const tip = edge.popper({
+                content: () => {
+                  const content  = document.createElement('div');
+                  content .innerHTML = `Dummy Operation`;
+                  return content ;
+                },
+              });
+        
+              tip.show();
+              edge.tippyInstance = tip;
+            }
           }
         },
       ],

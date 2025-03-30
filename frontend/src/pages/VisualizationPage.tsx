@@ -4,6 +4,7 @@ import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components
 import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
 import  InfoModal from '../components/InfoModal';
+import AboutContent from '../components/AboutContent';
 
 
 import '../index.css';
@@ -22,18 +23,19 @@ const VisualizationPage: React.FC = () => {
 
   // Modal state for InfoModal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalNodeData, setModalNodeData] = useState<any>(null);
+  const [modalContent, setModalContent] = useState<any>(null);
 
   // openModal and closeModal functions
-  const openModal = (nodeData: any) => {
-    setModalNodeData(nodeData);
+  const openModal = (modalContent: any) => {
+    setModalContent(modalContent);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setModalNodeData(null);
+    setModalContent(null);
   };
+
 
   const handleExport = () => {
     if (!cyVizRef.current) return;
@@ -85,54 +87,63 @@ const VisualizationPage: React.FC = () => {
         </main>
 
         <aside className="sidebar">
-          <button className="sidebar-button" title="Exit this visualization" onClick={handleExit}> <span className="material-icons">exit_to_app</span> </button>
-          <hr></hr>
-          <button className="sidebar-button" title= "Set dot layout" onClick={() => setCurrentLayout("preset")}> 
-            <span className="material-icons">more_horiz</span> 
+        
+          {/* Layout Section */}
+          <p className="sidebar-label">Layouts</p>
+          <button className={`sidebar-button ${currentLayout === "preset" ? "active" : ""}`} title="Dot layout" onClick={() => setCurrentLayout("preset")}>
+            <span className="material-icons">more_horiz</span>
           </button>
-          <button className="sidebar-button" title="Set circular layout" onClick={() => setCurrentLayout("avsdf")}>
+          <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular layout" onClick={() => setCurrentLayout("avsdf")}>
             <span className="material-icons">radio_button_unchecked</span>
           </button>
-          <button className="sidebar-button" title = "Set grid layout" onClick={() => setCurrentLayout("grid")}> 
-            <span className="material-icons">grid_view</span> 
+          <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid layout" onClick={() => setCurrentLayout("grid")}>
+            <span className="material-icons">grid_view</span>
           </button>
-          <button className="sidebar-button" title = "Set dagre layout" onClick={() => setCurrentLayout("dagre")}> 
-            <span className="material-icons">swap_horiz</span> 
+          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre layout" onClick={() => setCurrentLayout("dagre")}>
+            <span className="material-icons">swap_horiz</span>
           </button>
-          <button className="sidebar-button" title = "Set breadthfirst layout" onClick={() => setCurrentLayout("breadthfirst")}> 
-            <span className="material-icons">park</span> 
+          <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst layout" onClick={() => setCurrentLayout("breadthfirst")}>
+            <span className="material-icons">park</span>
           </button>
 
-          <hr></hr>
-          <button className="sidebar-button" title= "Filter"> 
-            <span className="material-icons">filter_alt</span> 
+          {/* Tools Section */}
+          <p className="sidebar-label">Tools</p>
+          <button className="sidebar-button" title="Filter loops in common">
+            <span className="material-icons">filter_alt</span>
           </button>
-          <button className="sidebar-button" title= "Filter"> 
-            <span className="material-icons">filter_alt</span> 
+          <button className="sidebar-button" title="Get match results">
+            <span className="material-icons">track_changes</span>
           </button>
-          <button className="sidebar-button" title= "Filter"> 
-            <span className="material-icons">filter_alt</span> 
+
+
+          {/* Export Section */}
+          <p className="sidebar-label">Export</p>
+          <button className="sidebar-button" title="Export as PNG" onClick={handleExport}>
+            <span className="material-icons">image</span>
           </button>
-          <hr></hr>
-          <button className="sidebar-button" title= "Filter"> 
-            <span className="material-icons">track_changes</span> 
+          <button className="sidebar-button" title="Export as PDF">
+            <span className="material-icons">picture_as_pdf</span>
           </button>
-          <hr></hr>
-          <button className="sidebar-button" title= "Export as PNG" onClick={handleExport}> 
-            <span className="material-icons">image</span> 
-          </button>
-          <button className="sidebar-button" title= "Export as PDF"> 
-            <span className="material-icons">picture_as_pdf</span> 
-          </button>
-          <hr></hr>
-          <button className="sidebar-button" title= "Get input information"> <span className="material-icons">info</span> </button>
-        </aside>
+
+          <div style={{ marginTop: 'auto' }}>
+          <p className="sidebar-label">About</p>
+            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent />)}>
+              <span className="material-icons">info</span>
+            </button>
+            <p className="sidebar-label">Exit</p>
+            <button className="sidebar-button" title="Exit this visualization" onClick={handleExit}>
+              <span className="material-icons">exit_to_app</span>
+            </button>
+          </div>
+
+          </aside>
+
       </div>
       <div className="bottom-left-info">
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} node={modalNodeData} />
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} />
     </div>
   );
 };

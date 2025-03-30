@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "@types/d3": "^7.4.3",
     "axios": "^1.7.9",
     "cytoscape": "^3.31.0",
@@ -17,6 +18,7 @@
     "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-cxtmenu": "^3.5.0",
     "cytoscape-dagre": "^2.5.0",
+    "cytoscape-popper": "^4.0.1",
     "d3": "^7.9.0",
     "dagre": "^0.8.5",
     "dompurify": "^3.2.4",
@@ -25,7 +27,8 @@
     "react-dom": "^19.0.0",
     "react-draggable": "^4.4.6",
     "react-draggable-lite": "^1.0.0",
-    "react-modal": "^3.16.3"
+    "react-modal": "^3.16.3",
+    "tippy.js": "^6.3.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

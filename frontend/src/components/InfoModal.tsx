@@ -1,34 +1,34 @@
-import React, { useState, useRef } from 'react';
+// InfoModal.tsx
+import React from 'react';
 import Modal from 'react-modal';
-import cytoscape from 'cytoscape';
 
 interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  node: cytoscape.NodeSingular | null;
+  content: React.ReactNode;
 }
 
-export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
-  if (!isOpen || !node) return null;
+export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
+  if (!isOpen) return null;
 
   return (
     <Modal
-    isOpen={isOpen}
-    onRequestClose={onClose}
-    contentLabel="Node Info"
-    bodyOpenClassName=""
-    htmlOpenClassName=""
-    style={{
-      overlay: { backgroundColor: 'transparent' },
-      content: {
-        position: 'static',
-        inset: 'unset',
-        padding: 0,
-        border: 'none',
-        background: 'none',
-      },
-    }}
-  >
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      contentLabel="Info Modal"
+      bodyOpenClassName=""
+      htmlOpenClassName=""
+      style={{
+        overlay: { backgroundColor: 'transparent' },
+        content: {
+          position: 'static',
+          inset: 'unset',
+          padding: 0,
+          border: 'none',
+          background: 'none',
+        },
+      }}
+    >
       <div
         style={{
           display: 'flex',
@@ -52,22 +52,7 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
             }}
           >
             <div style={{ marginBottom: '10px' }}>
-            <h2>Informatie {node.isNode() ? 'Node' : 'Edge'} {node.data('label') || 'No Label'}</h2>
-
-            {node.isNode() && (
-              <>
-                <p>Node ID: {node.id()}</p>
-                <p>Type: {node.data('type')}</p>
-              </>
-            )}
-
-            {node.isEdge() && (
-              <>
-                <p>From: {node.source().id()}</p>
-                <p>To: {node.target().id()}</p>
-                <p>Edge Label: {node.data('label')}</p>
-              </>
-            )}
+              {content}
             </div>
             <div style={{ textAlign: 'center', marginTop: '10px' }}>
               <button onClick={onClose}>Close</button>
@@ -75,7 +60,7 @@ export function InfoModal({ isOpen, onClose, node }: InfoModalProps) {
           </div>
         </DraggableContainer>
       </div>
-  </Modal>
+    </Modal>
   );
 }
 
@@ -84,9 +69,9 @@ interface DraggableContainerProps {
 }
 
 const DraggableContainer: React.FC<DraggableContainerProps> = ({ children }) => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const isDragging = useRef(false);
-  const startPos = useRef({ x: 0, y: 0 });
+  const [position, setPosition] = React.useState({ x: 0, y: 0 });
+  const isDragging = React.useRef(false);
+  const startPos = React.useRef({ x: 0, y: 0 });
 
   const onMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
