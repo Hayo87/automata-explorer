@@ -4,6 +4,7 @@ import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components
 import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
 import  InfoModal from '../components/InfoModal';
+import AboutContent from '../components/AboutContent';
 
 
 import '../index.css';
@@ -22,18 +23,19 @@ const VisualizationPage: React.FC = () => {
 
   // Modal state for InfoModal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalNodeData, setModalNodeData] = useState<any>(null);
+  const [modalContent, setModalContent] = useState<any>(null);
 
   // openModal and closeModal functions
-  const openModal = (nodeData: any) => {
-    setModalNodeData(nodeData);
+  const openModal = (modalContent: any) => {
+    setModalContent(modalContent);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setModalNodeData(null);
+    setModalContent(null);
   };
+
 
   const handleExport = () => {
     if (!cyVizRef.current) return;
@@ -125,7 +127,7 @@ const VisualizationPage: React.FC = () => {
 
           <div style={{ marginTop: 'auto' }}>
           <p className="sidebar-label">About</p>
-            <button className="sidebar-button" title="About this app">
+            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent />)}>
               <span className="material-icons">info</span>
             </button>
             <p className="sidebar-label">Exit</p>
@@ -141,7 +143,7 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} node={modalNodeData} />
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} />
     </div>
   );
 };

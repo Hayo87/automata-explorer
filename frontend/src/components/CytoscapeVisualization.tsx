@@ -11,6 +11,7 @@ import popper from 'cytoscape-popper';
 import tippy, { Props, Instance } from 'tippy.js';
 import 'tippy.js/dist/tippy.css'; // optional: tippy styling
 import type { VirtualElement } from '@popperjs/core';
+import ElementInfo from '../components/ElementInfo';
 
 // Register extensions 
 cytoscape.use( coseBilkent)
@@ -42,7 +43,7 @@ cytoscape.use(popper(tippyFactory));
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
-  openModal: (nodeData: any) => void;
+  openModal: (modalContent: any) => void;
 }
 
 export interface CytoscapeVisualizationRef {
@@ -241,20 +242,20 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       commands: [
         {
           content: '<span class="fa fa-check-circle-o fa-2x"></span>',
-          select: (ele: cytoscape.NodeSingular) => {
-          ele.toggleClass('checked');
+          select: (node: cytoscape.NodeSingular) => {
+          node.toggleClass('checked');
           },
         },
         {
           content: '<span class="fa fa-star fa-2x"></span>',
-          select: (ele: cytoscape.NodeSingular) => {
-            ele.toggleClass('starred');
+          select: (node: cytoscape.NodeSingular) => {
+            node.toggleClass('starred');
           },
         },
         {
           content: '<span class="fa fa-info-circle fa-2x"></span>',
-          select: (ele: cytoscape.NodeSingular ) => {
-          openModal(ele);
+          select: (node: cytoscape.NodeSingular ) => {
+          openModal(<ElementInfo element={node} />);
           }
         },
 
@@ -332,7 +333,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         {
           content: '<span class="fa fa-info-circle fa-2x"></span>',
           select: (edge: cytoscape.EdgeSingular) => {
-          openModal(edge);
+          openModal(<ElementInfo element={edge} />);
           }
         },
         {
