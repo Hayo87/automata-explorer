@@ -217,7 +217,10 @@ button:focus-visible {
   left: 0;
   background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
   padding: 5px;
-  font-size: 10px;
+  font-size: 0.7rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   z-index: 1000; 
   border-top-right-radius: 8px;
 }
