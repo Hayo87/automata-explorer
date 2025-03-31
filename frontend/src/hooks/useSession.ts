@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { uploadFiles, fetchSessionData, closeSession } from "../api/SessionApi";
+import { uploadFiles, fetchSessionData, closeSession, fetchFilteredSessionData } from "../api/SessionApi";
+import { Filter } from '../types/Filter';
 
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -38,6 +39,21 @@ export const useSession = () => {
     }
   };
 
+  // Fetch session data for visualization based on filters
+  const loadFilteredSessionData = async (sessionId: string, filters: Filter[]) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const sessionData = await fetchFilteredSessionData(sessionId, filters);
+      setData(sessionData);
+    } catch (err) {
+      setError((err as Error).message);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Close session using the API's closeSession function.
   const closeSessionHook = async (sessionId: string) => {
     try {
@@ -48,5 +64,5 @@ export const useSession = () => {
     }
   };
 
-  return { sessionId, data, loading, error, startSession, loadSessionData, closeSession: closeSessionHook };
+  return { sessionId, data, loading, error, startSession, loadSessionData, loadFilteredSessionData, closeSession: closeSessionHook };
 };
