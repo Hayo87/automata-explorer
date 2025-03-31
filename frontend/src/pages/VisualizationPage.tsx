@@ -5,17 +5,19 @@ import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
 import  InfoModal from '../components/InfoModal';
 import AboutContent from '../components/AboutContent';
-
-
+import FilterInfo from '../components/FilterInfo';
 import '../index.css';
+import { Filter } from '../types/Filter';
+
 
 const VisualizationPage: React.FC = () => {
   const { sessionId} = useParams<{ sessionId: string }>();
   const location = useLocation();
   const { reference, subject } = location.state as { reference: string; subject: string };
   const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
+  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
 
-  const { data, loadSessionData, loading } = useSession();
+  const { data, loadSessionData, loadFilteredSessionData, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
 
   const navigate = useNavigate();
@@ -34,6 +36,26 @@ const VisualizationPage: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setModalContent(null);
+  };
+
+  const openFilterModal = () => {
+    openModal(
+      <FilterInfo
+        initialFilters={activeFilters}
+        onProcess={async (updatedFilters) => {
+          setActiveFilters(updatedFilters); 
+          setIsModalOpen(false);
+  
+          const backendFilters = updatedFilters.filter(
+            (f) => f.type !== 'loop' 
+          );
+
+          if (backendFilters.length > 0) {
+             await loadFilteredSessionData(sessionId!, backendFilters);
+          }
+        }}
+      />
+    );
   };
 
 
@@ -108,7 +130,7 @@ const VisualizationPage: React.FC = () => {
 
           {/* Tools Section */}
           <p className="sidebar-label">Tools</p>
-          <button className="sidebar-button" title="Filter loops in common">
+          <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
             <span className="material-icons">filter_alt</span>
           </button>
           <button className="sidebar-button" title="Get match results">
@@ -125,9 +147,10 @@ const VisualizationPage: React.FC = () => {
             <span className="material-icons">picture_as_pdf</span>
           </button>
 
+          {/* About and Exit section */}
           <div style={{ marginTop: 'auto' }}>
           <p className="sidebar-label">About</p>
-            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent />)}>
+            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent/>)}>
               <span className="material-icons">info</span>
             </button>
             <p className="sidebar-label">Exit</p>
@@ -146,6 +169,6 @@ const VisualizationPage: React.FC = () => {
       <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} />
     </div>
   );
-};
+}
 
 export default VisualizationPage;
