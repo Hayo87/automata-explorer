@@ -45,7 +45,8 @@ public class FilterService {
 
                 if (synonyms.contains(output)) {
                 String newLabel = input + "/" + name;    
-                // add new transtition        
+                // add new transtition
+
                 automaton.addTransition(t.getSource(), new DiffProperty<>(newLabel, t.getProperty().getDiffKind()), t.getTarget());
                 // mark old transition for removal
                 toRemove.add(t);    
