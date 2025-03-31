@@ -82,7 +82,7 @@ public class BuildService {
                     filterService.processSynonyms(synonymActions, sessionId);
 
                 // Start build 
-                Object buildData = buildDefault(sessionId);;
+                Object buildData = buildDefault(sessionId);
                 return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
             }
 
