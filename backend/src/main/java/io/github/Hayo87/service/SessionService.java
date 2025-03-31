@@ -80,6 +80,17 @@ public class SessionService {
     }
 
     /**
+     *  Retrieves the  raw reference automata
+     *
+     * @param sessionId The session ID.
+     * @return The reference automata.
+     */
+    public String getRawReferenceAutomata(String sessionId) {
+        SessionData session = getSession(sessionId);
+        return session.getInputReference();
+    }
+
+    /**
      *  Retrieves the subject automata
      *
      * @param sessionId The session ID.
@@ -88,6 +99,17 @@ public class SessionService {
     public DiffAutomaton<String> getSubjectAutomata(String sessionId) {
         SessionData session = getSession(sessionId);
         return session.getSubject();
+    }
+
+    /**
+     *  Retrieves the raw subject automata
+     *
+     * @param sessionId The session ID.
+     * @return The subject automata
+     */
+    public String getRawSubjectAutomata(String sessionId) {
+        SessionData session = getSession(sessionId);
+        return session.getInputSubject();
     }
     
     /**
