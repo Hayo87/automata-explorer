@@ -100,7 +100,7 @@ public class BuildService {
 
         // Configure comparison, merging, and writing.
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
-        builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>("[skip]"));
+        builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>(""));
         var comparator = builder.createComparator();
         var writer = builder.createWriter();
 
