@@ -5,7 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
@@ -68,23 +70,25 @@ public class BuildService {
             }
 
             case "filter" -> {
-                // build clean input
-                buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
-                buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
+            buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
+            buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
 
-                // Get all actions
-                List<FilterActionDTO> actions = (List<FilterActionDTO>) request.getData();
+            ObjectMapper mapper = new ObjectMapper();
+            List<FilterActionDTO> actions = mapper.convertValue(
+                request.getData(),
+                new TypeReference<List<FilterActionDTO>>() {}
+            );
 
-                // apply synonyms 
-                List<FilterActionDTO> synonymActions = actions.stream()
-                    .filter(a -> "synonym".equalsIgnoreCase(a.getType()))
-                    .toList();
-                    filterService.processSynonyms(synonymActions, sessionId);
+            // Filter synonym actions
+            List<FilterActionDTO> synonymActions = actions.stream()
+                .filter(a -> "synonym".equalsIgnoreCase(a.getType()))
+                .toList();
 
-                // Start build 
-                Object buildData = buildDefault(sessionId);
-                return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
-            }
+            filterService.processSynonyms(synonymActions, sessionId);
+
+            Object buildData = buildDefault(sessionId);
+            return new BuildResponseDTO("build", "success", "Filtered build successful", buildData);
+        }
 
             default -> {
                 return new BuildResponseDTO(action, "Error processing", "Invalid action");
