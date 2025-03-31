@@ -1,14 +1,18 @@
 package io.github.Hayo87.dto;
 
+import java.util.List;
+
 public class FilterActionDTO {
-    private String type;  
-    private String value;
+    private String type;      
+    private String name;      
+    private List<String> values;
 
     public FilterActionDTO() {}
 
-    public FilterActionDTO(String type, String value) {
+    public FilterActionDTO(String type, String name, List<String> values) {
         this.type = type;
-        this.value = value;
+        this.name = name;
+        this.values = values;
     }
 
     public String getType() {
@@ -19,11 +23,19 @@ public class FilterActionDTO {
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public String getName() {
+        return name;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<String> getValues() {
+        return values;
+    }
+
+    public void setValues(List<String> values) {
+        this.values = values;
     }
 }

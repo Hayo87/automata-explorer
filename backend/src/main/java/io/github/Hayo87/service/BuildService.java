@@ -1,6 +1,7 @@
 package io.github.Hayo87.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
+import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.dto.MatchResultDTO;
 
 /**
@@ -23,11 +25,13 @@ public class BuildService {
     private final SessionService sessionService;
     private final ParserService parserService;
     private final MatchService matchService; 
+    private final FilterService filterService;
 
-    public BuildService(SessionService sessionService, ParserService parserService, MatchService matchService) {
+    public BuildService(SessionService sessionService, ParserService parserService, MatchService matchService, FilterService filterService) {
         this.sessionService = sessionService;
         this.parserService = parserService;
         this.matchService = matchService;
+        this.filterService = filterService;
     }
 
     /**
@@ -64,7 +68,20 @@ public class BuildService {
             }
 
             case "filter" -> {
-                // apply filters
+                // build clean input
+                buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
+                buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
+
+                // Get all actions
+                List<FilterActionDTO> actions = (List<FilterActionDTO>) request.getData();
+
+                // apply synonyms 
+                List<FilterActionDTO> synonymActions = actions.stream()
+                    .filter(a -> "synonym".equalsIgnoreCase(a.getType()))
+                    .toList();
+                    filterService.processSynonyms(synonymActions, sessionId);
+
+                // Start build 
                 Object buildData = buildDefault(sessionId);;
                 return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
             }
