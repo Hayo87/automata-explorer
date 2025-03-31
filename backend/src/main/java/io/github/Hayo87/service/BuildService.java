@@ -63,6 +63,12 @@ public class BuildService {
                 return new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData);
             }
 
+            case "filter" -> {
+                // apply filters
+                Object buildData = buildDefault(sessionId);;
+                return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
+            }
+
             default -> {
                 return new BuildResponseDTO(action, "Error processing", "Invalid action");
             }
