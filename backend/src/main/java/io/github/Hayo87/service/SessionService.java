@@ -1,16 +1,15 @@
 package io.github.Hayo87.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
 import io.github.Hayo87.dto.DeleteSessionResponseDTO;
+import io.github.Hayo87.model.SessionData;
 
 /**
  * Manages session creation, storage and deletion
@@ -20,7 +19,7 @@ import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 @Service
 public class SessionService {
 
-    private final Map<String, List<DiffAutomaton<String>>> sessionHistory = new ConcurrentHashMap<>();
+    private final Map<String, SessionData> sessions = new HashMap<>();
 
     public SessionService() {
     }
@@ -32,22 +31,41 @@ public class SessionService {
      */
     public String createSession() {
         String sessionId = UUID.randomUUID().toString();
-        List<DiffAutomaton<String>> history = new ArrayList<>();
-        sessionHistory.put(sessionId, history);
+        sessions.put(sessionId, new SessionData());
         return sessionId;
         }
 
     /**
-     * Stores automata for an existing session.
+     * Stores reference automata for an existing session.
      *
      * @param sessionId The session ID.
      * @param automaton The automata to be stored.
      */
-    public void store(String sessionId, DiffAutomaton<String> automaton) {
-        if (!sessionHistory.containsKey(sessionId)) {
-            throw new IllegalArgumentException("Session ID not found.");
-        }
-        sessionHistory.get(sessionId).add(automaton);
+    public void storeReference(String sessionId, DiffAutomaton<String> reference) {
+        SessionData session = getSession(sessionId);
+        session.setReference(reference);
+    }
+
+    /**
+     * Stores subject automata for an existing session.
+     *
+     * @param sessionId The session ID.
+     * @param automaton The automata to be stored.
+     */
+    public void storeSubject(String sessionId, DiffAutomaton<String> subject) {
+        SessionData session = getSession(sessionId);
+        session.setSubject(subject);
+    }
+
+    /**
+     * Stores difference automata for an existing session.
+     *
+     * @param sessionId The session ID.
+     * @param automaton The automata to be stored.
+     */
+    public void storeDifference(String sessionId, DiffAutomaton<String> automaton) {
+        SessionData session = getSession(sessionId);
+        session.setDiffAutomaton(automaton);
     }
 
     /**
@@ -57,8 +75,8 @@ public class SessionService {
      * @return The reference automata.
      */
     public DiffAutomaton<String> getReferenceAutomata(String sessionId) {
-        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
-        return  (history != null && !history.isEmpty()) ? history.get(0) : null;
+        SessionData session = getSession(sessionId);
+        return session.getReference();
     }
 
     /**
@@ -68,8 +86,8 @@ public class SessionService {
      * @return The subject automata
      */
     public DiffAutomaton<String> getSubjectAutomata(String sessionId) {
-        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
-        return  (history != null && history.size() > 1) ? history.get(1) : null;
+        SessionData session = getSession(sessionId);
+        return session.getSubject();
     }
     
     /**
@@ -79,12 +97,8 @@ public class SessionService {
      * @return The latest automaton, or null if no history exists.
      */
     public DiffAutomaton<String> getLatestDiffAutomaton(String sessionId) {
-        List<DiffAutomaton<String>> history = sessionHistory.get(sessionId);
-
-        if (history == null || history.isEmpty() || history.size() < 3) {
-            return null;
-        }
-        return history.get(history.size() - 1); // Get the last element
+        SessionData session = getSession(sessionId);
+        return session.getDiffAutomaton();
     }
 
     /**
@@ -94,13 +108,20 @@ public class SessionService {
      * @return DeleteSessionResponseDTO 
      */
     public DeleteSessionResponseDTO terminateSession(String sessionId) {
-        if (!sessionHistory.containsKey(sessionId)) {
+        if (!sessions.containsKey(sessionId)) {
             return new DeleteSessionResponseDTO("Session " + sessionId + " not found");
         }
         else {  
-            sessionHistory.remove(sessionId);
+            sessions.remove(sessionId);
             return new DeleteSessionResponseDTO("Session " + sessionId + " deleted successfully.");
         }
+    }
+
+    private SessionData getSession (String sessionId) {
+        if (!sessions.containsKey(sessionId)) {
+            throw new IllegalArgumentException("Session ID not found.");
+        }
+        return sessions.get(sessionId);
     }
 }
 
