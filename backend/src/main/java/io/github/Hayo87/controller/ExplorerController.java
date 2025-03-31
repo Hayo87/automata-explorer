@@ -50,7 +50,7 @@ public class ExplorerController {
      */
     @PostMapping("/session")
     public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
-        String sessionId = sessionService.createSession();
+        String sessionId = sessionService.createSession(input.getReference(), input.getSubject());
     
         try {
             buildService.processBuildAction(sessionId, new BuildRequestDTO("reference", input.getReference()));

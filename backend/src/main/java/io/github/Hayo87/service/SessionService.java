@@ -29,9 +29,9 @@ public class SessionService {
      *
      * @return A string with the unique session ID.
      */
-    public String createSession() {
+    public String createSession(String dotReference, String dotSubject) {
         String sessionId = UUID.randomUUID().toString();
-        sessions.put(sessionId, new SessionData());
+        sessions.put(sessionId, new SessionData(dotReference, dotSubject));
         return sessionId;
         }
 
