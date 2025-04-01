@@ -46,13 +46,12 @@ public class FilterService {
                 if (synonyms.contains(output)) {
                 String newLabel = input + "/" + name;    
                 // add new transtition
-
                 automaton.addTransition(t.getSource(), new DiffProperty<>(newLabel, t.getProperty().getDiffKind()), t.getTarget());
                 // mark old transition for removal
                 toRemove.add(t);    
                 }
             }
-            // Remove replaced transitions
+            // Remove old transitions
             for (Transition<DiffAutomatonStateProperty, DiffProperty<String>> t : toRemove) {
                 automaton.removeTransition(t);
             }
