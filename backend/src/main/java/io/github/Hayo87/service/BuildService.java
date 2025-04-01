@@ -16,6 +16,7 @@ import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.dto.MatchResultDTO;
+import io.github.Hayo87.type.FilterType;
 
 /**
  * Manages all build related actions and information request 
@@ -73,8 +74,8 @@ public class BuildService {
 
                     // Filter synonym actions
                     List<FilterActionDTO> synonymActions = actions.stream()
-                    .filter(a -> "synonym".equalsIgnoreCase(a.getType()))
-                    .toList();
+                    .filter(a -> a.getType() == FilterType.SYNONYM)
+                    .toList();      
 
                     // Process filters
                     filterService.processSynonyms(synonymActions, sessionId); 
