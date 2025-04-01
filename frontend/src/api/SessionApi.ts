@@ -12,6 +12,7 @@ const readDotFileAsText = (file: File): Promise<string> => {
   });
 };
 
+// Post input files and initiate a session
 export const uploadFiles = async (file1: File, file2: File): Promise<string> => {
   try {
     // Read .dot files as text
