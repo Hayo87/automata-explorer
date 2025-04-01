@@ -17,10 +17,10 @@ import 'tippy.js/dist/tippy.css';
 import type { VirtualElement } from '@popperjs/core';
 
 // Utils 
-import { attachSynonymTooltips } from './utils/attachSynonymTooltips';
-import { processSynonymLabels  } from './utils/processSynonymLabels';
-import { attachCytoscapeMenus } from "./utils/attachCytoscapeMenus";
-import cytoscapeStyles from '../style/cytoscapeStyles';
+import { attachSynonymTooltips } from '../utils/attachSynonymTooltips';
+import { processSynonymLabels  } from '../utils/processSynonymLabels';
+import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
+import cytoscapeStyles from '../utils/cytoscapeStyles';
 
 // Register extensions 
 cytoscape.use( coseBilkent )
@@ -148,7 +148,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     processSynonymLabels(cyInstance, synonyms); 
 
     // Attach synonym tooltips
-    attachSynonymTooltips(cyInstance, synonyms);
+   attachSynonymTooltips(cyInstance, synonyms);
 
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);
