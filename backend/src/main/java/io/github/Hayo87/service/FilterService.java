@@ -29,7 +29,7 @@ public class FilterService {
         for (FilterActionDTO s: filters) {
             String name = s.getName();
             List<String> synonyms = s.getValues();
-            FilterSubtype subtype = s.getSubType();
+            FilterSubtype subtype = s.getSubtype();
             applySynonyms(subtype, reference, name, synonyms);
             applySynonyms(subtype, subject, name, synonyms); 
         }

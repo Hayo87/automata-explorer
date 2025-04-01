@@ -13,13 +13,6 @@ public class FilterActionDTO {
 
     public FilterActionDTO() {}
 
-    public FilterActionDTO(FilterType type, FilterSubtype subtype, String name, List<String> values) {
-        this.type = type;
-        this.subtype = subtype;
-        this.name = name;
-        this.values = values;
-    }
-
     public FilterType getType() {
         return type;
     }
@@ -28,7 +21,7 @@ public class FilterActionDTO {
         this.type = type;
     }
 
-    public FilterSubtype getSubType() {
+    public FilterSubtype getSubtype() {
         return subtype;
     }
 
