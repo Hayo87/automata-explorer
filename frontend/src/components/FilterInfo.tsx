@@ -6,8 +6,9 @@ interface Props {
   onProcess: (filters: Filter[]) => void;
 }
 
-const filterTypes = ['synonym', 'loop', 'outputHider'] as const;
-const loopValues = ['common', 'reference', 'subject'];
+const filterTypes = ['synonym', 'hider'] as const;
+const filterSubtypes = ['input', 'output'];
+const hiderSubtypes = ['input', 'output', 'loop'];
 
 const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
   const [filters, setFilters] = useState<Filter[]>([]);
@@ -15,18 +16,17 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
     type: 'synonym',
     name: '',
     values: [],
+    subtype: 'output'
   });
   const [valueInput, setValueInput] = useState('');
-
-  const isLoop = newFilter.type === 'loop';
 
   useEffect(() => {
     setFilters(initialFilters);
   }, [initialFilters]);
 
   const handleAdd = () => {
-    if (!valueInput.trim()) return;
-    if (!isLoop && !newFilter.name.trim()) return;
+    if (!valueInput.trim() || !newFilter.subtype) return;
+    if (newFilter.type !== 'hider' && !newFilter.name.trim()) return;
 
     const splitValues = valueInput
       .split(',')
@@ -39,10 +39,11 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
       type: newFilter.type,
       name: newFilter.name,
       values: splitValues,
+      subtype: newFilter.subtype
     };
 
     setFilters([...filters, newEntry]);
-    setNewFilter({ type: 'synonym', name: '', values: [] });
+    setNewFilter({ type: 'synonym', name: '', values: [], subtype: 'output' });
     setValueInput('');
   };
 
@@ -77,6 +78,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
             >
               <span>
                 <strong>{filter.type}</strong>
+                {filter.subtype && <> [{filter.subtype}]</>}
                 {filter.name && <> → {filter.name}</>}
                 {' = '}
                 {filter.values.join(', ')}
@@ -113,7 +115,14 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
         <select
           value={newFilter.type}
           onChange={(e) => {
-            setNewFilter({ ...newFilter, type: e.target.value as Filter['type'], name: '', values: [] });
+            const selectedType = e.target.value as Filter['type'];
+            setNewFilter({
+              ...newFilter,
+              type: selectedType,
+              name: '',
+              values: [],
+              subtype: selectedType === 'synonym' ? 'output' : 'loop'
+            });
             setValueInput('');
           }}
         >
@@ -124,41 +133,39 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
           ))}
         </select>
 
+        <select
+          value={newFilter.subtype || ''}
+          onChange={(e) => setNewFilter({ ...newFilter, subtype: e.target.value })}
+          style={{ width: '100px' }}
+        >
+          <option value="">Subtype</option>
+          {(newFilter.type === 'synonym' ? filterSubtypes : hiderSubtypes).map((sub) => (
+            <option key={sub} value={sub}>
+              {sub}
+            </option>
+          ))}
+        </select>
+
         <input
           type="text"
           placeholder="Name"
           value={newFilter.name}
-          disabled={isLoop}
+          disabled={newFilter.type === 'hider'}
           onChange={(e) => setNewFilter({ ...newFilter, name: e.target.value })}
           style={{
             width: '160px',
-            backgroundColor: isLoop ? '#f0f0f0' : undefined,
-            color: isLoop ? '#999' : undefined,
+            backgroundColor: newFilter.type === 'hider' ? '#f0f0f0' : undefined,
+            color: newFilter.type === 'hider' ? '#999' : undefined,
           }}
         />
 
-        {isLoop ? (
-          <select
-            value={newFilter.values[0] || ''}
-            onChange={(e) => setNewFilter({ ...newFilter, values: [e.target.value] })}
-            style={{ width: '160px' }}
-          >
-            <option value="">Select</option>
-            {loopValues.map((val) => (
-              <option key={val} value={val}>
-                {val}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            type="text"
-            placeholder="Values (comma-separated)"
-            value={valueInput}
-            onChange={(e) => setValueInput(e.target.value)}
-            style={{ width: '160px' }}
-          />
-        )}
+        <input
+          type="text"
+          placeholder="Values (comma-separated)"
+          value={valueInput}
+          onChange={(e) => setValueInput(e.target.value)}
+          style={{ width: '160px' }}
+        />
 
         <button onClick={handleAdd}>Add</button>
       </div>

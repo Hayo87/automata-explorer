@@ -241,36 +241,54 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       const label = edge.data('label');
       const [input, output] = label?.split('/')?.map((s: string) => s.trim()) ?? [];
 
-      if (output && synonyms.has(output.trim())) {
-        const decorated = `${input}/ {${output}}`; 
-        edge.data('label', decorated);
-        edge.addClass('synonym-output');
-        edge.data('synonymTerm', output.trim());
+      const hasInputSynonym = input && synonyms.has(input);
+      const hasOutputSynonym = output && synonyms.has(output);
+
+      if (hasInputSynonym || hasOutputSynonym) {
+        const decoratedInput = hasInputSynonym ? `{${input}}` : input;
+        const decoratedOutput = hasOutputSynonym ? `{${output}}` : output;
+        const decoratedLabel = `${decoratedInput}/${decoratedOutput}`;
+
+        edge.data('label', decoratedLabel);
+        edge.addClass('synonym');
+
+        if (hasInputSynonym) {
+          edge.data('synonymInput', input);
+        }
+        if (hasOutputSynonym) {
+          edge.data('synonymOutput', output);
+        }
       }
     });
 
+
     // Show tooltip on mouseover for synonyms
-    cyInstance.on('mouseover', 'edge.synonym-output', (event: cytoscape.EventObject) => {
+    cyInstance.on('mouseover', 'edge.synonym', (event: cytoscape.EventObject) => {
       const edge = event.target;
-      const synonym = edge.data('synonymTerm');
-      const values = synonyms.get(synonym);
-  
-      if (!values) return;
-  
+    
+      const inputTerm = edge.data('synonymInput');
+      const outputTerm = edge.data('synonymOutput');
+    
+      const inputValues = inputTerm ? synonyms.get(inputTerm) : null;
+      const outputValues = outputTerm ? synonyms.get(outputTerm) : null;
+    
+      if (!inputValues && !outputValues) return;
+    
       const content = document.createElement('div');
       content.innerHTML = `
-        <strong>${synonym}</strong><br/>
-        ${values.join(', ')}
+        ${inputValues ? `${inputTerm} → {${inputValues.join(', ')}}<br/>` : ''}
+        ${outputValues ? `${outputTerm} → {${outputValues.join(', ')}}` : ''}
       `;
-  
+    
       const tip = edge.popper({
         content: () => content,
       });
-  
+    
       tip.show();
-  
+    
       edge.once('mouseout', () => tip.destroy());
     });
+    
 
     // Add the context menu's 
     cyInstance.cxtmenu({

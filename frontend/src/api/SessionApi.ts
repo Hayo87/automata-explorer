@@ -50,7 +50,7 @@ export const uploadFiles = async (file1: File, file2: File): Promise<string> => 
 };
 
 // Post build action and get visualization data for a session
-export const postBuild = async (sessionId: string, filters:Filter[]): Promise<any> => {
+export const postBuild = async (sessionId: string, filterlist:Filter[]): Promise<any> => {
   try {
     const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`, {
       method: 'POST',
@@ -59,7 +59,7 @@ export const postBuild = async (sessionId: string, filters:Filter[]): Promise<an
       },
       body: JSON.stringify({
         action: 'build',       
-        data: filters,
+        filters: filterlist,
       }),
     });
 

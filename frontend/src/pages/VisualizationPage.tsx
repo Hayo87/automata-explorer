@@ -46,20 +46,20 @@ const VisualizationPage: React.FC = () => {
         onProcess={async (updatedFilters) => {
           setActiveFilters(updatedFilters); 
           setIsModalOpen(false);
-  
+
+          const synonymFilters = updatedFilters.filter(f => f.type === 'synonym');
+          await buildSession(sessionId!, synonymFilters);
+          
           const synonymMap = new Map<string, string[]>();
-          updatedFilters
-            .filter(f => f.type === 'synonym')
-            .forEach(f => synonymMap.set(f.name, f.values));
+          synonymFilters.forEach(f => synonymMap.set(f.name, f.values));
           setSynonymMap(synonymMap);
-  
-          const backendFilters = updatedFilters.filter(f => f.type !== 'loop');
-          if (backendFilters.length > 0) {
-            await buildSession(sessionId!, backendFilters);
-          }
         }}
       />
     );
+  };
+
+  const handleGroupSynonym = () => {
+    //dummy method
   };
   
   const handleExport = () => {
@@ -136,7 +136,7 @@ const VisualizationPage: React.FC = () => {
           <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
             <span className="material-icons">filter_alt</span>
           </button>
-          <button className="sidebar-button" title="Get match results">
+          <button className="sidebar-button" title="Create synonym" onClick={handleGroupSynonym} >
             <span className="material-icons">track_changes</span>
           </button>
 
