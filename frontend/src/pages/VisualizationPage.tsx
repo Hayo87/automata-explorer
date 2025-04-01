@@ -18,7 +18,7 @@ const VisualizationPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
   const [synonymMap, setSynonymMap] = useState<Map<string, string[]>>(new Map());
 
-  const { data, loadSessionData, loadFilteredSessionData, loading } = useSession();
+  const { data, buildSession, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
 
   const navigate = useNavigate();
@@ -55,15 +55,13 @@ const VisualizationPage: React.FC = () => {
   
           const backendFilters = updatedFilters.filter(f => f.type !== 'loop');
           if (backendFilters.length > 0) {
-            await loadFilteredSessionData(sessionId!, backendFilters);
+            await buildSession(sessionId!, backendFilters);
           }
         }}
       />
     );
   };
   
-
-
   const handleExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
@@ -93,7 +91,7 @@ const VisualizationPage: React.FC = () => {
 
   useEffect(() => {
     if (sessionId) {
-      loadSessionData(sessionId);
+      buildSession(sessionId, activeFilters);
     }
   }, [sessionId]);
 

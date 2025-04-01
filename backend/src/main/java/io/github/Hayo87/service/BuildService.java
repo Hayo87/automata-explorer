@@ -60,6 +60,26 @@ public class BuildService {
             }
 
             case "build" -> {
+                if (data !=null) { // process filters
+                    buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
+                    buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
+
+                    // Data to FilterActionDTO
+                    ObjectMapper mapper = new ObjectMapper();
+                    List<FilterActionDTO> actions = mapper.convertValue(
+                        request.getData(),
+                        new TypeReference<List<FilterActionDTO>>() {}
+                    );
+
+                    // Filter synonym actions
+                    List<FilterActionDTO> synonymActions = actions.stream()
+                    .filter(a -> "synonym".equalsIgnoreCase(a.getType()))
+                    .toList();
+
+                    // Process filters
+                    filterService.processSynonyms(synonymActions, sessionId); 
+                }
+
                 Object buildData = buildDefault(sessionId); 
                 return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
             }
@@ -68,27 +88,6 @@ public class BuildService {
                 Object matchData = match(sessionId);
                 return new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData);
             }
-
-            case "filter" -> {
-            buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
-            buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
-
-            ObjectMapper mapper = new ObjectMapper();
-            List<FilterActionDTO> actions = mapper.convertValue(
-                request.getData(),
-                new TypeReference<List<FilterActionDTO>>() {}
-            );
-
-            // Filter synonym actions
-            List<FilterActionDTO> synonymActions = actions.stream()
-                .filter(a -> "synonym".equalsIgnoreCase(a.getType()))
-                .toList();
-
-            filterService.processSynonyms(synonymActions, sessionId);
-
-            Object buildData = buildDefault(sessionId);
-            return new BuildResponseDTO("build", "success", "Filtered build successful", buildData);
-        }
 
             default -> {
                 return new BuildResponseDTO(action, "Error processing", "Invalid action");
