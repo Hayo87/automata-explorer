@@ -61,10 +61,10 @@ public class BuildService {
             }
 
             case BUILD  -> {
-                if (!request.getFilters().isEmpty()) { // process filters
-                    buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
-                    buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
+                buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
+                buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
 
+                if (!request.getFilters().isEmpty()) { 
                     // Data to FilterActionDTO
                     ObjectMapper mapper = new ObjectMapper();
                     List<FilterActionDTO> actions = mapper.convertValue(
