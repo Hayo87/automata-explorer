@@ -24,7 +24,6 @@ export const useSession = () => {
     }
   };
 
-
   // Build session data for visualization
   const buildSession = async (sessionId: string, filters: Filter[]) => {
     try {
@@ -41,7 +40,7 @@ export const useSession = () => {
   };
 
   // Close session using the API's closeSession function.
-  const closeSessionHook = async (sessionId: string) => {
+  const terminateSession = async (sessionId: string) => {
     try {
       await closeSession(sessionId);
     } catch (err) {
@@ -50,5 +49,5 @@ export const useSession = () => {
     }
   };
 
-  return { sessionId, data, loading, error, startSession, buildSession, closeSession: closeSessionHook };
+  return { sessionId, data, loading, error, startSession, buildSession, terminateSession };
 };
