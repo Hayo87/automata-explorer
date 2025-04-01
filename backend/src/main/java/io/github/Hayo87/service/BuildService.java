@@ -16,6 +16,7 @@ import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.dto.MatchResultDTO;
+import io.github.Hayo87.type.BuildType;
 import io.github.Hayo87.type.FilterType;
 
 /**
@@ -45,30 +46,29 @@ public class BuildService {
      * @return result of the action wrapped in a responseDTO.
      */
     public BuildResponseDTO processBuildAction(String sessionId, BuildRequestDTO request) {
-        String action = request.getAction().toLowerCase();
-        Object data = request.getData();
+        BuildType type = request.getAction();
 
-        switch (action) {
+        switch (type) {
 
-            case "reference" -> {
-                buildInput(sessionId, (String) data, true);
+            case REFERENCE -> {
+                buildInput(sessionId, request.getInput(), true);
                 return new BuildResponseDTO("reference", "success", "Reference processed successfully");
             }
 
-            case "subject" -> {
-                buildInput(sessionId, (String) data, false);
+            case SUBJECT -> {
+                buildInput(sessionId, request.getInput(), false);
                 return new BuildResponseDTO("subject", "success", "Subject processed successfully");
             }
 
-            case "build" -> {
-                if (data !=null) { // process filters
+            case BUILD  -> {
+                if (!request.getFilters().isEmpty()) { // process filters
                     buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
                     buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
 
                     // Data to FilterActionDTO
                     ObjectMapper mapper = new ObjectMapper();
                     List<FilterActionDTO> actions = mapper.convertValue(
-                        request.getData(),
+                        request.getFilters(),
                         new TypeReference<List<FilterActionDTO>>() {}
                     );
 
@@ -81,18 +81,15 @@ public class BuildService {
                     filterService.processSynonyms(synonymActions, sessionId); 
                 }
 
-                Object buildData = buildDefault(sessionId); 
+                JsonNode buildData = buildDefault(sessionId); 
                 return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
             }
 
-            case "match" -> {
+            case MATCH -> {
                 Object matchData = match(sessionId);
                 return new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData);
             }
-
-            default -> {
-                return new BuildResponseDTO(action, "Error processing", "Invalid action");
-            }
+            default -> throw new IllegalStateException("Unhandled BuildType: " + type);
         }
     }
 
