@@ -22,7 +22,7 @@ const VisualizationPage: React.FC = () => {
   const [currentLayout, setCurrentLayout] = useState("preset");
 
   const navigate = useNavigate();
-  const { closeSession } = useSession();
+  const { terminateSession } = useSession();
 
   // Modal state for InfoModal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,11 +76,10 @@ const VisualizationPage: React.FC = () => {
     document.body.removeChild(link);
   };
 
-
   const handleExit = async () => {
     try {
       if(sessionId){
-        await closeSession(sessionId);
+        await terminateSession(sessionId);
       }
     } catch (error) {
       console.error("Failed to close session:", error);
