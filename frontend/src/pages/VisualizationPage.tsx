@@ -16,6 +16,7 @@ const VisualizationPage: React.FC = () => {
   const { reference, subject } = location.state as { reference: string; subject: string };
   const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
+  const [synonymMap, setSynonymMap] = useState<Map<string, string[]>>(new Map());
 
   const { data, loadSessionData, loadFilteredSessionData, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
@@ -46,17 +47,21 @@ const VisualizationPage: React.FC = () => {
           setActiveFilters(updatedFilters); 
           setIsModalOpen(false);
   
-          const backendFilters = updatedFilters.filter(
-            (f) => f.type !== 'loop' 
-          );
-
+          const synonymMap = new Map<string, string[]>();
+          updatedFilters
+            .filter(f => f.type === 'synonym')
+            .forEach(f => synonymMap.set(f.name, f.values));
+          setSynonymMap(synonymMap);
+  
+          const backendFilters = updatedFilters.filter(f => f.type !== 'loop');
           if (backendFilters.length > 0) {
-             await loadFilteredSessionData(sessionId!, backendFilters);
+            await loadFilteredSessionData(sessionId!, backendFilters);
           }
         }}
       />
     );
   };
+  
 
 
   const handleExport = () => {
@@ -101,7 +106,7 @@ const VisualizationPage: React.FC = () => {
           {loading ? (
             <p style={{ textAlign: "center" }}>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} synonyms={synonymMap} />
           ) : (
             <p style={{ textAlign: "center" }}>No data available</p>
 

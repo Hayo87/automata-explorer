@@ -44,6 +44,7 @@ interface CytoscapeVisualizationProps {
   data: GraphResponse;
   layout: string;
   openModal: (modalContent: any) => void;
+  synonyms: Map<string, string[]>;
 }
 
 export interface CytoscapeVisualizationRef {
@@ -51,9 +52,8 @@ export interface CytoscapeVisualizationRef {
 }
 
 
-
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
-  ({ data, layout, openModal }, ref) => {
+  ({ data, layout, openModal, synonyms }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
@@ -199,7 +199,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
             "underlay-padding": "4px",
             "underlay-opacity": 0.5
           }
-        },    
+        },  
       ],
       zoom: 1,
       pan: { x: 0, y: 0 },
@@ -234,6 +234,42 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       if (!initialPositionsRef.current[id]) {
         initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
       }
+    });
+
+    // Process synonyms on edges
+    cyInstance.edges().forEach((edge: cytoscape.EdgeSingular) => {
+      const label = edge.data('label');
+      const [input, output] = label?.split('/')?.map((s: string) => s.trim()) ?? [];
+
+      if (output && synonyms.has(output.trim())) {
+        const decorated = `${input}/ {${output}}`; 
+        edge.data('label', decorated);
+        edge.addClass('synonym-output');
+        edge.data('synonymTerm', output.trim());
+      }
+    });
+
+    // Show tooltip on mouseover for synonyms
+    cyInstance.on('mouseover', 'edge.synonym-output', (event: cytoscape.EventObject) => {
+      const edge = event.target;
+      const synonym = edge.data('synonymTerm');
+      const values = synonyms.get(synonym);
+  
+      if (!values) return;
+  
+      const content = document.createElement('div');
+      content.innerHTML = `
+        <strong>${synonym}</strong><br/>
+        ${values.join(', ')}
+      `;
+  
+      const tip = edge.popper({
+        content: () => content,
+      });
+  
+      tip.show();
+  
+      edge.once('mouseout', () => tip.destroy());
     });
 
     // Add the context menu's 
