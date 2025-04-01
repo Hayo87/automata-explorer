@@ -1,7 +1,6 @@
 import type cytoscape from 'cytoscape';
 
 export function attachSynonymTooltips(cy: cytoscape.Core | null, synonyms: Map<string, string[]>) {
-  
     if (!cy) return;
 
     const showTooltip = (event: cytoscape.EventObject) => {

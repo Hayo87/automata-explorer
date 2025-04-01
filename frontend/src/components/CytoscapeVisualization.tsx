@@ -1,28 +1,33 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import cytoscape from "cytoscape";
 import NodeSingular from "cytoscape"
-import dagre from "cytoscape-dagre";
+
+//hooks
 import useTransformGraph from "../hooks/useTransformGraph";
 import { GraphResponse } from "../hooks/useTransformGraph";
+
+// Layout extentions
+import dagre from "cytoscape-dagre";
 import coseBilkent from 'cytoscape-cose-bilkent';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
 import popper from 'cytoscape-popper';
-import tippy, { Props, Instance } from 'tippy.js';
-import 'tippy.js/dist/tippy.css'; // optional: tippy styling
+import tippy, { Props, Instance, sticky } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 import type { VirtualElement } from '@popperjs/core';
+
+// Utils 
 import { attachSynonymTooltips } from './utils/attachSynonymTooltips';
 import { processSynonymLabels  } from './utils/processSynonymLabels';
 import { attachCytoscapeMenus } from "./utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../style/cytoscapeStyles';
 
-
 // Register extensions 
-cytoscape.use( coseBilkent)
-cytoscape.use( avsdf)
-cytoscape.use( dagre)
-cytoscape.use(cxtmenu);
-
+cytoscape.use( coseBilkent )
+cytoscape.use( avsdf )
+cytoscape.use( dagre )
+cytoscape.use( cxtmenu );
+cytoscape.use(popper(tippyFactory));
 
 function tippyFactory(ref: VirtualElement, content: HTMLElement): Instance<Props> {
   const dummyDomEle = document.createElement('div');
@@ -34,15 +39,14 @@ function tippyFactory(ref: VirtualElement, content: HTMLElement): Instance<Props
     arrow: true,
     placement: 'bottom',
     hideOnClick: false,
-    sticky: 'reference',
     interactive: true,
     appendTo: document.body,
+    plugins: [sticky],
+    sticky: true       
   });
 
   return tip;
 }
-
-cytoscape.use(popper(tippyFactory));
 
 interface CytoscapeVisualizationProps {
   data: GraphResponse;
@@ -54,7 +58,6 @@ interface CytoscapeVisualizationProps {
 export interface CytoscapeVisualizationRef {
   exportPNG: () => string;
 }
-
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
   ({ data, layout, openModal, synonyms }, ref) => {
@@ -142,16 +145,15 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     });
 
     // Process synonyms on edges
-    processSynonymLabels(cyInstance, synonyms);
+    processSynonymLabels(cyInstance, synonyms); 
 
-    // Show tooltip on mouseover for synonyms
+    // Attach synonym tooltips
     attachSynonymTooltips(cyInstance, synonyms);
-    
+
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);
-       
-    cyRef.current = cyInstance;
 
+    cyRef.current = cyInstance;
 
     return () => {
       cyInstance.destroy();
