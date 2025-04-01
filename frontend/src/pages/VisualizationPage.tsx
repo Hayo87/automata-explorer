@@ -45,7 +45,7 @@ const VisualizationPage: React.FC = () => {
         initialFilters={activeFilters}
         onProcess={async (updatedFilters) => {
           setActiveFilters(updatedFilters); 
-          setIsModalOpen(false);
+          closeModal();
 
           const synonymFilters = updatedFilters.filter(f => f.type === 'synonym');
           await buildSession(sessionId!, synonymFilters);
