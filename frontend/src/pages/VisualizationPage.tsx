@@ -7,7 +7,7 @@ import  InfoModal from '../components/InfoModal';
 import AboutContent from '../components/AboutContent';
 import FilterInfo from '../components/FilterInfo';
 import '../index.css';
-import { Filter } from '../types/Filter';
+import { Filter } from '../types/BuildResponse';
 
 
 const VisualizationPage: React.FC = () => {
@@ -16,7 +16,6 @@ const VisualizationPage: React.FC = () => {
   const { reference, subject } = location.state as { reference: string; subject: string };
   const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
-  const [synonymMap, setSynonymMap] = useState<Map<string, string[]>>(new Map());
 
   const { data, buildSession, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
@@ -46,13 +45,7 @@ const VisualizationPage: React.FC = () => {
         onProcess={async (updatedFilters) => {
           setActiveFilters(updatedFilters); 
           closeModal();
-
-          const synonymFilters = updatedFilters.filter(f => f.type === 'synonym');
-          await buildSession(sessionId!, synonymFilters);
-          
-          const synonymMap = new Map<string, string[]>();
-          synonymFilters.forEach(f => synonymMap.set(f.name, f.values));
-          setSynonymMap(synonymMap);
+          await buildSession(sessionId!, updatedFilters);
         }}
       />
     );
@@ -88,11 +81,19 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
+  // When sessionId is available, trigger a build with the current activeFilters.
   useEffect(() => {
     if (sessionId) {
       buildSession(sessionId, activeFilters);
     }
   }, [sessionId]);
+
+  // When a build response comes back, update activeFilters from data.filters.
+  useEffect(() => {
+    if (data && data.filters) {
+      setActiveFilters(data.filters);
+    }
+  }, [data]);
 
   return (
     <div className="page-container">
@@ -103,7 +104,7 @@ const VisualizationPage: React.FC = () => {
           {loading ? (
             <p style={{ textAlign: "center" }}>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} synonyms={synonymMap} />
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
           ) : (
             <p style={{ textAlign: "center" }}>No data available</p>
 
@@ -172,5 +173,7 @@ const VisualizationPage: React.FC = () => {
     </div>
   );
 }
+
+
 
 export default VisualizationPage;
