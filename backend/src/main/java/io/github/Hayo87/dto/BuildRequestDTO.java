@@ -1,5 +1,6 @@
 package io.github.Hayo87.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.github.Hayo87.type.BuildType;
@@ -7,7 +8,7 @@ import io.github.Hayo87.type.BuildType;
 public class BuildRequestDTO {
     private BuildType action;
     private String input;
-    private List<FilterActionDTO> filters; 
+    private List<FilterActionDTO> filters = new ArrayList<>();
 
     public BuildRequestDTO() {}
 
