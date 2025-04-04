@@ -3,8 +3,8 @@ import cytoscape from "cytoscape";
 import NodeSingular from "cytoscape"
 
 //hooks
-import useTransformGraph from "../hooks/useTransformGraph";
-import { GraphResponse } from "../hooks/useTransformGraph";
+import useTransformGraph from "../hooks/useTransform";
+import { BuildResponse } from "../types/BuildResponse";
 
 // Layout extentions
 import dagre from "cytoscape-dagre";
@@ -18,7 +18,6 @@ import type { VirtualElement } from '@popperjs/core';
 
 // Utils 
 import { attachSynonymTooltips } from '../utils/attachSynonymTooltips';
-import { processSynonymLabels  } from '../utils/processSynonymLabels';
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../utils/cytoscapeStyles';
 
@@ -49,10 +48,9 @@ function tippyFactory(ref: VirtualElement, content: HTMLElement): Instance<Props
 }
 
 interface CytoscapeVisualizationProps {
-  data: GraphResponse;
+  data: BuildResponse;
   layout: string;
   openModal: (modalContent: any) => void;
-  synonyms: Map<string, string[]>;
 }
 
 export interface CytoscapeVisualizationRef {
@@ -60,7 +58,7 @@ export interface CytoscapeVisualizationRef {
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
-  ({ data, layout, openModal, synonyms }, ref) => {
+  ({ data, layout, openModal }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
@@ -144,11 +142,8 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       }
     });
 
-    // Process synonyms on edges
-    processSynonymLabels(cyInstance, synonyms); 
-
     // Attach synonym tooltips
-   attachSynonymTooltips(cyInstance, synonyms);
+    attachSynonymTooltips(cyInstance, data?.filters || []);
 
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);
