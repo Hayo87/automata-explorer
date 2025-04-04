@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
-import { Filter } from '../types/Filter';
+import { Filter } from '../types/BuildResponse';
 
 
 // Function to read a .dot file as plain text
