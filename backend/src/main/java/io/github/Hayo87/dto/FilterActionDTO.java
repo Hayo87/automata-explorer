@@ -6,12 +6,12 @@ import io.github.Hayo87.type.FilterSubtype;
 import io.github.Hayo87.type.FilterType;
 
 public class FilterActionDTO {
+    private int order; 
     private FilterType type;
     private FilterSubtype subtype;      
     private String name;      
     private List<String> values;
-    private int order; 
-
+    
     public FilterActionDTO() {}
 
     public FilterType getType() {

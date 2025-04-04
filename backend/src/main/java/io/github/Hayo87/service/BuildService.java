@@ -1,6 +1,7 @@
 package io.github.Hayo87.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -17,7 +18,6 @@ import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.dto.MatchResultDTO;
 import io.github.Hayo87.type.BuildType;
-import io.github.Hayo87.type.FilterType;
 
 /**
  * Manages all build related actions and information request 
@@ -64,30 +64,27 @@ public class BuildService {
                 buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
                 buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
 
+                List<FilterActionDTO> actions = new ArrayList<>();
+
                 if (!request.getFilters().isEmpty()) { 
                     // Data to FilterActionDTO
                     ObjectMapper mapper = new ObjectMapper();
-                    List<FilterActionDTO> actions = mapper.convertValue(
+                    actions = mapper.convertValue(
                         request.getFilters(),
                         new TypeReference<List<FilterActionDTO>>() {}
                     );
 
-                    // Filter synonym actions
-                    List<FilterActionDTO> synonymActions = actions.stream()
-                    .filter(a -> a.getType() == FilterType.SYNONYM)
-                    .toList();      
-
                     // Process filters
-                    filterService.processSynonyms(synonymActions, sessionId); 
+                    filterService.processFilters(sessionId, actions); 
                 }
 
                 JsonNode buildData = buildDefault(sessionId); 
-                return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
+                return new BuildResponseDTO("build", "success", "Build succesfull", buildData, actions);
             }
 
             case MATCH -> {
                 Object matchData = match(sessionId);
-                return new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData);
+                return new BuildResponseDTO("match", "success", "DiffMachine differences matched", null);
             }
             default -> throw new IllegalStateException("Unhandled BuildType: " + type);
         }

@@ -1,6 +1,7 @@
 package io.github.Hayo87.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -22,17 +23,30 @@ public class FilterService {
         this.sessionService = sessionService;
     }
 
-    public void processSynonyms(List<FilterActionDTO> filters,String sessionId) {
+    public void processFilters(String sessionId, List<FilterActionDTO> filterActions){
+        // Sort the actions by the order field
+        filterActions.sort(Comparator.comparingInt(FilterActionDTO::getOrder));
+        
+        //Process filters actions in order
+        for (FilterActionDTO action : filterActions) {
+            switch (action.getType()) {
+                case SYNONYM -> processSynonym(action, sessionId);
+                case HIDER -> processHider(action, sessionId);
+                default -> {
+                }
+            }
+        }
+    }
+        
+    private void processSynonym(FilterActionDTO synonymsAction,String sessionId) {
         DiffAutomaton<String> reference = sessionService.getReferenceAutomata(sessionId);
         DiffAutomaton<String> subject = sessionService.getSubjectAutomata(sessionId);
 
-        for (FilterActionDTO s: filters) {
-            String name = s.getName();
-            List<String> synonyms = s.getValues();
-            FilterSubtype subtype = s.getSubtype();
+            String name = synonymsAction.getName();
+            List<String> synonyms = synonymsAction.getValues();
+            FilterSubtype subtype = synonymsAction.getSubtype();
             applySynonyms(subtype, reference, name, synonyms);
             applySynonyms(subtype, subject, name, synonyms); 
-        }
     }    
         
     private void applySynonyms(FilterSubtype subtype, DiffAutomaton<String> automaton, String name, List<String> synonyms) {
@@ -62,4 +76,9 @@ public class FilterService {
             automaton.removeTransition(t);
         }
     }
+
+    private void processHider(FilterActionDTO hiderAction,String sessionId){
+        // dummy 
+    } 
+
 }
