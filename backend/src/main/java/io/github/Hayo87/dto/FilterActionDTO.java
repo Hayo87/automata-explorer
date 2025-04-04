@@ -17,7 +17,6 @@ public class FilterActionDTO {
     public FilterType getType() {
         return type;
     }
-
     public void setType(FilterType type) {
         this.type = type;
     }
@@ -25,7 +24,6 @@ public class FilterActionDTO {
     public FilterSubtype getSubtype() {
         return subtype;
     }
-
     public void setSubType(FilterSubtype subtype) {
         this.subtype = subtype;
     }
@@ -33,7 +31,6 @@ public class FilterActionDTO {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -41,8 +38,12 @@ public class FilterActionDTO {
     public List<String> getValues() {
         return values;
     }
-
     public void setValues(List<String> values) {
         this.values = values;
+    }
+
+    public int getOrder() {return order;}
+    public void setOrder(int order) {
+        this.order = order;
     }
 }
