@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { uploadFiles, postBuild, closeSession } from "../api/SessionApi";
-import { Filter } from '../types/Filter';
+import { Filter } from '../types/BuildResponse';
 
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
