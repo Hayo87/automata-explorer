@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Filter } from '../types/Filter';
+import { Filter } from '../types/BuildResponse';
 
 interface Props {
   initialFilters: Filter[]; 
@@ -14,9 +14,11 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
   const [filters, setFilters] = useState<Filter[]>([]);
   const [newFilter, setNewFilter] = useState<Filter>({
     type: 'synonym',
+    subtype: 'output',
     name: '',
     values: [],
-    subtype: 'output'
+    order: 0,
+    decoratedName: ''
   });
   const [valueInput, setValueInput] = useState('');
 
@@ -39,18 +41,21 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
       type: newFilter.type,
       name: newFilter.name,
       values: splitValues,
-      subtype: newFilter.subtype
+      subtype: newFilter.subtype,
+      order: filters.length + 1,
+      decoratedName: '',
     };
 
     setFilters([...filters, newEntry]);
-    setNewFilter({ type: 'synonym', name: '', values: [], subtype: 'output' });
+    setNewFilter({ type: 'synonym', name: '', values: [], subtype: 'output', order: 0, decoratedName: ''});
     setValueInput('');
   };
 
   const handleRemove = (index: number) => {
     const updated = [...filters];
     updated.splice(index, 1);
-    setFilters(updated);
+    const recalculated = updated.map((f, i) => ({ ...f, order: i + 1 }));
+    setFilters(recalculated);
   };
 
   const handleProcess = () => {
