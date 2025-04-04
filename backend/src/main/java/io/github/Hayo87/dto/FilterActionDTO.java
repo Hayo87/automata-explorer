@@ -10,6 +10,7 @@ public class FilterActionDTO {
     private FilterSubtype subtype;      
     private String name;      
     private List<String> values;
+    private int order; 
 
     public FilterActionDTO() {}
 
