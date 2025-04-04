@@ -1,37 +1,59 @@
 import type cytoscape from 'cytoscape';
+import { Filter } from '../types/BuildResponse';
 
-export function attachSynonymTooltips(cy: cytoscape.Core | null, synonyms: Map<string, string[]>) {
-    if (!cy) return;
+export function attachSynonymTooltips(cy: cytoscape.Core | null, filters: Filter[]) {
+  if (!cy) return;
 
-    const showTooltip = (event: cytoscape.EventObject) => {
-      const edge = event.target;
+  // Build a synonyms map
+  const synonymsMap = new Map<string, string[]>(
+    filters.filter(f => f.type === 'synonym').map(f => [f.decoratedName, f.values])
+  );
 
-      const inputTerm = edge.data('synonymInput');
-      const outputTerm = edge.data('synonymOutput');
+  const showTooltip = (event: cytoscape.EventObject) => {
+    const edge = event.target as cytoscape.EdgeSingular;
+    const label = edge.data('label');
+    if (!label) return;
 
-      const inputValues = inputTerm ? synonyms.get(inputTerm) : null;
-      const outputValues = outputTerm ? synonyms.get(outputTerm) : null;
+    const parts = label.split("/");
+    if (parts.length < 2) return;
 
-      if (!inputValues && !outputValues) return;
+    let inputPart = parts[0].trim();
+    let outputPart = parts[1].trim();
 
-      const content = document.createElement('div');
-      content.innerHTML = `
-        ${inputValues ? `<span style="font-weight: bold;">${inputTerm}</span> ↦ {${inputValues.join(', ')}}<br/>` : ''}
-        ${outputValues ? `<span style="font-weight: bold;">${outputTerm}</span> ↦ {${outputValues.join(', ')}}` : ''}
-      `;
+    const inputKey = inputPart.includes("ƒ_in(") ? inputPart : inputPart;
+    const outputKey = outputPart.includes("ƒ_out(") ? outputPart : outputPart;
 
-      const tip = edge.popper({
-        content: () => content,
-      });
+    const inputValues = synonymsMap.get(inputKey);
+    const outputValues = synonymsMap.get(outputKey);
 
-      tip.show();
+    if (!inputValues && !outputValues) return;
 
-      edge.once('mouseout', () => tip.destroy());
-    };
+    const content = document.createElement('div');
+    content.innerHTML = `
+      ${inputValues ? `<span style="font-weight: bold;">${inputKey}</span> ↦ {${inputValues.join(', ')}}<br/>` : ''}
+      ${outputValues ? `<span style="font-weight: bold;">${outputKey}</span> ↦ {${outputValues.join(', ')}}` : ''}
+    `;
 
-    cy.on('mouseover', 'edge.synonym', showTooltip);
+    
+    const tip = edge.popper({
+      content: () => content,
+    });
 
-    return () => {
-      cy.off('mouseover', 'edge.synonym', showTooltip);
-    };
+    tip.show();
+    edge.once('mouseout', () => tip.destroy());
+  };
+
+  // Attach mouseover listener to edges whose label contains either "ƒ_in(" or "ƒ_out(".
+  cy.edges().forEach((edge: cytoscape.EdgeSingular) => {
+    const label = edge.data('label');
+    if (label && (label.includes("ƒ_in(") || label.includes("ƒ_out("))) {
+      edge.on('mouseover', showTooltip);
+    }
+  });
+
+  return () => {
+    cy.edges().forEach((edge: cytoscape.EdgeSingular) => {
+      edge.off('mouseover', showTooltip);
+    });
+  };
 }
