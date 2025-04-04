@@ -1,28 +1,36 @@
 package io.github.Hayo87.dto;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BuildResponseDTO {
     private String action;
     private String status;
     private String message;
-    private Object data;
+    private JsonNode build;
+    private List<FilterActionDTO> filters;
 
     public BuildResponseDTO(String status, String message){
-        this.status = status;
-        this.message = message;
+        this(null, status, message, null, null);
     }
 
     public BuildResponseDTO(String action, String status, String message) {
-        this.action = action;
-        this.status = status;
-        this.message = message;
-        this.data = null;
+        this(action, status, message, null, null);
     }
 
-    public BuildResponseDTO(String action, String status, String message, Object data) {
+    public BuildResponseDTO(String action, String status, String message, JsonNode build) {
+        this(action, status, message, build, null);
+    }
+
+    public BuildResponseDTO(String action, String status, String message, JsonNode build ,List<FilterActionDTO> filters ) {
         this.action = action;
         this.status = status;
         this.message = message;
-        this.data = data;
+        this.build = build;
+        this.filters = filters; 
     }
 
     public String getAction() { return action; }
@@ -34,6 +42,12 @@ public class BuildResponseDTO {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public Object getData() { return data; }
-    public void setData(Object data) { this.data = data; }
+    public JsonNode getBuild() { return build; }
+    public void setData(JsonNode data) { this.build = data; }
+
+    public List<FilterActionDTO> getFilters() {return this.filters;}
+    public void setFilters (List<FilterActionDTO> filters) {
+        this.filters = filters;
+    }
+
 }
