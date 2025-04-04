@@ -46,7 +46,9 @@ public class FilterService {
             List<String> synonyms = synonymsAction.getValues();
             FilterSubtype subtype = synonymsAction.getSubtype();
             applySynonyms(subtype, reference, name, synonyms);
-            applySynonyms(subtype, subject, name, synonyms); 
+            applySynonyms(subtype, subject, name, synonyms);
+
+            synonymsAction.setDecoratedName(LabelUtils.writeSynonymLabel("", name, subtype));      
     }    
         
     private void applySynonyms(FilterSubtype subtype, DiffAutomaton<String> automaton, String name, List<String> synonyms) {
@@ -61,10 +63,8 @@ public class FilterService {
             };
 
             if (synonyms.contains(partToCompare)) {
-                String newLabel = switch (subtype) {
-                    case INPUT -> LabelUtils.replaceInput(label, name);
-                    case OUTPUT -> LabelUtils.replaceOutput(label, name);
-                    };
+                String newLabel = LabelUtils.writeSynonymLabel(label, name, subtype);
+                
                 // add new transtition
                 automaton.addTransition(t.getSource(), new DiffProperty<>(newLabel, t.getProperty().getDiffKind()), t.getTarget());
                 // mark old transition for removal

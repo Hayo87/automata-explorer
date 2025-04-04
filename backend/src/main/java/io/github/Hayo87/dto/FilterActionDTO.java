@@ -11,6 +11,7 @@ public class FilterActionDTO {
     private FilterSubtype subtype;      
     private String name;      
     private List<String> values;
+    private String decoratedName; 
     
     public FilterActionDTO() {}
 
@@ -45,5 +46,10 @@ public class FilterActionDTO {
     public int getOrder() {return order;}
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public String getDecoratedName() { return decoratedName;}
+    public void setDecoratedName(String decoratedName) {
+        this.decoratedName = decoratedName;
     }
 }

@@ -5,6 +5,9 @@ package io.github.Hayo87.model;
  * Labels are expected to follow the format: <code>input/output</code>,
  * where the input or output may need to be extracted and cleaned for processing
  */
+
+import io.github.Hayo87.type.FilterSubtype;
+
 public class LabelUtils {
 
     /**
@@ -37,6 +40,9 @@ public class LabelUtils {
      * @return
      */
     public static String build(String input, String output) {
+        if (input.isEmpty() || output.isEmpty()) {
+            return input.trim() + output.trim();
+        } else {}
         return input.trim() + "/" + output.trim();
     }
 
@@ -60,6 +66,14 @@ public class LabelUtils {
     public static String replaceOutput(String label, String newOutput) {
         String input = extractInput(label);
         return build(input, newOutput);
+    }
+
+ 
+    public static String writeSynonymLabel(String label, String synonymName, FilterSubtype subtype) {
+        return switch (subtype) {
+            case INPUT -> replaceInput(label, "ƒ_in(" + synonymName + ")");
+            case OUTPUT -> replaceOutput(label, "ƒ_out(" + synonymName + ")");
+        };
     }
 }
 
