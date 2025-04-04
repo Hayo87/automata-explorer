@@ -1,17 +1,23 @@
 package io.github.Hayo87.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
+import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.dto.MatchResultDTO;
+import io.github.Hayo87.type.BuildType;
 
 /**
  * Manages all build related actions and information request 
@@ -23,11 +29,13 @@ public class BuildService {
     private final SessionService sessionService;
     private final ParserService parserService;
     private final MatchService matchService; 
+    private final FilterService filterService;
 
-    public BuildService(SessionService sessionService, ParserService parserService, MatchService matchService) {
+    public BuildService(SessionService sessionService, ParserService parserService, MatchService matchService, FilterService filterService) {
         this.sessionService = sessionService;
         this.parserService = parserService;
         this.matchService = matchService;
+        this.filterService = filterService;
     }
 
     /**
@@ -38,34 +46,47 @@ public class BuildService {
      * @return result of the action wrapped in a responseDTO.
      */
     public BuildResponseDTO processBuildAction(String sessionId, BuildRequestDTO request) {
-        String action = request.getAction().toLowerCase();
-        Object data = request.getData();
+        BuildType type = request.getAction();
 
-        switch (action) {
+        switch (type) {
 
-            case "reference" -> {
-                buildInput(sessionId, (String) data, true);
+            case REFERENCE -> {
+                buildInput(sessionId, request.getInput(), true);
                 return new BuildResponseDTO("reference", "success", "Reference processed successfully");
             }
 
-            case "subject" -> {
-                buildInput(sessionId, (String) data, false);
+            case SUBJECT -> {
+                buildInput(sessionId, request.getInput(), false);
                 return new BuildResponseDTO("subject", "success", "Subject processed successfully");
             }
 
-            case "build" -> {
-                Object buildData = buildDefault(sessionId); 
-                return new BuildResponseDTO("build", "success", "Build succesfull", buildData);
+            case BUILD  -> {
+                buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
+                buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
+
+                List<FilterActionDTO> actions = new ArrayList<>();
+
+                if (!request.getFilters().isEmpty()) { 
+                    // Data to FilterActionDTO
+                    ObjectMapper mapper = new ObjectMapper();
+                    actions = mapper.convertValue(
+                        request.getFilters(),
+                        new TypeReference<List<FilterActionDTO>>() {}
+                    );
+
+                    // Process filters
+                    filterService.processFilters(sessionId, actions); 
+                }
+
+                JsonNode buildData = buildDefault(sessionId); 
+                return new BuildResponseDTO("build", "success", "Build succesfull", buildData, actions);
             }
 
-            case "match" -> {
+            case MATCH -> {
                 Object matchData = match(sessionId);
-                return new BuildResponseDTO("match", "success", "DiffMachine differences matched", matchData);
+                return new BuildResponseDTO("match", "success", "DiffMachine differences matched", null);
             }
-
-            default -> {
-                return new BuildResponseDTO(action, "Error processing", "Invalid action");
-            }
+            default -> throw new IllegalStateException("Unhandled BuildType: " + type);
         }
     }
 
@@ -80,7 +101,11 @@ public class BuildService {
     private void buildInput(String sessionId, String input, Boolean isReference){
         try{
             // Attemp parse and add to session history
-            sessionService.store(sessionId, parserService.convertDotStringToDiffAutomaton(input, isReference));   
+            if (isReference){
+                sessionService.storeReference(sessionId, parserService.convertDotStringToDiffAutomaton(input, isReference));   
+            } else {
+                sessionService.storeSubject(sessionId, parserService.convertDotStringToDiffAutomaton(input, isReference));
+            }
 
         } catch (IOException e) {
             System.err.println("Parsing failed: " + e.getMessage());
@@ -100,13 +125,13 @@ public class BuildService {
 
         // Configure comparison, merging, and writing.
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
-        builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>("[skip]"));
+        builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>(""));
         var comparator = builder.createComparator();
         var writer = builder.createWriter();
 
         // Apply structural comparison to the two input automata and store
         DiffAutomaton<String> result = comparator.compare(reference, subject);
-        sessionService.store(sessionId,result);
+        sessionService.storeDifference(sessionId,result);
 
         // Delegate processing to parserService
         return parserService.convertJsonToDiffAutomaton(result, writer); 

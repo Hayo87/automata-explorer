@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { uploadFiles, fetchSessionData, closeSession } from "../api/SessionApi";
+import { uploadFiles, postBuild, closeSession } from "../api/SessionApi";
+import { Filter } from '../types/BuildResponse';
 
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -23,12 +24,12 @@ export const useSession = () => {
     }
   };
 
-  // Fetch session data for visualization
-  const loadSessionData = async (sessionId: string) => {
+  // Build session data for visualization
+  const buildSession = async (sessionId: string, filters: Filter[]) => {
     try {
       setLoading(true);
       setError(null);
-      const sessionData = await fetchSessionData(sessionId);
+      const sessionData = await postBuild(sessionId, filters);
       setData(sessionData);
     } catch (err) {
       setError((err as Error).message);
@@ -39,7 +40,7 @@ export const useSession = () => {
   };
 
   // Close session using the API's closeSession function.
-  const closeSessionHook = async (sessionId: string) => {
+  const terminateSession = async (sessionId: string) => {
     try {
       await closeSession(sessionId);
     } catch (err) {
@@ -48,5 +49,5 @@ export const useSession = () => {
     }
   };
 
-  return { sessionId, data, loading, error, startSession, loadSessionData, closeSession: closeSessionHook };
+  return { sessionId, data, loading, error, startSession, buildSession, terminateSession };
 };

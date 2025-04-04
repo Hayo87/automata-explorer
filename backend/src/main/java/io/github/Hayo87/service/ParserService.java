@@ -39,8 +39,8 @@ public class ParserService {
      */
     @SuppressWarnings("CallToPrintStackTrace")
     private JsonNode convertDotStringToJson(String dotContent) throws IOException {
+        long startTime = System.nanoTime();
 
-        
         // Create and start process
         ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tjson0");
         processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
@@ -54,6 +54,9 @@ public class ParserService {
             writerPipe.write(dotContent);
             writerPipe.flush();
             writerPipe.close();
+
+            long elapsedTime = System.nanoTime() - startTime;
+            System.out.println("Process conversion took: " + (elapsedTime / 1_000_000.0) + " ms");
             
             // Read result as JsonNode
             ObjectMapper objectMapper = new ObjectMapper();

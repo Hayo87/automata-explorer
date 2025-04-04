@@ -1,6 +1,6 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+import { Filter } from '../types/BuildResponse';
 
-console.log(" Using API Base URL in Frontend:", API_BASE_URL); // Debugging
 
 // Function to read a .dot file as plain text
 const readDotFileAsText = (file: File): Promise<string> => {
@@ -12,6 +12,7 @@ const readDotFileAsText = (file: File): Promise<string> => {
   });
 };
 
+// Post input files and initiate a session
 export const uploadFiles = async (file1: File, file2: File): Promise<string> => {
   try {
     // Read .dot files as text
@@ -30,7 +31,7 @@ export const uploadFiles = async (file1: File, file2: File): Promise<string> => 
     });
 
     if (!response.ok) {
-      const errorText = await response.text(); // Read error message if any
+      const errorText = await response.text(); 
       throw new Error(`Failed to create session. Status: ${response.status}, Message: ${errorText}`);
     }
 
@@ -49,15 +50,18 @@ export const uploadFiles = async (file1: File, file2: File): Promise<string> => 
   }
 };
 
-// Fetch visualization data for a session
-export const fetchSessionData = async (sessionId: string): Promise<any> => {
+// Post build action and get visualization data for a session
+export const postBuild = async (sessionId: string, filterlist:Filter[]): Promise<any> => {
   try {
     const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ action: "build" }),
+      body: JSON.stringify({
+        action: 'build',       
+        filters: filterlist,
+      }),
     });
 
     if (!response.ok) {

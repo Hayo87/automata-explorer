@@ -1,4 +1,3 @@
-// InfoModal.tsx
 import React from 'react';
 import Modal from 'react-modal';
 
@@ -63,7 +62,6 @@ export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
     </Modal>
   );
 }
-
 interface DraggableContainerProps {
   children: React.ReactNode;
 }

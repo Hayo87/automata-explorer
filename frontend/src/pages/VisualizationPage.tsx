@@ -5,21 +5,23 @@ import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
 import  InfoModal from '../components/InfoModal';
 import AboutContent from '../components/AboutContent';
-
-
+import FilterInfo from '../components/FilterInfo';
 import '../index.css';
+import { Filter } from '../types/BuildResponse';
+
 
 const VisualizationPage: React.FC = () => {
   const { sessionId} = useParams<{ sessionId: string }>();
   const location = useLocation();
   const { reference, subject } = location.state as { reference: string; subject: string };
   const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
+  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
 
-  const { data, loadSessionData, loading } = useSession();
+  const { data, buildSession, loading } = useSession();
   const [currentLayout, setCurrentLayout] = useState("preset");
 
   const navigate = useNavigate();
-  const { closeSession } = useSession();
+  const { terminateSession } = useSession();
 
   // Modal state for InfoModal
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,7 +38,23 @@ const VisualizationPage: React.FC = () => {
     setModalContent(null);
   };
 
+  const openFilterModal = () => {
+    openModal(
+      <FilterInfo
+        initialFilters={activeFilters}
+        onProcess={async (updatedFilters) => {
+          setActiveFilters(updatedFilters); 
+          closeModal();
+          await buildSession(sessionId!, updatedFilters);
+        }}
+      />
+    );
+  };
 
+  const handleGroupSynonym = () => {
+    //dummy method
+  };
+  
   const handleExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
@@ -51,11 +69,10 @@ const VisualizationPage: React.FC = () => {
     document.body.removeChild(link);
   };
 
-
   const handleExit = async () => {
     try {
       if(sessionId){
-        await closeSession(sessionId);
+        await terminateSession(sessionId);
       }
     } catch (error) {
       console.error("Failed to close session:", error);
@@ -64,11 +81,19 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
+  // When sessionId is available, trigger a build with the current activeFilters.
   useEffect(() => {
     if (sessionId) {
-      loadSessionData(sessionId);
+      buildSession(sessionId, activeFilters);
     }
   }, [sessionId]);
+
+  // When a build response comes back, update activeFilters from data.filters.
+  useEffect(() => {
+    if (data && data.filters) {
+      setActiveFilters(data.filters);
+    }
+  }, [data]);
 
   return (
     <div className="page-container">
@@ -108,10 +133,10 @@ const VisualizationPage: React.FC = () => {
 
           {/* Tools Section */}
           <p className="sidebar-label">Tools</p>
-          <button className="sidebar-button" title="Filter loops in common">
+          <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
             <span className="material-icons">filter_alt</span>
           </button>
-          <button className="sidebar-button" title="Get match results">
+          <button className="sidebar-button" title="Create synonym" onClick={handleGroupSynonym} >
             <span className="material-icons">track_changes</span>
           </button>
 
@@ -125,9 +150,10 @@ const VisualizationPage: React.FC = () => {
             <span className="material-icons">picture_as_pdf</span>
           </button>
 
+          {/* About and Exit section */}
           <div style={{ marginTop: 'auto' }}>
           <p className="sidebar-label">About</p>
-            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent />)}>
+            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent/>)}>
               <span className="material-icons">info</span>
             </button>
             <p className="sidebar-label">Exit</p>
@@ -146,6 +172,8 @@ const VisualizationPage: React.FC = () => {
       <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} />
     </div>
   );
-};
+}
+
+
 
 export default VisualizationPage;

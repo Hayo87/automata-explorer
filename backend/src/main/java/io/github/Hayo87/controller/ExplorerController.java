@@ -17,6 +17,7 @@ import io.github.Hayo87.dto.CreateSessionResponseDTO;
 import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
+import io.github.Hayo87.type.BuildType;
 
 /**
  * REST Controller for session management, and the building and exploring of 
@@ -50,11 +51,11 @@ public class ExplorerController {
      */
     @PostMapping("/session")
     public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
-        String sessionId = sessionService.createSession();
+        String sessionId = sessionService.createSession(input.getReference(), input.getSubject());
     
         try {
-            buildService.processBuildAction(sessionId, new BuildRequestDTO("reference", input.getReference()));
-            buildService.processBuildAction(sessionId, new BuildRequestDTO("subject", input.getSubject()));
+            buildService.processBuildAction(sessionId, new BuildRequestDTO(BuildType.REFERENCE, input.getReference()));
+            buildService.processBuildAction(sessionId, new BuildRequestDTO(BuildType.SUBJECT, input.getSubject()));
     
             return ResponseEntity.ok(new CreateSessionResponseDTO(sessionId));
     

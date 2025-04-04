@@ -226,12 +226,11 @@ button:focus-visible {
 }
 
 
-
 .reference-file-name {
-  color: green; 
+  color: red; 
 }
 .subject-file-name {
-  color: red;
+  color: green;
 }
 
 .sidebar-label {

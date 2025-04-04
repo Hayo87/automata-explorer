@@ -1,41 +1,6 @@
 import { useMemo } from "react";
 import DOMPurify from "dompurify";
-
-export interface NodeData {
-  _gvid: string,
-  name: string,
-  fillcolor:  string,
-  fontcolor:  string,
-  height: number,
-  label:  string,
-  pos: string,
-  shape: string,
-  style: string,
-  width: number, 
-}
-
-export interface EdgeData {
-  _gvid: string,
-  tail: string,
-  head: string,
-  color: string,
-  id: string,
-  label: string,
-  lp: string,
-  pos: string,
-  };
-
-export interface GraphResponse {
-  action: string;
-  status: string;
-  message: string;
-  data: GraphData;
-}
-export interface GraphData {
-  name: string, 
-  objects: NodeData[],
-  edges: EdgeData[],
-}
+import { BuildResponse} from '../types/BuildResponse';
 
 interface TransformedNode {
   data: {
@@ -69,10 +34,10 @@ interface TransformedEdge {
   };
 }
 
-const useTransformGraph = (backendData: GraphResponse | null) => {
+const useTransformGraph = (backendData: BuildResponse | null) => {
   return useMemo(() => {
     if (!backendData) return { nodes: [], edges: [] };
-    const { data: graphData } = backendData;
+    const { build: graphData } = backendData;
 
 
     let nodes: TransformedNode[] = graphData.objects.map((node) => {
@@ -127,6 +92,8 @@ const useTransformGraph = (backendData: GraphResponse | null) => {
           targetNode.style.shape = "doublecircle";
         }
     }
+    
+
 
     return { nodes, edges };
   }, [backendData]);
