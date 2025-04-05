@@ -1,6 +1,9 @@
 import React from 'react';
 import Modal from 'react-modal';
 
+// Make sure to set the app element in your entry point, e.g.,
+// Modal.setAppElement('#root');
+
 interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,46 +17,16 @@ export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
+      parentSelector={() => document.getElementById('modal-root') || document.body}
       contentLabel="Info Modal"
-      bodyOpenClassName=""
-      htmlOpenClassName=""
-      style={{
-        overlay: { backgroundColor: 'transparent' },
-        content: {
-          position: 'static',
-          inset: 'unset',
-          padding: 0,
-          border: 'none',
-          background: 'none',
-        },
-      }}
+      className="modal-content"
+      overlayClassName="modal-overlay"
     >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-        onContextMenu={(e) => e.preventDefault()}
-      >
+      <div onContextMenu={(e) => e.preventDefault()}>
         <DraggableContainer>
-          <div
-            style={{
-              backgroundColor: 'white',
-              border: '1px solid #333',
-              padding: '20px',
-              boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-              maxWidth: '90%',
-              maxHeight: '80%',
-              overflowY: 'auto',
-              cursor: 'move',
-            }}
-          >
-            <div style={{ marginBottom: '10px' }}>
-              {content}
-            </div>
-            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+          <div className="modal-inner-content">
+            <div>{content}</div>
+            <div className="modal-footer">
               <button onClick={onClose}>Close</button>
             </div>
           </div>
@@ -62,6 +35,7 @@ export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
     </Modal>
   );
 }
+
 interface DraggableContainerProps {
   children: React.ReactNode;
 }
@@ -95,14 +69,17 @@ const DraggableContainer: React.FC<DraggableContainerProps> = ({ children }) => 
     document.removeEventListener('mouseup', onMouseUp);
   };
 
+  React.useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
   return (
     <div
       onMouseDown={onMouseDown}
-      style={{
-        position: 'relative',
-        left: position.x,
-        top: position.y,
-      }}
+      style={{ position: 'relative', left: position.x, top: position.y }}
     >
       {children}
     </div>
