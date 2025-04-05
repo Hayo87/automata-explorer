@@ -27,7 +27,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
   }, [initialFilters]);
 
   const handleAdd = () => {
-    if (!valueInput.trim() || !newFilter.subtype) return;
+    if ((!valueInput.trim() && !(newFilter.type === 'hider' && newFilter.subtype === 'loop')) || !newFilter.subtype) return;
     if (newFilter.type !== 'hider' && !newFilter.name.trim()) return;
 
     const splitValues = valueInput
@@ -35,12 +35,12 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
       .map((v) => v.trim())
       .filter((v) => v.length > 0);
 
-    if (splitValues.length === 0) return;
+    if (splitValues.length === 0 && !(newFilter.type === 'hider' && newFilter.subtype === 'loop')) return;
 
     const newEntry: Filter = {
       type: newFilter.type,
       name: newFilter.name,
-      values: splitValues,
+      values: newFilter.type === 'hider' && newFilter.subtype === 'loop' ? [] : splitValues,
       subtype: newFilter.subtype,
       order: filters.length + 1,
       decoratedName: '',
@@ -63,7 +63,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
   };
 
   return (
-    <div style={{ minWidth: '500px', minHeight: '400px' }}>
+    <div style={{ minWidth: '600px', minHeight: '500px' }}>
       <h2>Active Filters</h2>
 
       {filters.length === 0 ? (
@@ -87,6 +87,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
                 {filter.name && <> → {filter.name}</>}
                 {' = '}
                 {filter.values.join(', ')}
+                {' (Order: ' + filter.order + ')'}
               </span>
               <button
                 onClick={() => handleRemove(index)}
@@ -143,7 +144,6 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
           onChange={(e) => setNewFilter({ ...newFilter, subtype: e.target.value })}
           style={{ width: '100px' }}
         >
-          <option value="">Subtype</option>
           {(newFilter.type === 'synonym' ? filterSubtypes : hiderSubtypes).map((sub) => (
             <option key={sub} value={sub}>
               {sub}
@@ -169,7 +169,12 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
           placeholder="Values (comma-separated)"
           value={valueInput}
           onChange={(e) => setValueInput(e.target.value)}
-          style={{ width: '160px' }}
+          style={{
+            width: '160px',
+            backgroundColor: newFilter.type === 'hider' && newFilter.subtype === 'loop' ? '#f0f0f0' : undefined,
+            color: newFilter.type === 'hider' && newFilter.subtype === 'loop' ? '#999' : undefined,
+          }}
+          disabled={newFilter.type === 'hider' && newFilter.subtype === 'loop'}
         />
 
         <button onClick={handleAdd}>Add</button>

@@ -3,6 +3,7 @@ package io.github.Hayo87.service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.model.LabelUtils;
 import io.github.Hayo87.type.FilterSubtype;
+import io.github.Hayo87.type.FilterType;
 
 @Service
 public class FilterService {
@@ -23,12 +25,25 @@ public class FilterService {
         this.sessionService = sessionService;
     }
 
-    public void processFilters(String sessionId, List<FilterActionDTO> filterActions){
-        // Sort the actions by the order field
+    public void preProcessing(String sessionId, List<FilterActionDTO> filterActions) {
+        List<FilterActionDTO> preActions = filterActions.stream()
+            .filter(action -> action.getType() == FilterType.SYNONYM)
+            .collect(Collectors.toList());
+        process(sessionId, preActions);
+    }
+
+    public void postProcessing(String sessionId,List<FilterActionDTO> filterActions) {
+        List<FilterActionDTO> postActions = filterActions.stream()
+            .filter(action -> action.getType() == FilterType.HIDER)
+            .collect(Collectors.toList());
+        process(sessionId, postActions);
+    }
+
+    private void process(String sessionId, List<FilterActionDTO> filterActions){
         filterActions.sort(Comparator.comparingInt(FilterActionDTO::getOrder));
         
-        //Process filters actions in order
         for (FilterActionDTO action : filterActions) {
+            System.out.println(action.getType().toString());
             switch (action.getType()) {
                 case SYNONYM -> processSynonym(action, sessionId);
                 case HIDER -> processHider(action, sessionId);
@@ -42,13 +57,13 @@ public class FilterService {
         DiffAutomaton<String> reference = sessionService.getReferenceAutomata(sessionId);
         DiffAutomaton<String> subject = sessionService.getSubjectAutomata(sessionId);
 
-            String name = synonymsAction.getName();
-            List<String> synonyms = synonymsAction.getValues();
-            FilterSubtype subtype = synonymsAction.getSubtype();
-            applySynonyms(subtype, reference, name, synonyms);
-            applySynonyms(subtype, subject, name, synonyms);
+        String name = synonymsAction.getName();
+        List<String> synonyms = synonymsAction.getValues();
+        FilterSubtype subtype = synonymsAction.getSubtype();
+        applySynonyms(subtype, reference, name, synonyms);
+        applySynonyms(subtype, subject, name, synonyms);
 
-            synonymsAction.setDecoratedName(LabelUtils.writeSynonymLabel("", name, subtype));      
+        synonymsAction.setDecoratedName(LabelUtils.writeSynonymLabel("", name, subtype));      
     }    
         
     private void applySynonyms(FilterSubtype subtype, DiffAutomaton<String> automaton, String name, List<String> synonyms) {
@@ -60,6 +75,7 @@ public class FilterService {
             String partToCompare = switch (subtype) {
                 case INPUT -> LabelUtils.extractInput(label);
                 case OUTPUT -> LabelUtils.extractOutput(label);
+                default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
             };
 
             if (synonyms.contains(partToCompare)) {
@@ -77,8 +93,42 @@ public class FilterService {
         }
     }
 
-    private void processHider(FilterActionDTO hiderAction,String sessionId){
-        // dummy 
+    private void processHider(FilterActionDTO filterAction,String sessionId){
+        DiffAutomaton<String> diffAutomaton = sessionService.getLatestDiffAutomaton(sessionId);
+        List<String> filters = filterAction.getValues();
+        FilterSubtype subtype = filterAction.getSubtype();
+
+        applyHiders(subtype, diffAutomaton,filters);
     } 
 
+    private void applyHiders(FilterSubtype subtype, DiffAutomaton<String> diffAutomaton, List<String> filters) {
+        List<Transition<DiffAutomatonStateProperty, DiffProperty<String>>> toRemove = new ArrayList<>();
+    
+        if (subtype == FilterSubtype.LOOP) {
+            toRemove.addAll(diffAutomaton.getTransitions(t -> t.getSource().equals(t.getTarget())));
+
+        } else {
+            System.out.println("*** Processing INPUT / OUTPUT filters");
+            for (Transition<DiffAutomatonStateProperty, DiffProperty<String>> t : diffAutomaton.getTransitions()) {
+                String label = t.getProperty().getProperty();
+    
+                String partToCompare = switch (subtype) {
+                    case INPUT -> LabelUtils.extractInput(label);
+                    case OUTPUT -> LabelUtils.extractOutput(label);
+                    default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
+                };
+    
+                if (filters.contains(partToCompare)) {
+                    System.out.println("*** Filters: " + filters.toString());
+                    System.out.println("*** Part to Compare" + filters.toString());
+                    toRemove.add(t);
+                }
+            }
+        }
+    
+        for (Transition<DiffAutomatonStateProperty, DiffProperty<String>> t : toRemove) {
+            diffAutomaton.removeTransition(t);
+        }
+    }
 }
+    

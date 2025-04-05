@@ -64,22 +64,19 @@ public class BuildService {
                 buildInput(sessionId, sessionService.getRawReferenceAutomata(sessionId), true);
                 buildInput(sessionId, sessionService.getRawSubjectAutomata(sessionId), false);
 
-                List<FilterActionDTO> actions = new ArrayList<>();
+                List<FilterActionDTO> filters = new ArrayList<>();
 
                 if (!request.getFilters().isEmpty()) { 
                     // Data to FilterActionDTO
                     ObjectMapper mapper = new ObjectMapper();
-                    actions = mapper.convertValue(
+                    filters = mapper.convertValue(
                         request.getFilters(),
                         new TypeReference<List<FilterActionDTO>>() {}
                     );
-
-                    // Process filters
-                    filterService.processFilters(sessionId, actions); 
                 }
 
-                JsonNode buildData = buildDefault(sessionId); 
-                return new BuildResponseDTO("build", "success", "Build succesfull", buildData, actions);
+                JsonNode buildData = buildDefault(sessionId, filters); 
+                return new BuildResponseDTO("build", "success", "Build succesfull", buildData, filters);
             }
 
             case MATCH -> {
@@ -119,9 +116,12 @@ public class BuildService {
      * @return the JSON reprententation or the empty string in case of an error
      */
 
-    public JsonNode buildDefault(String sessionId) {
+    public JsonNode buildDefault(String sessionId, List<FilterActionDTO> filters) {
         DiffAutomaton<String> reference = sessionService.getReferenceAutomata(sessionId);
         DiffAutomaton<String> subject = sessionService.getSubjectAutomata(sessionId);
+
+        // Perform pre processing filters
+        filterService.preProcessing(sessionId, filters);
 
         // Configure comparison, merging, and writing.
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
@@ -133,6 +133,9 @@ public class BuildService {
         DiffAutomaton<String> result = comparator.compare(reference, subject);
         sessionService.storeDifference(sessionId,result);
 
+        // Perform post processing
+        filterService.postProcessing(sessionId, filters);
+        
         // Delegate processing to parserService
         return parserService.convertJsonToDiffAutomaton(result, writer); 
     }

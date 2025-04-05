@@ -73,6 +73,7 @@ public class LabelUtils {
         return switch (subtype) {
             case INPUT -> replaceInput(label, "ƒ_in(" + synonymName + ")");
             case OUTPUT -> replaceOutput(label, "ƒ_out(" + synonymName + ")");
+            default -> label;
         };
     }
 }
