@@ -104,7 +104,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
 
     const cyInstance = cytoscape({
       container: containerRef.current,
-      elements,
+      elements: [],
       layout: {name: layout},
       style: cytoscapeStyles ,
       zoom: 1,
@@ -132,14 +132,23 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       pixelRatio: "auto",
     });
 
-    // Store initial postions
-    cyInstance.nodes().forEach((node: NodeSingular) => {
-      const id = node.id();
-      const pos = node.position();
-      // Only store if not already stored.
-      if (!initialPositionsRef.current[id]) {
-        initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
-      }
+    // Load elements in batch
+    cyInstance.batch(() => {
+      cyInstance.add(elements);
+    });
+
+    // Fit layout
+    cyInstance.fit();
+
+    // Store initial positions in a batch
+    cyInstance.batch(() => {
+      cyInstance.nodes().forEach((node: NodeSingular) => {
+        const id = node.id();
+        const pos = node.position();
+        if (!initialPositionsRef.current[id]) {
+          initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
+        }
+      });
     });
 
     // Attach synonym tooltips
@@ -163,14 +172,15 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     switch (layout) {
 
     case "preset":
-      // Restore positions
-      cyInstance.nodes().forEach((node: NodeSingular) => {
-        const id = node.id();
-        if (initialPositionsRef.current[id]) {
-          node.position(initialPositionsRef.current[id]);
-        }
+      cyInstance.batch(() => {
+        cyInstance.nodes().forEach((node: NodeSingular) => {
+          const id = node.id();
+          if (initialPositionsRef.current[id]) {
+            node.position(initialPositionsRef.current[id]);
+          }
+        });
       });
-      cyInstance.layout({ name: "preset" }).run();
+      cyInstance.layout({ name: "preset", fit:true }).run();
       break;
 
     case "avsdf":
@@ -190,7 +200,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       break;
 
     default:
-      cyInstance.layout({ name: layout }).run();
+      cyInstance.layout({ name: layout, fit:true }).run();
       break;
   }
   }, [layout]);
