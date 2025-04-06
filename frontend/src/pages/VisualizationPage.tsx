@@ -97,7 +97,7 @@ const VisualizationPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <img src="/logo_nofill.svg" alt="Logo" className="small-logo" style={{ backgroundColor: "transparent" }} />
+      <img src="/logo_nofill.svg" alt="Logo" className="small-logo" />
       
       <div className="content-container">
         <main className="graph-area">
@@ -167,8 +167,8 @@ const VisualizationPage: React.FC = () => {
           </div>
 
           </aside>
-
       </div>
+
       <div className="bottom-left-info">
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
