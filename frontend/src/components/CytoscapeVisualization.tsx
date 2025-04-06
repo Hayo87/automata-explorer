@@ -15,17 +15,20 @@ import popper from 'cytoscape-popper';
 import tippy, { Props, Instance, sticky } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 import type { VirtualElement } from '@popperjs/core';
+import expandCollapse from "cytoscape-expand-collapse";
 
 // Utils 
 import { attachSynonymTooltips } from '../utils/attachSynonymTooltips';
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../utils/cytoscapeStyles';
+//import { attachExpandCollapse } from '../utils/attachContextCollapse';
 
 // Register extensions 
-cytoscape.use( coseBilkent )
-cytoscape.use( avsdf )
-cytoscape.use( dagre )
+cytoscape.use( coseBilkent );
+cytoscape.use( avsdf );
+cytoscape.use( dagre );
 cytoscape.use( cxtmenu );
+cytoscape.use(expandCollapse);
 cytoscape.use(popper(tippyFactory));
 
 function tippyFactory(ref: VirtualElement, content: HTMLElement): Instance<Props> {
@@ -63,41 +66,9 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
+  //const ecRef = useRef<any>(null);
 
   // Convert states to nodes
-  const nodes = transformedData.nodes.map(node => ({
-    group: "nodes",
-    data: {
-      id: node.data.id,
-      label: node.data.label,
-      parent: undefined,
-      color: node.style.backgroundColor,
-      height: node.style.height,
-      width: node.style.width,
-      shape: node.style.shape
-    },
-    position: node.position,
-    selectable: true,
-    grabbable: true,
-    locked: false,
-    pannable: false,
-    classes:  node.style.shape === "doublecircle" ? "start" : ""
-  }));
-
-  // Convert transitions to edges
-  const edges = transformedData.edges.map((edge, index) => ({
-    group: "edges",
-    data: {
-      id: `edge${index}`,
-      source: edge.data.source,
-      target: edge.data.target,
-      label: edge.data.label,
-      color: edge.style.lineColor
-    },
-    pannable: true,
-  }));
-
-  const elements = [...nodes, ...edges];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -134,7 +105,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
 
     // Load elements in batch
     cyInstance.batch(() => {
-      cyInstance.add(elements);
+      cyInstance.add(transformedData);
     });
 
     // Fit layout
@@ -157,17 +128,21 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);
 
+    // Attach expand and collapse functionality
+    //ecRef.current = attachExpandCollapse(cyInstance);
+
     cyRef.current = cyInstance;
 
     return () => {
       cyInstance.destroy();
       cyRef.current = null;
     };
-  }, [elements]);
+  }, [transformedData]);
 
   useEffect(() => {
     if (!cyRef.current) return;
     const cyInstance = cyRef.current;
+    console.log("Toepassen: " + layout);
 
     switch (layout) {
 
@@ -186,18 +161,17 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     case "avsdf":
       {
         const numNodes = cyInstance.nodes().length;
-        const spreadfactor = Math.max(100, numNodes * 20);
+        const spreadfactor = Math.max(100, numNodes * 5);
         cyInstance.layout({ name: 'avsdf', nodeSeparation: spreadfactor},).run();
       }
       break;
-
-    case "dagre":
-      cyInstance.layout({ name: "dagre", fit: true }).run();
-      break;
-
-    case "grid":
-      cyInstance.layout({ name: "grid", fit: true}).run();
-      break;
+     
+    case "cose-bilkent":
+      console.log("Case bilkent gekozen");
+      const numNodes = cyInstance.nodes().length;
+      const spreadfactor = Math.max(9000, numNodes * 50);
+      cyInstance.layout({ name: "cose-bilkent", fit: true, randomize: false, nodeRepulsion: spreadfactor, idealEdgeLength: 100}).run();
+      break;  
 
     default:
       cyInstance.layout({ name: layout, fit:true }).run();

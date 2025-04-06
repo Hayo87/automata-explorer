@@ -7,14 +7,33 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             "label": "data(label)",
             "text-valign": "center",
             "color": "white",
-            "background-color": "data(color)",
+            "background-color": "grey",
             "font-size": "12px",
-            "width": "data(width)",
-            "height": "data(height)",
+            "width": "50px",
+            "height": "50px",
             "border-width" : 2,
             "border-style": "solid",
-            "border-color": "black"
+            "border-color": "black",
+            "shape": "ellipse"
           },
+        },
+        {
+          selector: 'node.added',
+          style: {
+            "background-color": "green",
+          }
+        },
+        {
+          selector: 'node.removed',
+          style: {
+            "background-color": "red"
+          }
+        },
+        {
+          selector: 'node.common',
+          style: {
+            "background-color": "black",
+          }
         },
         {
           selector: 'node.start',
@@ -59,7 +78,6 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             'pie-3-background-color': 'data(slice3Color)',
             'pie-3-background-size': 'data(slice3Size)',
             'background-color': '#ccc'
-
           }
         },
         {
@@ -75,6 +93,30 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             "text-rotation": "autorotate",
             "text-margin-y": -10,
           },
+        },
+        {
+          selector: 'edge.added',
+          style: {
+            "line-color": "green",
+            "target-arrow-color": "green",
+            "color": "green",
+          }
+        },
+        {
+          selector: 'edge.removed',
+          style: {
+            "line-color": "red",
+            "target-arrow-color": "red",
+            "color": "red",
+          }
+        },
+        {
+          selector: 'edge.common',
+          style: {
+            "line-color": "black",
+            "target-arrow-color": "black",
+            "color": "black",
+          }
         },
         {
           selector: 'edge.checked',
