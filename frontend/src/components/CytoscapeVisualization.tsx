@@ -21,7 +21,7 @@ import expandCollapse from "cytoscape-expand-collapse";
 import { attachSynonymTooltips } from '../utils/attachSynonymTooltips';
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../utils/cytoscapeStyles';
-//import { attachExpandCollapse } from '../utils/attachContextCollapse';
+import { attachExpandCollapse } from '../utils/attachContextCollapse';
 
 // Register extensions 
 cytoscape.use( coseBilkent );
@@ -66,7 +66,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
-  //const ecRef = useRef<any>(null);
 
   // Convert states to nodes
 
@@ -129,7 +128,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     attachCytoscapeMenus(cyInstance, openModal);
 
     // Attach expand and collapse functionality
-    //ecRef.current = attachExpandCollapse(cyInstance);
+    attachExpandCollapse(cyInstance);
 
     cyRef.current = cyInstance;
 
@@ -171,6 +170,9 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       const numNodes = cyInstance.nodes().length;
       const spreadfactor = Math.max(9000, numNodes * 50);
       cyInstance.layout({ name: "cose-bilkent", fit: true, randomize: false, nodeRepulsion: spreadfactor, idealEdgeLength: 100}).run();
+      var api = cyInstance.expandCollapse('get')
+      console.log(api);
+      api.collapseEdges(cyInstance.edges(),{})
       break;  
 
     default:
@@ -186,7 +188,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     }
   }));
 
-  return <div ref={containerRef} className="cytoscape-container"></div>;
+  return <div ref={containerRef} className="graph-area"></div>;
 });
 
 export default CytoscapeVisualization;
