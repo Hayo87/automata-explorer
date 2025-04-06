@@ -115,21 +115,25 @@ const VisualizationPage: React.FC = () => {
         
           {/* Layout Section */}
           <p className="sidebar-label">Layouts</p>
-          <button className={`sidebar-button ${currentLayout === "preset" ? "active" : ""}`} title="Dot layout" onClick={() => setCurrentLayout("preset")}>
+          <button className={`sidebar-button ${currentLayout === "preset" ? "active" : ""}`} title="Dot" onClick={() => setCurrentLayout("preset")}>
             <span className="material-icons">more_horiz</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular layout" onClick={() => setCurrentLayout("avsdf")}>
+          <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular" onClick={() => setCurrentLayout("avsdf")}>
             <span className="material-icons">radio_button_unchecked</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid layout" onClick={() => setCurrentLayout("grid")}>
+          <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid" onClick={() => setCurrentLayout("grid")}>
             <span className="material-icons">grid_view</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre layout" onClick={() => setCurrentLayout("dagre")}>
+          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre" onClick={() => setCurrentLayout("dagre")}>
             <span className="material-icons">swap_horiz</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst layout" onClick={() => setCurrentLayout("breadthfirst")}>
+          <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
             <span className="material-icons">park</span>
           </button>
+          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("cose-bilkent")}>
+            <span className="material-icons">park</span>
+          </button>
+
 
           {/* Tools Section */}
           <p className="sidebar-label">Tools</p>
