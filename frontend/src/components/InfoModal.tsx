@@ -1,8 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-
-// Make sure to set the app element in your entry point, e.g.,
-// Modal.setAppElement('#root');
 
 interface InfoModalProps {
   isOpen: boolean;
@@ -11,6 +8,18 @@ interface InfoModalProps {
 }
 
 export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const disableContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    document.addEventListener('contextmenu', disableContextMenu);
+    return () => {
+      document.removeEventListener('contextmenu', disableContextMenu);
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -22,7 +31,10 @@ export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
       className="modal-content"
       overlayClassName="modal-overlay"
     >
-      <div onContextMenu={(e) => e.preventDefault()}>
+      <div onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}>
         <DraggableContainer>
           <div className="modal-inner-content">
             <div>{content}</div>

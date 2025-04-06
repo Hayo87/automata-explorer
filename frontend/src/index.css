@@ -62,8 +62,9 @@ h1 {
   top: 10px;
   left: 10px;
   width: 250px; 
-  z-index: 10;
-  background: rgba(255, 255, 255, 0.8); 
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.8);
+  border-top-right-radius: 8px; 
 }
 
 .cytoscape-container {
