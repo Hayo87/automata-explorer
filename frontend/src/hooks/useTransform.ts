@@ -24,7 +24,8 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
         data: {
           id: node._gvid,
           label: node.label,
-          parent: undefined
+          parent: undefined,
+          NodeType:typeClass
         },
         position: { x, y: y * -1 },
         selectable: true,
@@ -50,7 +51,8 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
           id: edge.id,
           source: edge.tail,
           target: edge.head,
-          label: DOMPurify.sanitize(edge.label, { ALLOWED_TAGS: [] })
+          label: DOMPurify.sanitize(edge.label, { ALLOWED_TAGS: [] }),
+          edgeType: typeClass,
         },
         pannable: true,
         classes: typeClass,
