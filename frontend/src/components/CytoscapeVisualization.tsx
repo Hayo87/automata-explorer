@@ -1,6 +1,7 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import cytoscape from "cytoscape";
 import NodeSingular from "cytoscape"
+import Core from 'cytoscape';
 
 //hooks
 import useTransformGraph from "../hooks/useTransform";
@@ -54,6 +55,7 @@ interface CytoscapeVisualizationProps {
   data: BuildResponse;
   layout: string;
   openModal: (modalContent: any) => void;
+  onCy?: (cy: Core) => void;
 }
 
 export interface CytoscapeVisualizationRef {
@@ -61,7 +63,7 @@ export interface CytoscapeVisualizationRef {
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
-  ({ data, layout, openModal }, ref) => {
+  ({ data, layout, openModal, onCy }, ref) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
@@ -130,18 +132,22 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     // Attach expand and collapse functionality
     attachExpandCollapse(cyInstance);
 
+
+    if (onCy) {
+      onCy(cyInstance);
+    }
+
     cyRef.current = cyInstance;
 
     return () => {
       cyInstance.destroy();
       cyRef.current = null;
     };
-  }, [transformedData]);
+  }, [transformedData, onCy]);
 
   useEffect(() => {
     if (!cyRef.current) return;
     const cyInstance = cyRef.current;
-    console.log("Toepassen: " + layout);
 
     switch (layout) {
 
@@ -170,9 +176,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       const numNodes = cyInstance.nodes().length;
       const spreadfactor = Math.max(9000, numNodes * 50);
       cyInstance.layout({ name: "cose-bilkent", fit: true, randomize: false, nodeRepulsion: spreadfactor, idealEdgeLength: 100}).run();
-      var api = cyInstance.expandCollapse('get')
-      console.log(api);
-      api.collapseEdges(cyInstance.edges(),{})
       break;  
 
     default:
