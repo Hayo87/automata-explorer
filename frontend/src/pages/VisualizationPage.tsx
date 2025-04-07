@@ -37,7 +37,7 @@ const VisualizationPage: React.FC = () => {
     setIsModalOpen(false);
     setModalContent(null);
   };
-
+;
   const openFilterModal = () => {
     openModal(
       <FilterInfo
@@ -51,9 +51,28 @@ const VisualizationPage: React.FC = () => {
     );
   };
 
-  const handleGroupSynonym = () => {
-    //dummy method
+  const handleCollapse = () => {
+    if (!cyVizRef.current) return;
+    const cy = cyVizRef.current
+    const api = (cy as any).expandCollapse('get');
+
+    const collapsedEdges = (cy as any).edges('.cy-expand-collapse-collapsed-edge');
+
+    if (collapsedEdges.length === 0) {
+      const edges = (cy as any).edges(":selected");
+      if (edges.length >= 2) {
+        api.collapseEdges(edges);
+      } else { 
+      api.collapseAllEdges();
+      } 
+    } else {
+      api.expandAllEdges();
+    }
   };
+
+  const handleZones = () => {
+    //dummy
+  }
   
   const handleExport = () => {
     if (!cyVizRef.current) return;
@@ -104,7 +123,7 @@ const VisualizationPage: React.FC = () => {
           {loading ? (
             <p style={{ textAlign: "center" }}>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal}  onCy={(cy) => {cyVizRef.current = cy}} />
           ) : (
             <p style={{ textAlign: "center" }}>No data available</p>
 
@@ -136,11 +155,14 @@ const VisualizationPage: React.FC = () => {
 
 
           {/* Tools Section */}
-          <p className="sidebar-label">Tools</p>
+          <p className="sidebar-label">Filters</p>
           <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
             <span className="material-icons">filter_alt</span>
           </button>
-          <button className="sidebar-button" title="Create synonym" onClick={handleGroupSynonym} >
+          <button className="sidebar-button" title="Collapse edges" onClick={handleCollapse} >
+            <span className="material-icons">track_changes</span>
+          </button>
+          <button className="sidebar-button" title="Enable zones " onClick={handleZones} >
             <span className="material-icons">track_changes</span>
           </button>
 

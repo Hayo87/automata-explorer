@@ -7,8 +7,10 @@ export function attachExpandCollapse(cyInstance: cytoscape.Core) {
     cueEnabled: true,
     expandCollapseCuePosition: 'top-left',
     expandCollapseCueSize: 12,
-    expandCollapseCueLineSize: 2,
-    groupEdgesOfSameTypeOnCollapse: true
+    expandCollapseCueLineSize: 8,
+    groupEdgesOfSameTypeOnCollapse: true,
+    edgeTypeInfo: "edgeType",
+    zIndex: 100000
   }
   
     return cyInstance.expandCollapse(defaultOptions);
