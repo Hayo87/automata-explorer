@@ -84,8 +84,8 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
           selector: "edge",
           style: {
             "width": 2,
-            "line-color": "data(color)",
-            "target-arrow-color": "data(color)",
+            "line-color": "grey",
+            "target-arrow-color": "grey",
             "target-arrow-shape": "triangle",
             "curve-style": "bezier",
             "label": "data(label)",
