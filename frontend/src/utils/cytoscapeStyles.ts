@@ -7,14 +7,33 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             "label": "data(label)",
             "text-valign": "center",
             "color": "white",
-            "background-color": "data(color)",
+            "background-color": "grey",
             "font-size": "12px",
-            "width": "data(width)",
-            "height": "data(height)",
+            "width": "50px",
+            "height": "50px",
             "border-width" : 2,
             "border-style": "solid",
-            "border-color": "black"
+            "border-color": "black",
+            "shape": "ellipse"
           },
+        },
+        {
+          selector: 'node.added',
+          style: {
+            "background-color": "green",
+          }
+        },
+        {
+          selector: 'node.removed',
+          style: {
+            "background-color": "red"
+          }
+        },
+        {
+          selector: 'node.common',
+          style: {
+            "background-color": "black",
+          }
         },
         {
           selector: 'node.start',
@@ -59,15 +78,14 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             'pie-3-background-color': 'data(slice3Color)',
             'pie-3-background-size': 'data(slice3Size)',
             'background-color': '#ccc'
-
           }
         },
         {
           selector: "edge",
           style: {
             "width": 2,
-            "line-color": "data(color)",
-            "target-arrow-color": "data(color)",
+            "line-color": "grey",
+            "target-arrow-color": "grey",
             "target-arrow-shape": "triangle",
             "curve-style": "bezier",
             "label": "data(label)",
@@ -75,6 +93,83 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             "text-rotation": "autorotate",
             "text-margin-y": -10,
           },
+        },
+        {
+          selector: 'edge.cy-expand-collapse-collapsed-edge',
+          style: {
+            'label': (e: cytoscape.EdgeSingular) => {
+              const count = e.data('collapsedEdges') ? e.data('collapsedEdges').length : 0;
+              return '(' + count + ')';
+            },
+            'line-style': 'dashed',
+            'opacity': 0.7,
+            'width': (e: cytoscape.EdgeSingular) => {
+              const count = e.data('collapsedEdges') ? e.data('collapsedEdges').length : 0;
+              return (3 + Math.log2(count || 1)) + 'px';
+            },
+            'target-arrow-shape': function(edge: cytoscape.EdgeSingular) {
+              const directionType = edge.data('directionType');
+              if (directionType === 'unidirection' || directionType === 'bidirection') {
+                return 'triangle';
+              }
+              return 'none';
+            },
+            'source-arrow-shape': function(edge: cytoscape.EdgeSingular) {
+              const directionType = edge.data('directionType');
+              return directionType === 'bidirection' ? 'triangle' : 'none';
+            },
+          }
+        },    
+        {
+          selector: 'edge.added',
+          style: {
+            "line-color": "green",
+            "target-arrow-color": "green",
+            "color": "green",
+          }
+        },
+        {
+          selector: 'edge.cy-expand-collapse-collapsed-edge[edgeType="added"]',
+          style: {
+            'line-color': 'green',
+            "target-arrow-color": "green",
+            "source-arrow-color": "green",
+            "color": "green",
+          }
+        },
+        {
+          selector: 'edge.removed',
+          style: {
+            "line-color": "red",
+            "target-arrow-color": "red",
+            "color": "red",
+          }
+        },
+        {
+          selector: 'edge.cy-expand-collapse-collapsed-edge[edgeType="removed"]',
+          style: {
+            'line-color': 'red',
+            "target-arrow-color": "red",
+            "source-arrow-color": "red",
+            "color": "red",
+          }
+        },
+        {
+          selector: 'edge.common',
+          style: {
+            "line-color": "black",
+            "target-arrow-color": "black",
+            "color": "black",
+          }
+        },
+        {
+          selector: 'edge.cy-expand-collapse-collapsed-edge[edgeType="common"]',
+          style: {
+            'line-color': 'black',
+            "target-arrow-color": "black",
+            "source-arrow-color": "black",
+            "color": "black",
+          }
         },
         {
           selector: 'edge.checked',

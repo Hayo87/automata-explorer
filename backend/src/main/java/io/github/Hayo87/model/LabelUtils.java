@@ -71,8 +71,8 @@ public class LabelUtils {
  
     public static String writeSynonymLabel(String label, String synonymName, FilterSubtype subtype) {
         return switch (subtype) {
-            case INPUT -> replaceInput(label, "ƒ_in(" + synonymName + ")");
-            case OUTPUT -> replaceOutput(label, "ƒ_out(" + synonymName + ")");
+            case INPUT -> replaceInput(label, "↦ [" + synonymName + "]");
+            case OUTPUT -> replaceOutput(label, "↦ [" + synonymName + "]");
             default -> label;
         };
     }

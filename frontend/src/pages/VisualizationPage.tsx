@@ -37,7 +37,7 @@ const VisualizationPage: React.FC = () => {
     setIsModalOpen(false);
     setModalContent(null);
   };
-
+;
   const openFilterModal = () => {
     openModal(
       <FilterInfo
@@ -51,9 +51,28 @@ const VisualizationPage: React.FC = () => {
     );
   };
 
-  const handleGroupSynonym = () => {
-    //dummy method
+  const handleCollapse = () => {
+    if (!cyVizRef.current) return;
+    const cy = cyVizRef.current
+    const api = (cy as any).expandCollapse('get');
+
+    const collapsedEdges = (cy as any).edges('.cy-expand-collapse-collapsed-edge');
+
+    if (collapsedEdges.length === 0) {
+      const edges = (cy as any).edges(":selected");
+      if (edges.length >= 2) {
+        api.collapseEdges(edges);
+      } else { 
+      api.collapseAllEdges();
+      } 
+    } else {
+      api.expandAllEdges();
+    }
   };
+
+  const handleZones = () => {
+    //dummy
+  }
   
   const handleExport = () => {
     if (!cyVizRef.current) return;
@@ -97,14 +116,14 @@ const VisualizationPage: React.FC = () => {
 
   return (
     <div className="page-container">
-      <img src="/logo_nofill.svg" alt="Logo" className="small-logo" style={{ backgroundColor: "transparent" }} />
+      <img src="/logo_nofill.svg" alt="Logo" className="small-logo" />
       
       <div className="content-container">
         <main className="graph-area">
           {loading ? (
             <p style={{ textAlign: "center" }}>Loading visualization...</p>
           ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal}  onCy={(cy) => {cyVizRef.current = cy}} />
           ) : (
             <p style={{ textAlign: "center" }}>No data available</p>
 
@@ -115,28 +134,35 @@ const VisualizationPage: React.FC = () => {
         
           {/* Layout Section */}
           <p className="sidebar-label">Layouts</p>
-          <button className={`sidebar-button ${currentLayout === "preset" ? "active" : ""}`} title="Dot layout" onClick={() => setCurrentLayout("preset")}>
+          <button className={`sidebar-button ${currentLayout === "preset" ? "active" : ""}`} title="Dot" onClick={() => setCurrentLayout("preset")}>
             <span className="material-icons">more_horiz</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular layout" onClick={() => setCurrentLayout("avsdf")}>
+          <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular" onClick={() => setCurrentLayout("avsdf")}>
             <span className="material-icons">radio_button_unchecked</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid layout" onClick={() => setCurrentLayout("grid")}>
+          <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid" onClick={() => setCurrentLayout("grid")}>
             <span className="material-icons">grid_view</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre layout" onClick={() => setCurrentLayout("dagre")}>
+          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre" onClick={() => setCurrentLayout("dagre")}>
             <span className="material-icons">swap_horiz</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst layout" onClick={() => setCurrentLayout("breadthfirst")}>
+          <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
+            <span className="material-icons">park</span>
+          </button>
+          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("cose-bilkent")}>
             <span className="material-icons">park</span>
           </button>
 
+
           {/* Tools Section */}
-          <p className="sidebar-label">Tools</p>
+          <p className="sidebar-label">Filters</p>
           <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
             <span className="material-icons">filter_alt</span>
           </button>
-          <button className="sidebar-button" title="Create synonym" onClick={handleGroupSynonym} >
+          <button className="sidebar-button" title="Collapse edges" onClick={handleCollapse} >
+            <span className="material-icons">track_changes</span>
+          </button>
+          <button className="sidebar-button" title="Enable zones " onClick={handleZones} >
             <span className="material-icons">track_changes</span>
           </button>
 
@@ -163,8 +189,8 @@ const VisualizationPage: React.FC = () => {
           </div>
 
           </aside>
-
       </div>
+
       <div className="bottom-left-info">
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
