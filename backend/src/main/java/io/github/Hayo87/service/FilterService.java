@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.github.tno.gltsdiff.glts.Transition;
+import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
@@ -20,10 +21,6 @@ import io.github.Hayo87.type.FilterType;
 
 @Service
 public class FilterService {
-
-    public FilterService(SessionService sessionService) {
-        this.sessionService = sessionService;
-    }
 
     public void preProcessing(SessionData session, List<FilterActionDTO> filterActions) {
         List<FilterActionDTO> preActions = filterActions.stream()
@@ -54,14 +51,14 @@ public class FilterService {
     }
         
     private void processSynonym(FilterActionDTO synonymsAction, SessionData session) {
-        DiffAutomaton<String> reference = session.getReference();
-        DiffAutomaton<String> subject = session.getSubject();
+        Automaton<String> reference = session.getReference();
+        Automaton<String> subject = session.getSubject();
 
         String name = synonymsAction.getName();
         List<String> synonyms = synonymsAction.getValues();
         FilterSubtype subtype = synonymsAction.getSubtype();
-        applySynonyms(subtype, reference, name, synonyms);
-        applySynonyms(subtype, subject, name, synonyms);
+        //applySynonyms(subtype, reference, name, synonyms);
+        //applySynonyms(subtype, subject, name, synonyms);
 
         synonymsAction.setDecoratedName(LabelUtils.writeSynonymLabel("", name, subtype));      
     }    
