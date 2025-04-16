@@ -14,6 +14,7 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
 import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.model.LabelUtils;
+import io.github.Hayo87.model.SessionData;
 import io.github.Hayo87.type.FilterSubtype;
 import io.github.Hayo87.type.FilterType;
 
@@ -25,37 +26,37 @@ public class FilterService {
         this.sessionService = sessionService;
     }
 
-    public void preProcessing(String sessionId, List<FilterActionDTO> filterActions) {
+    public void preProcessing(SessionData session, List<FilterActionDTO> filterActions) {
         List<FilterActionDTO> preActions = filterActions.stream()
             .filter(action -> action.getType() == FilterType.SYNONYM)
             .collect(Collectors.toList());
-        process(sessionId, preActions);
+        process(session, preActions);
     }
 
-    public void postProcessing(String sessionId,List<FilterActionDTO> filterActions) {
+    public void postProcessing( SessionData session ,List<FilterActionDTO> filterActions) {
         List<FilterActionDTO> postActions = filterActions.stream()
             .filter(action -> action.getType() == FilterType.HIDER)
             .collect(Collectors.toList());
-        process(sessionId, postActions);
+        process(session, postActions);
     }
 
-    private void process(String sessionId, List<FilterActionDTO> filterActions){
+    private void process(SessionData session, List<FilterActionDTO> filterActions){
         filterActions.sort(Comparator.comparingInt(FilterActionDTO::getOrder));
         
         for (FilterActionDTO action : filterActions) {
             System.out.println(action.getType().toString());
             switch (action.getType()) {
-                case SYNONYM -> processSynonym(action, sessionId);
-                case HIDER -> processHider(action, sessionId);
+                case SYNONYM -> processSynonym(action, session);
+                case HIDER -> processHider(action, session);
                 default -> {
                 }
             }
         }
     }
         
-    private void processSynonym(FilterActionDTO synonymsAction,String sessionId) {
-        DiffAutomaton<String> reference = sessionService.getReferenceAutomata(sessionId);
-        DiffAutomaton<String> subject = sessionService.getSubjectAutomata(sessionId);
+    private void processSynonym(FilterActionDTO synonymsAction, SessionData session) {
+        DiffAutomaton<String> reference = session.getReference();
+        DiffAutomaton<String> subject = session.getSubject();
 
         String name = synonymsAction.getName();
         List<String> synonyms = synonymsAction.getValues();
@@ -93,8 +94,8 @@ public class FilterService {
         }
     }
 
-    private void processHider(FilterActionDTO filterAction,String sessionId){
-        DiffAutomaton<String> diffAutomaton = sessionService.getLatestDiffAutomaton(sessionId);
+    private void processHider(FilterActionDTO filterAction,SessionData session){
+        DiffAutomaton<String> diffAutomaton = session.getDiffAutomaton();
         List<String> filters = filterAction.getValues();
         FilterSubtype subtype = filterAction.getSubtype();
 
