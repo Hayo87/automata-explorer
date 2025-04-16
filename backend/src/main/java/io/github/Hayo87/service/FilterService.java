@@ -20,7 +20,6 @@ import io.github.Hayo87.type.FilterType;
 
 @Service
 public class FilterService {
-    private final SessionService sessionService;
 
     public FilterService(SessionService sessionService) {
         this.sessionService = sessionService;
