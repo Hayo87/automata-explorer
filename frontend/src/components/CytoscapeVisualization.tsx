@@ -139,18 +139,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
 
     switch (layout) {
 
-    case "preset":
-      cyInstance.batch(() => {
-        cyInstance.nodes().forEach((node: NodeSingular) => {
-          const id = node.id();
-          if (initialPositionsRef.current[id]) {
-            node.position(initialPositionsRef.current[id]);
-          }
-        });
-      });
-      cyInstance.layout({ name: "preset", fit:true }).run();
-      break;
-
     case "avsdf":
       {
         const numNodes = cyInstance.nodes().length;
