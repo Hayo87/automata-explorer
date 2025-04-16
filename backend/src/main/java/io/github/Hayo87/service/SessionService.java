@@ -6,8 +6,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
-
 import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 import io.github.Hayo87.model.SessionData;
 
@@ -18,16 +16,15 @@ import io.github.Hayo87.model.SessionData;
  */
 @Service
 public class SessionService {
-
     private final Map<String, SessionData> sessions = new HashMap<>();
 
     public SessionService() {
     }
 
-        /**
+    /**
      * Creates a new (empty) session
      *
-     * @return A string with the unique session ID.
+     * @return string with the unique session ID.
      */
     public String createSession(String dotReference, String dotSubject) {
         String sessionId = UUID.randomUUID().toString();
@@ -36,91 +33,15 @@ public class SessionService {
         }
 
     /**
-     * Stores reference automata for an existing session.
-     *
-     * @param sessionId The session ID.
-     * @param automaton The automata to be stored.
+     * Retrieves the sessionData object from the session storage
+     * @param sessionId
+     * @return the sessionData object
      */
-    public void storeReference(String sessionId, DiffAutomaton<String> reference) {
-        SessionData session = getSession(sessionId);
-        session.setReference(reference);
-    }
-
-    /**
-     * Stores subject automata for an existing session.
-     *
-     * @param sessionId The session ID.
-     * @param automaton The automata to be stored.
-     */
-    public void storeSubject(String sessionId, DiffAutomaton<String> subject) {
-        SessionData session = getSession(sessionId);
-        session.setSubject(subject);
-    }
-
-    /**
-     * Stores difference automata for an existing session.
-     *
-     * @param sessionId The session ID.
-     * @param automaton The automata to be stored.
-     */
-    public void storeDifference(String sessionId, DiffAutomaton<String> automaton) {
-        SessionData session = getSession(sessionId);
-        session.setDiffAutomaton(automaton);
-    }
-
-    /**
-     *  Retrieves the reference automata
-     *
-     * @param sessionId The session ID.
-     * @return The reference automata.
-     */
-    public DiffAutomaton<String> getReferenceAutomata(String sessionId) {
-        SessionData session = getSession(sessionId);
-        return session.getReference();
-    }
-
-    /**
-     *  Retrieves the  raw reference automata
-     *
-     * @param sessionId The session ID.
-     * @return The reference automata.
-     */
-    public String getRawReferenceAutomata(String sessionId) {
-        SessionData session = getSession(sessionId);
-        return session.getInputReference();
-    }
-
-    /**
-     *  Retrieves the subject automata
-     *
-     * @param sessionId The session ID.
-     * @return The subject automata
-     */
-    public DiffAutomaton<String> getSubjectAutomata(String sessionId) {
-        SessionData session = getSession(sessionId);
-        return session.getSubject();
-    }
-
-    /**
-     *  Retrieves the raw subject automata
-     *
-     * @param sessionId The session ID.
-     * @return The subject automata
-     */
-    public String getRawSubjectAutomata(String sessionId) {
-        SessionData session = getSession(sessionId);
-        return session.getInputSubject();
-    }
-    
-    /**
-     * Retrieves the latest stored diff automaton from session history.
-     *
-     * @param sessionId The session ID.
-     * @return The latest automaton, or null if no history exists.
-     */
-    public DiffAutomaton<String> getLatestDiffAutomaton(String sessionId) {
-        SessionData session = getSession(sessionId);
-        return session.getDiffAutomaton();
+    public SessionData getSession (String sessionId) {
+        if (!sessions.containsKey(sessionId)) {
+            throw new IllegalArgumentException("Session ID not found.");
+        }
+        return sessions.get(sessionId);
     }
 
     /**
@@ -139,11 +60,5 @@ public class SessionService {
         }
     }
 
-    private SessionData getSession (String sessionId) {
-        if (!sessions.containsKey(sessionId)) {
-            throw new IllegalArgumentException("Session ID not found.");
-        }
-        return sessions.get(sessionId);
-    }
 }
 

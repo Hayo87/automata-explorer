@@ -1,6 +1,5 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import cytoscape from "cytoscape";
-import NodeSingular from "cytoscape"
 import Core from 'cytoscape';
 
 //hooks
@@ -19,7 +18,6 @@ import type { VirtualElement } from '@popperjs/core';
 import expandCollapse from "cytoscape-expand-collapse";
 
 // Utils 
-import { attachSynonymTooltips } from '../utils/attachSynonymTooltips';
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../utils/cytoscapeStyles';
 import { attachExpandCollapse } from '../utils/attachContextCollapse';
@@ -67,9 +65,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
-  const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
-
-  // Convert states to nodes
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -77,7 +72,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     const cyInstance = cytoscape({
       container: containerRef.current,
       elements: [],
-      layout: {name: layout},
       style: cytoscapeStyles ,
       zoom: 1,
       pan: { x: 0, y: 0 },
@@ -111,20 +105,11 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
 
     // Fit layout
     cyInstance.fit();
+    cyInstance.layout({ name: layout, fit: true }).run();
 
-    // Store initial positions in a batch
-    cyInstance.batch(() => {
-      cyInstance.nodes().forEach((node: NodeSingular) => {
-        const id = node.id();
-        const pos = node.position();
-        if (!initialPositionsRef.current[id]) {
-          initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
-        }
-      });
-    });
 
     // Attach synonym tooltips
-    attachSynonymTooltips(cyInstance, data?.filters || []);
+    //attachSynonymTooltips(cyInstance, data?.filters || []);
 
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);
@@ -150,18 +135,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     const cyInstance = cyRef.current;
 
     switch (layout) {
-
-    case "preset":
-      cyInstance.batch(() => {
-        cyInstance.nodes().forEach((node: NodeSingular) => {
-          const id = node.id();
-          if (initialPositionsRef.current[id]) {
-            node.position(initialPositionsRef.current[id]);
-          }
-        });
-      });
-      cyInstance.layout({ name: "preset", fit:true }).run();
-      break;
 
     case "avsdf":
       {

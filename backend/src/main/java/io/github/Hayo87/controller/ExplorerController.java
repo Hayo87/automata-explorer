@@ -1,5 +1,7 @@
 package io.github.Hayo87.controller;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -52,22 +54,15 @@ public class ExplorerController {
     @PostMapping("/session")
     public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
         String sessionId = sessionService.createSession(input.getReference(), input.getSubject());
-    
-        try {
-            buildService.processBuildAction(sessionId, new BuildRequestDTO(BuildType.REFERENCE, input.getReference()));
-            buildService.processBuildAction(sessionId, new BuildRequestDTO(BuildType.SUBJECT, input.getSubject()));
-    
-            return ResponseEntity.ok(new CreateSessionResponseDTO(sessionId));
-    
-        } catch (Exception e) {
-            
-            sessionService.terminateSession(sessionId);
-    
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new CreateSessionResponseDTO("Error processing session: " + e.getMessage()));
-        }
+
+        // Parse inputs in background
+        CompletableFuture.runAsync(() -> {
+            buildService.processBuildAction(sessionId, new BuildRequestDTO(BuildType.INPUTS, ""));
+        });
+
+        return ResponseEntity.ok(new CreateSessionResponseDTO(sessionId));
     }
-    
+
     /**
      * Deletes a session and clears its history.
      *
@@ -84,10 +79,9 @@ public class ExplorerController {
      *
      * @param sessionId The unique identifier of the session.
      * @param request The {@link BuildRequestDTO} containing the action to perform.
-     *                - action = "reference" → Builds the reference automata.
-     *                - action = "subject" → Builds the subject automata.
-     *                - action = "build" → Builds the DiffAutomata 
-     *                - action = "match" → Starts a matching process.
+     *                - action = "inputs" → Rebuilds from the raw inputs 
+     *                - action = "build" → Builds the DiffAutomata<String> 
+     *                - action = "mealy" → Builds the DiffAutomata<Mealy>
      * @return A {@link ResponseEntity} indicating the success or failure of the action.
      *         - HTTP 200 OK → Action executed successfully, results returned in DTO.
      *         - HTTP 400 Bad Request → Invalid action provided.

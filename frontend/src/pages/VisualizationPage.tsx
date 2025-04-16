@@ -18,7 +18,7 @@ const VisualizationPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
 
   const { data, buildSession, loading } = useSession();
-  const [currentLayout, setCurrentLayout] = useState("preset");
+  const [currentLayout, setCurrentLayout] = useState("dagre");
 
   const navigate = useNavigate();
   const { terminateSession } = useSession();
@@ -134,9 +134,6 @@ const VisualizationPage: React.FC = () => {
         
           {/* Layout Section */}
           <p className="sidebar-label">Layouts</p>
-          <button className={`sidebar-button ${currentLayout === "preset" ? "active" : ""}`} title="Dot" onClick={() => setCurrentLayout("preset")}>
-            <span className="material-icons">more_horiz</span>
-          </button>
           <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular" onClick={() => setCurrentLayout("avsdf")}>
             <span className="material-icons">radio_button_unchecked</span>
           </button>

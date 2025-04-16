@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import DOMPurify from "dompurify";
 import { BuildResponse} from '../types/BuildResponse';
 
 const useTransformGraph = (backendData: BuildResponse | null) => {
@@ -7,55 +6,42 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
     if (!backendData) return { nodes: [], edges: [] };
     const { build: graphData } = backendData;
 
-    let nodes = graphData.objects.map((node) => {
-      const [x, y] = node.pos.split(",").map(parseFloat);
-
-      let typeClass = "";
-      if (node.fillcolor === "#00cc00") {
-        typeClass = "added";
-      } else if (node.fillcolor === "#ff4040") {
-        typeClass = "removed";
-      } else {
-        typeClass = "common";
-      }
-
+    let nodes = graphData.nodes.map((node) => {
       return {
         group: "nodes",
         data: {
-          id: node._gvid,
-          label: node.label,
-          parent: undefined,
-          NodeType:typeClass
+          id: node.name,
+          label: node.attributes?.label,
+          NodeType:typeof node.attributes?.diffkind === "string"
+          ? node.attributes.diffkind.toLowerCase()
+          : "",
         },
-        position: { x, y: y * -1 },
         selectable: true,
         grabbable: true,
         locked: false,
         pannable: false,
-        classes: typeClass, 
+        classes: typeof node.attributes?.diffkind === "string"
+        ? node.attributes.diffkind.toLowerCase()
+        : ""
       };
     });
 
     let edges = graphData.edges.map((edge) => {
-      let typeClass = "";
-      if (edge.color === "#00cc00") {
-        typeClass = "added";
-      } else if (edge.color === "#ff4040") {
-        typeClass = "removed";
-      } else {
-        typeClass = "common";
-      }
       return {
         group: "edges",
         data: {
           id: edge.id,
           source: edge.tail,
           target: edge.head,
-          label: DOMPurify.sanitize(edge.label, { ALLOWED_TAGS: [] }),
-          edgeType: typeClass,
+          label: edge.attributes?.label,
+          edgeType: typeof edge.attributes?.diffkind === "string"
+          ? edge.attributes.diffkind.toLowerCase()
+          : "",
         },
         pannable: true,
-        classes: typeClass,
+        classes: typeof edge.attributes?.diffkind === "string"
+        ? edge.attributes.diffkind.toLowerCase()
+        : "",
       };
     });
     

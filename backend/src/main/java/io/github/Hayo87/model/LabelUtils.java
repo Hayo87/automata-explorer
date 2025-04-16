@@ -32,7 +32,6 @@ public class LabelUtils {
         return parts.length == 2 ? parts[0].trim() : label;
     }
 
-
     /**
      * Build a new label of the form <code>input/output</code>
      * @param input
@@ -68,7 +67,6 @@ public class LabelUtils {
         return build(input, newOutput);
     }
 
- 
     public static String writeSynonymLabel(String label, String synonymName, FilterSubtype subtype) {
         return switch (subtype) {
             case INPUT -> replaceInput(label, "↦ [" + synonymName + "]");

@@ -30,7 +30,7 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
           }
         },
         {
-          selector: 'node.common',
+          selector: 'node.unchanged',
           style: {
             "background-color": "black",
           }
@@ -155,7 +155,7 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
           }
         },
         {
-          selector: 'edge.common',
+          selector: 'edge.unchanged',
           style: {
             "line-color": "black",
             "target-arrow-color": "black",
@@ -163,7 +163,7 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
           }
         },
         {
-          selector: 'edge.cy-expand-collapse-collapsed-edge[edgeType="common"]',
+          selector: 'edge.cy-expand-collapse-collapsed-edge[edgeType="unchanged"]',
           style: {
             'line-color': 'black',
             "target-arrow-color": "black",
