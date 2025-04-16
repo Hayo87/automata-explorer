@@ -3,14 +3,21 @@ package io.github.Hayo87.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
+
+import io.github.Hayo87.model.DiffAutomatonSerializer;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BuildResponseDTO {
     private String action;
     private String status;
     private String message;
-    private JsonNode build;
+
+    @JsonSerialize(using = DiffAutomatonSerializer.class)
+    private DiffAutomaton<String> build;
+    
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<FilterActionDTO> filters;
 
     public BuildResponseDTO(String status, String message){
@@ -21,11 +28,11 @@ public class BuildResponseDTO {
         this(action, status, message, null, null);
     }
 
-    public BuildResponseDTO(String action, String status, String message, JsonNode build) {
+    public BuildResponseDTO(String action, String status, String message, DiffAutomaton<String> build) {
         this(action, status, message, build, null);
     }
 
-    public BuildResponseDTO(String action, String status, String message, JsonNode build ,List<FilterActionDTO> filters ) {
+    public BuildResponseDTO(String action, String status, String message, DiffAutomaton<String> build ,List<FilterActionDTO> filters ) {
         this.action = action;
         this.status = status;
         this.message = message;
@@ -42,8 +49,8 @@ public class BuildResponseDTO {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public JsonNode getBuild() { return build; }
-    public void setData(JsonNode data) { this.build = data; }
+    public DiffAutomaton<String> getBuild() { return build; }
+    public void setBuild(DiffAutomaton<String> build) { this.build = build; }
 
     public List<FilterActionDTO> getFilters() {return this.filters;}
     public void setFilters (List<FilterActionDTO> filters) {
