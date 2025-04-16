@@ -105,24 +105,28 @@ public class ParserService {
             throw new RuntimeException("Failed to convert dotString to Json", e);
         }
     }
-        @PostConstruct
-        public void warmup() {
-        CompletableFuture.runAsync(() -> {
-            try {
-                String dummy = "digraph G { a -> b }";
-                Process process = new ProcessBuilder("dot", "-Tdot_json").start();
-                try (var w = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-                     var r = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                    w.write(dummy);
-                    w.flush();
-                    w.close();
-                    while (r.readLine() != null); 
-                    process.waitFor();
+    
+    /**
+     * Method to improve the performance by warming up the process initially
+     */
+    @PostConstruct
+    public void warmup() {
+    CompletableFuture.runAsync(() -> {
+        try {
+            String dummy = "digraph G { a -> b }";
+            Process process = new ProcessBuilder("dot", "-Tdot_json").start();
+            try (var w = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+                var r = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                w.write(dummy);
+                w.flush();
+                w.close();
+                while (r.readLine() != null); 
+                     process.waitFor();
                 }
-            } catch (IOException | InterruptedException e) {
-                System.err.println("⚠ Graphviz warmup failed: " + e.getMessage());
-            }
-        });
+        } catch (IOException | InterruptedException e) {
+                System.err.println("Graphviz warmup failed: " + e.getMessage());
+        }
+    });
     }
 }
     
