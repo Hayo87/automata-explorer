@@ -1,9 +1,8 @@
 package io.github.Hayo87.type;
 
 public enum BuildType {
-    REFERENCE,
-    SUBJECT,
+    INPUTS,
     BUILD,
-    MATCH
+    MEALY,
 }
 
