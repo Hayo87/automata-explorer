@@ -1,6 +1,5 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import cytoscape from "cytoscape";
-import NodeSingular from "cytoscape"
 import Core from 'cytoscape';
 
 //hooks
@@ -19,7 +18,6 @@ import type { VirtualElement } from '@popperjs/core';
 import expandCollapse from "cytoscape-expand-collapse";
 
 // Utils 
-import { attachSynonymTooltips } from '../utils/attachSynonymTooltips';
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../utils/cytoscapeStyles';
 import { attachExpandCollapse } from '../utils/attachContextCollapse';
@@ -67,7 +65,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
-  const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
   useEffect(() => {
     if (!containerRef.current) return;
