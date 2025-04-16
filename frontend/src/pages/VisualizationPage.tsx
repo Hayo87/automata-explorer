@@ -18,7 +18,7 @@ const VisualizationPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
 
   const { data, buildSession, loading } = useSession();
-  const [currentLayout, setCurrentLayout] = useState("preset");
+  const [currentLayout, setCurrentLayout] = useState("dagre");
 
   const navigate = useNavigate();
   const { terminateSession } = useSession();

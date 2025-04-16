@@ -69,15 +69,12 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const cyRef = useRef<cytoscape.Core | null>(null);
   const initialPositionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
-  // Convert states to nodes
-
   useEffect(() => {
     if (!containerRef.current) return;
 
     const cyInstance = cytoscape({
       container: containerRef.current,
       elements: [],
-      layout: {name: layout},
       style: cytoscapeStyles ,
       zoom: 1,
       pan: { x: 0, y: 0 },
@@ -111,20 +108,11 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
 
     // Fit layout
     cyInstance.fit();
+    cyInstance.layout({ name: layout, fit: true }).run();
 
-    // Store initial positions in a batch
-    cyInstance.batch(() => {
-      cyInstance.nodes().forEach((node: NodeSingular) => {
-        const id = node.id();
-        const pos = node.position();
-        if (!initialPositionsRef.current[id]) {
-          initialPositionsRef.current[id] = { x: pos.x, y: pos.y };
-        }
-      });
-    });
 
     // Attach synonym tooltips
-    attachSynonymTooltips(cyInstance, data?.filters || []);
+    //attachSynonymTooltips(cyInstance, data?.filters || []);
 
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);

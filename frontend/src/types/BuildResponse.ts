@@ -8,32 +8,24 @@ export interface BuildResponse  {
 
 export interface GraphData {
   name: string, 
-  objects: NodeData[],
+  nodes: NodeData[],
   edges: EdgeData[],
 }
 
 export interface NodeData {
-    _gvid: string,
-    name: string,
-    fillcolor:  string,
-    fontcolor:  string,
-    height: number,
-    label:  string,
-    pos: string,
-    shape: string,
-    style: string,
-    width: number, 
+  name: string;
+  attributes?: Attributes;
 }
 
-  export interface EdgeData {
-    _gvid: string,
-    tail: string,
-    head: string,
-    color: string,
-    id: string,
-    label: string,
-    lp: string,
-    pos: string,
+export interface EdgeData {
+  id: string;
+  tail: string | number;
+  head: string | number;
+  attributes?: Attributes;
+}
+
+export interface Attributes {
+  [key: string]: string | number | boolean | { html: string };
 }
 
 export interface Filter {
