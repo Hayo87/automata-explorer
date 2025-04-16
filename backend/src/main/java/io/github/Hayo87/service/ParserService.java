@@ -30,11 +30,10 @@ import jakarta.annotation.PostConstruct;
 public class ParserService {
     private final ObjectMapper objectMapper;
 
-        @Autowired
+    @Autowired
     public ParserService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
 
     /**
      * Parses a DOT string and converts it into a DiffAutomaton.
