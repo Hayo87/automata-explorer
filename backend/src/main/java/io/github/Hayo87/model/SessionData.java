@@ -5,7 +5,10 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
+import io.github.Hayo87.type.DiffType;
+
 public class SessionData {
+    private DiffType type; 
     String inputReference;
     String inputSubject;
 
@@ -16,7 +19,8 @@ public class SessionData {
     private final ReentrantLock lock = new ReentrantLock();
     private boolean ready;
 
-    public SessionData(String inputReference, String inputSubject) {
+    public SessionData(DiffType type, String inputReference, String inputSubject) {
+        this.type = type;
         this.inputReference = inputReference;
         this.inputSubject = inputSubject;
     }

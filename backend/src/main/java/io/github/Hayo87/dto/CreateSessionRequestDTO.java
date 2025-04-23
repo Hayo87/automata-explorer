@@ -1,12 +1,16 @@
 package io.github.Hayo87.dto;
 
+import io.github.Hayo87.type.DiffType;
+
 public class CreateSessionRequestDTO {
+    private DiffType type;
     private String reference;
     private String subject;
 
     public CreateSessionRequestDTO() {}
 
-    public CreateSessionRequestDTO(String reference, String subject) {
+    public CreateSessionRequestDTO(DiffType type, String reference, String subject) {
+        this.type = type;
         this.reference = reference;
         this.subject = subject;
     }
@@ -26,4 +30,12 @@ public class CreateSessionRequestDTO {
     public void setSubject(String subject) {
         this.subject = subject;
     }
+
+    public DiffType getType() {
+        return type;
+    }
+    public void setType(DiffType type) {
+        this.type = type;
+    }
+
 }

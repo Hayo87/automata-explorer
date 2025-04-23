@@ -53,7 +53,7 @@ public class ExplorerController {
      */
     @PostMapping("/session")
     public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
-        String sessionId = sessionService.createSession(input.getReference(), input.getSubject());
+        String sessionId = sessionService.createSession(input.getType(), input.getReference(), input.getSubject());
 
         // Parse inputs in background
         CompletableFuture.runAsync(() -> {

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import io.github.Hayo87.dto.DeleteSessionResponseDTO;
 import io.github.Hayo87.model.SessionData;
+import io.github.Hayo87.type.DiffType;
 
 /**
  * Manages session creation, storage and deletion
@@ -26,9 +27,9 @@ public class SessionService {
      *
      * @return string with the unique session ID.
      */
-    public String createSession(String dotReference, String dotSubject) {
+    public String createSession(DiffType type, String dotReference, String dotSubject) {
         String sessionId = UUID.randomUUID().toString();
-        sessions.put(sessionId, new SessionData(dotReference, dotSubject));
+        sessions.put(sessionId, new SessionData(type, dotReference, dotSubject));
         return sessionId;
         }
 
