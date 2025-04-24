@@ -14,6 +14,7 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
 import io.github.Hayo87.dto.FilterActionDTO;
 import io.github.Hayo87.model.MealyTransition.Mealy;
+import io.github.Hayo87.model.Utils.LabelUtils;
 import io.github.Hayo87.type.FilterSubtype;
 import io.github.Hayo87.type.FilterType;
 
@@ -60,7 +61,7 @@ public class SynonymFilter implements DiffAutomatonFilter<Mealy> {
             String currentValue = extract.apply(oldLabel);
         
             if (synonyms.contains(currentValue)) {
-                Mealy newLabel = replace.apply(oldLabel, name);
+                Mealy newLabel = replace.apply(oldLabel, LabelUtils.writeSynonymLabel(name));
 
                 DiffProperty<Mealy> newProp = new DiffProperty<>(newLabel, t.getProperty().getDiffKind());
         
