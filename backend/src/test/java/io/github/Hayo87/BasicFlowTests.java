@@ -43,10 +43,10 @@ public class BasicFlowTests {
     @ParameterizedTest
     @MethodSource("loadDotFiles")
     @Order(1)
-    public void testCreateSession(String referenceGraph, String subjectGraph) {
+    public void testCreateSession(String referenceGraph, String subjectGraph, String type) {
         try {
             // Escape for JSON request
-            String requestBody = objectMapper.writeValueAsString(new DotRequest(referenceGraph, subjectGraph));
+            String requestBody = objectMapper.writeValueAsString(new DotRequest(referenceGraph, subjectGraph, type));
     
             String sessionId =
                 given()
@@ -126,9 +126,10 @@ public class BasicFlowTests {
         List<Arguments> testCases = new ArrayList<>();
         for (int i = 0; i < Math.min(referenceFiles.size(), subjectFiles.size()); i++) {
             String referenceGraph = Files.readString(referenceFiles.get(i)); 
-            String subjectGraph = Files.readString(subjectFiles.get(i));  
+            String subjectGraph = Files.readString(subjectFiles.get(i));
     
-            testCases.add(Arguments.of(referenceGraph, subjectGraph));
+            testCases.add(Arguments.of(referenceGraph, subjectGraph, "STRING"));
+            testCases.add(Arguments.of(referenceGraph, subjectGraph, "MEALY"));
         }
     
         return testCases.stream();
@@ -136,14 +137,14 @@ public class BasicFlowTests {
 
     // Helper class to ensure correct JSON structure
     private static class DotRequest {
-        @SuppressWarnings("unused")
         public String reference;
-        @SuppressWarnings("unused")
         public String subject;
-
-        public DotRequest(String reference, String subject) {
+        public String type;
+    
+        public DotRequest(String reference, String subject, String type) {
             this.reference = reference;
             this.subject = subject;
+            this.type = type;
         }
     }
 }
