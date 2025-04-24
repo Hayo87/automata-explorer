@@ -42,7 +42,7 @@ const UploadPage: React.FC = () => {
         <DragAndDrop setFile={setFile2} label="Subject" />
       </div>
       <label className="toggle-label">
-        <span><strong>Parse as Mealy</strong></span>
+        <span><strong>Process as Mealy</strong></span>
         <input
           type="checkbox"
           checked={parseAsMealy}
