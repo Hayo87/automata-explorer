@@ -21,6 +21,7 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 
 import io.github.Hayo87.model.Filters.DiffAutomatonFilter;
+import io.github.Hayo87.model.Utils.LabelUtils;
 
 @Component
 public class StringDiffHandler extends AbstractDiffHandler<String> {
@@ -66,9 +67,27 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
             edgeNode.put("head", targetId);
 
             ObjectNode attributes = mapper.createObjectNode();
-            attributes.put("label", edge.getProperty().getProperty());
-            attributes.put("diffkind", edge.getProperty().getDiffKind().toString());
+            String diffKind = edge.getProperty().getDiffKind().toString();
+            attributes.put("diffkind", diffKind);
 
+            ArrayNode labelArray = mapper.createArrayNode();
+
+            String input = LabelUtils.extractInput(edge.getProperty().getProperty());
+            String output = LabelUtils.extractOutput(edge.getProperty().getProperty());
+    
+            // Input
+            ObjectNode inputNode = mapper.createObjectNode();
+            inputNode.put("type", "input");
+            inputNode.put("value", input);
+            labelArray.add(inputNode);
+
+            // Output
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("type", "output");
+            outputNode.put("value", output);
+            labelArray.add(outputNode);
+
+            attributes.set("label", labelArray);
             edgeNode.set("attributes", attributes);
             edgesArray.add(edgeNode);
         }
