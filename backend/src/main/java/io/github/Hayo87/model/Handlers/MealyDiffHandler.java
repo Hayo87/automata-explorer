@@ -85,8 +85,6 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();
 
-        root.put("name", "diff");
-
         // Serialize nodes
         ArrayNode nodesArray = mapper.createArrayNode();
         for (State<DiffAutomatonStateProperty> state : value.getStates()) {
