@@ -2,6 +2,7 @@ package io.github.Hayo87.model.Filters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import io.github.Hayo87.type.FilterSubtype;
 import io.github.Hayo87.type.FilterType;
 
 @Component
-public class LoopHider<T> implements DiffAutomatonFilter<T> {
+public abstract class AbstractLoopHider<T> implements DiffAutomatonFilter<T> {
 
     @Override
     public FilterType getType() {
@@ -23,8 +24,8 @@ public class LoopHider<T> implements DiffAutomatonFilter<T> {
     }
 
     @Override
-    public boolean supports(FilterSubtype subType) {
-        return subType == FilterSubtype.LOOP; 
+    public Set<FilterSubtype> getSupportedSubtypes() {
+        return Set.of(FilterSubtype.LOOP);
     }
 
     @Override
@@ -38,7 +39,6 @@ public class LoopHider<T> implements DiffAutomatonFilter<T> {
         for (Transition<DiffAutomatonStateProperty, DiffProperty<T>> t : toRemove) {
             diffAutomaton.removeTransition(t);
         }
-        
         return diffAutomaton;
     }
 }

@@ -2,6 +2,7 @@ package io.github.Hayo87.model.Filters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -27,8 +28,8 @@ public class SynonymFilter implements DiffAutomatonFilter<Mealy> {
     }
 
     @Override
-    public boolean supports(FilterSubtype subType) {
-        return subType == FilterSubtype.INPUT || subType == FilterSubtype.OUTPUT;
+    public Set<FilterSubtype> getSupportedSubtypes() {
+        return Set.of(FilterSubtype.INPUT, FilterSubtype.OUTPUT);
     }
 
     @Override
