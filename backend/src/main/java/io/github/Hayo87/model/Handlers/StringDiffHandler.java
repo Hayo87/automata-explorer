@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
+import com.github.tno.gltsdiff.glts.State;
 import com.github.tno.gltsdiff.glts.Transition;
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomata;
@@ -48,6 +49,24 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
     public JsonNode serialize(DiffAutomaton<String> automaton) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();
+
+        // Serialize nodes
+        ArrayNode nodesArray = mapper.createArrayNode();
+        for (State<DiffAutomatonStateProperty> state : automaton.getStates()) {
+            ObjectNode node = mapper.createObjectNode();
+            node.put("name", state.getId());
+
+            ObjectNode attributes = mapper.createObjectNode();
+            attributes.put("label", "S" + state.getId());
+            attributes.put("isInitial", state.getProperty().isInitial());
+            attributes.put("diffkind", state.getProperty().getStateDiffKind().toString());
+
+            node.set("attributes", attributes);
+            nodesArray.add(node);
+        }
+        root.set("nodes", nodesArray);
+
+        // Serialize edges
         ArrayNode edgesArray = mapper.createArrayNode();
         Map<String, Integer> edgeCount = new HashMap<>();
 
