@@ -9,11 +9,11 @@ export const useSession = () => {
   const [error, setError] = useState<string | null>(null);
 
   //  Upload files and get sessionId
-  const startSession = async (file1: File, file2: File) => {
+  const startSession = async (file1: File, file2: File, type: "STRING" | "MEALY") => {
     try {
       setLoading(true);
       setError(null);
-      const newSessionId = await uploadFiles(file1, file2);
+      const newSessionId = await uploadFiles(file1, file2, type);
       setSessionId(newSessionId);
       return newSessionId;
     } catch (err) {

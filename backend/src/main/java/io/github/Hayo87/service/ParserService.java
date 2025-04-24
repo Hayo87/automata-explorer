@@ -26,6 +26,7 @@ import jakarta.annotation.PostConstruct;
  * 
  * @author Marijn Verheul 
  */
+
 @Service
 public class ParserService {
     private final ObjectMapper objectMapper;

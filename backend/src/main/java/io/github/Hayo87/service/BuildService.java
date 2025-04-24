@@ -8,18 +8,14 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomata;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
-import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.FilterActionDTO;
+import io.github.Hayo87.model.Handlers.DiffHandler;
 import io.github.Hayo87.model.SessionData;
-import io.github.Hayo87.type.BuildType;
 
 /**
  * Manages all build related actions for Difference Automata's.
@@ -29,71 +25,34 @@ import io.github.Hayo87.type.BuildType;
 public class BuildService {
     private final SessionService sessionService;
     private final ParserService parserService; 
-    private final FilterService filterService;
+    private final HandlerService handlerService;
     private final ObjectMapper mapper;
 
     @Autowired
-    public BuildService( SessionService sessionService, ParserService parserService, FilterService filterService, ObjectMapper mapper) {
+    public BuildService( SessionService sessionService, ParserService parserService, HandlerService handlerService, ObjectMapper mapper) {
         this.sessionService = sessionService;
         this.parserService = parserService;
-        this.filterService = filterService;
+        this.handlerService = handlerService;
         this.mapper = mapper;
     }
 
-    /**
-     * General method to process build actions.
-     * 
-     * @param sessionId the session ID for the build action.
-     * @param request the BuildRequestDTO with the build action and build data.
-     * @return result of the action wrapped in a responseDTO.
-     */
-    public BuildResponseDTO processBuildAction(String sessionId, BuildRequestDTO request) {
-        BuildType type = request.getAction();
+    public void buildInputs(String sessionId) {
         SessionData session = sessionService.getSession(sessionId);
 
-        switch (type) {
-
-            case INPUTS -> {
-                session.getLock().lock();
+        session.getLock().lock();
+        try {
+            session.setReference(buildInput(session.getInputReference()));
+            session.setSubject(buildInput(session.getInputSubject()));
     
-                try {
-                    session.setReference(buildInput(session.getInputReference()));
-                    session.setSubject(buildInput(session.getInputSubject()));
-            
-                } catch (Exception e) {
-                    System.err.println("Rebuilding inputs failed: " + e.getMessage());
-                    session.setReady(false);
-                    return new BuildResponseDTO("inputs", "error", "Input parsing failed: " + e.getMessage());
-                } finally {
-                    session.getLock().unlock();
-                }
-                return new BuildResponseDTO("inputs", "success", "Inputs processed successfully");
-            }
-
-            case BUILD  -> {
-                DiffAutomaton<String> result = null;
-                List<FilterActionDTO> filters = request.getFilters() == null
-                    ? List.of()
-                    : mapper.convertValue(request.getFilters(), new TypeReference<>() {});
-
-                session.getLock().lock();
-
-                try{ 
-                    result = buildDefault(session, filters);
-                }catch (Exception e) {
-                    sessionService.terminateSession(sessionId);
-                } finally {
-                    session.getLock().unlock(); 
-                }
-                return new BuildResponseDTO("build", "success", "Build succesfull", result, filters);
-            }
-            default -> throw new IllegalStateException("Unhandled BuildType: " + type);
+        } catch (Exception e) {
+            System.err.println("Rebuilding inputs failed: " + e.getMessage());
+        } finally {
+            session.getLock().unlock();
         }
     }
 
     /**
-     * Build an input (difference) automaton based on the input and 
-     * stores the result in the session history.
+     * Build an input automaton
      * 
      * @param input the input string
      * @param isReference wheter the input is the reference automata
@@ -111,30 +70,50 @@ public class BuildService {
         return result; 
     }
 
-    /**
-     * Builds the default differenceAutomaton based on the sessions intput
-     * @param session the sessionData object for the build 
-     * @return the JSON reprententation or the empty string in case of an error
-     */
-
-    public DiffAutomaton<String> buildDefault(SessionData session, List<FilterActionDTO> filters) {
-        DiffAutomaton<String> reference = DiffAutomata.fromAutomaton(session.getReference(), DiffKind.REMOVED);
-        DiffAutomaton<String> subject = DiffAutomata.fromAutomaton(session.getSubject(), DiffKind.ADDED);
-        
-        // Perform pre processing filters
-        //filterService.preProcessing(session, ??);
-
-        // Configure comparison, merging, and writing.
-        DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
-        builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>(""));
-        var comparator = builder.createComparator();
-
-        // Apply structural comparison to the two input automata and store
-        DiffAutomaton<String> result = comparator.compare(reference, subject);
-        session.setDiffAutomaton(result);
-
-        // Delegate processing to parserService
-        return result;
+    public BuildResponseDTO buildDiff(String sessionId, BuildRequestDTO request) {
+        SessionData session = sessionService.getSession(sessionId);
+        List<FilterActionDTO> filters = request.getFilters() == null
+            ? List.of()
+            : mapper.convertValue(request.getFilters(), new TypeReference<>() {});
+    
+        DiffHandler<?> handler = handlerService.getHandler(session.getType());
+    
+        session.getLock().lock();
+        try { 
+            return handleDiffBuild(session, handler, filters);
+        } catch (Exception e) {
+            throw new RuntimeException("Build failed", e); 
+        } finally {
+            session.getLock().unlock(); 
+        }
     }
-      
+
+    private <T> BuildResponseDTO handleDiffBuild( SessionData session, DiffHandler<T> handler, List<FilterActionDTO> filters) {
+
+         // Get the type specific Diffautomata's
+        DiffAutomaton<T> reference = handler.convert(session.getReference(), true);
+        DiffAutomaton<T> subject = handler.convert(session.getSubject(), false);
+
+        // Seperate filters
+        List<FilterActionDTO> preFilters = filterActionsByStage(filters, true);
+        List<FilterActionDTO> postFilters = filterActionsByStage(filters, false);
+
+        // Process pre filters
+        reference = handler.preFilter(reference, preFilters);
+        subject = handler.preFilter(subject, preFilters);
+
+        // Build
+        DiffAutomaton<T> result = handler.build(reference, subject);
+
+        // Process post filters
+        result = handler.postFilter(result, postFilters);
+
+        return new BuildResponseDTO(session.getType(), "Build succesfull", handler.serialize(result), filters);
+    }
+
+    private List<FilterActionDTO> filterActionsByStage(List<FilterActionDTO> filters, boolean preStage) {
+        return filters.stream()
+            .filter(f -> f.getType().isPre() == preStage)
+            .toList();
+    }   
 }

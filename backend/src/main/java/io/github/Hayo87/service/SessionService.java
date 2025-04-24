@@ -6,8 +6,9 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import io.github.Hayo87.dto.DeleteSessionResponseDTO;
+import io.github.Hayo87.dto.SessionResponseDTO;
 import io.github.Hayo87.model.SessionData;
+import io.github.Hayo87.type.DiffType;
 
 /**
  * Manages session creation, storage and deletion
@@ -26,9 +27,9 @@ public class SessionService {
      *
      * @return string with the unique session ID.
      */
-    public String createSession(String dotReference, String dotSubject) {
+    public String createSession(DiffType type, String dotReference, String dotSubject) {
         String sessionId = UUID.randomUUID().toString();
-        sessions.put(sessionId, new SessionData(dotReference, dotSubject));
+        sessions.put(sessionId, new SessionData(type, dotReference, dotSubject));
         return sessionId;
         }
 
@@ -50,13 +51,13 @@ public class SessionService {
      * @param sessionId The ID of the session to be removed.
      * @return DeleteSessionResponseDTO 
      */
-    public DeleteSessionResponseDTO terminateSession(String sessionId) {
+    public SessionResponseDTO terminateSession(String sessionId) {
         if (!sessions.containsKey(sessionId)) {
-            return new DeleteSessionResponseDTO("Session " + sessionId + " not found");
+            return new SessionResponseDTO(sessionId, " Session not found");
         }
         else {  
             sessions.remove(sessionId);
-            return new DeleteSessionResponseDTO("Session " + sessionId + " deleted successfully.");
+            return new SessionResponseDTO( sessionId, " Deleted succesfully");
         }
     }
 

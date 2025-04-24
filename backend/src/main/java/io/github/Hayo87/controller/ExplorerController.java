@@ -14,12 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
-import io.github.Hayo87.dto.CreateSessionRequestDTO;
-import io.github.Hayo87.dto.CreateSessionResponseDTO;
-import io.github.Hayo87.dto.DeleteSessionResponseDTO;
+import io.github.Hayo87.dto.SessionRequestDTO;
+import io.github.Hayo87.dto.SessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
-import io.github.Hayo87.type.BuildType;
 
 /**
  * REST Controller for session management, and the building and exploring of 
@@ -52,15 +50,15 @@ public class ExplorerController {
      * @return A unique session ID wrapped in a DTO.
      */
     @PostMapping("/session")
-    public ResponseEntity<CreateSessionResponseDTO> createSession(@RequestBody CreateSessionRequestDTO input) {
-        String sessionId = sessionService.createSession(input.getReference(), input.getSubject());
+    public ResponseEntity<SessionResponseDTO> createSession(@RequestBody SessionRequestDTO input) {
+        String sessionId = sessionService.createSession(input.getType(), input.getReference(), input.getSubject());
 
         // Parse inputs in background
         CompletableFuture.runAsync(() -> {
-            buildService.processBuildAction(sessionId, new BuildRequestDTO(BuildType.INPUTS, ""));
+            buildService.buildInputs(sessionId);
         });
 
-        return ResponseEntity.ok(new CreateSessionResponseDTO(sessionId));
+        return ResponseEntity.ok(new SessionResponseDTO(sessionId, "Created"));
     }
 
     /**
@@ -70,7 +68,7 @@ public class ExplorerController {
      * @return ResponseEntity (idempotent, always succes).
      */
     @DeleteMapping("/session/{sessionId}")
-    public ResponseEntity<DeleteSessionResponseDTO> deleteSession(@PathVariable String sessionId) {        
+    public ResponseEntity<SessionResponseDTO> deleteSession(@PathVariable String sessionId) {        
         return ResponseEntity.ok(sessionService.terminateSession(sessionId)); 
     }
 
@@ -79,9 +77,6 @@ public class ExplorerController {
      *
      * @param sessionId The unique identifier of the session.
      * @param request The {@link BuildRequestDTO} containing the action to perform.
-     *                - action = "inputs" → Rebuilds from the raw inputs 
-     *                - action = "build" → Builds the DiffAutomata<String> 
-     *                - action = "mealy" → Builds the DiffAutomata<Mealy>
      * @return A {@link ResponseEntity} indicating the success or failure of the action.
      *         - HTTP 200 OK → Action executed successfully, results returned in DTO.
      *         - HTTP 400 Bad Request → Invalid action provided.
@@ -93,16 +88,15 @@ public class ExplorerController {
             @RequestBody BuildRequestDTO request) {
 
         try {
-            BuildResponseDTO response = buildService.processBuildAction(sessionId, request);
+            BuildResponseDTO response = buildService.buildDiff(sessionId, request);
 
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-
+            sessionService.terminateSession(sessionId);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new BuildResponseDTO("Error processing", e.getMessage()));
+                    .body(new BuildResponseDTO( "Error processing: " +  e.getMessage()));
         }
-         
     }
 }
 

@@ -1,6 +1,5 @@
 export interface BuildResponse  {
-  action: string;
-  status: string;
+  type: string;
   message: string;
   build: GraphData;
   filters: Filter[];
@@ -24,8 +23,14 @@ export interface EdgeData {
   attributes?: Attributes;
 }
 
+export interface LabelEntry {
+  type: 'input' | 'output';
+  value: string;
+  diffkind?: 'UNCHANGED' | 'ADDED' | 'REMOVED'; 
+}
+
 export interface Attributes {
-  [key: string]: string | number | boolean | { html: string };
+  [key: string]: string | number | boolean | LabelEntry[];
 }
 
 export interface Filter {
