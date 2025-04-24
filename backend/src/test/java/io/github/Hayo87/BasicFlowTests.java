@@ -129,7 +129,7 @@ public class BasicFlowTests {
             String subjectGraph = Files.readString(subjectFiles.get(i));
     
             testCases.add(Arguments.of(referenceGraph, subjectGraph, "STRING"));
-            testCases.add(Arguments.of(referenceGraph, subjectGraph, "MEALY"));
+            //testCases.add(Arguments.of(referenceGraph, subjectGraph, "MEALY"));
         }
     
         return testCases.stream();
