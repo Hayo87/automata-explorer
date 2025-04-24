@@ -16,7 +16,6 @@ import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.SessionRequestDTO;
 import io.github.Hayo87.dto.SessionResponseDTO;
-import io.github.Hayo87.model.SessionData;
 import io.github.Hayo87.service.BuildService;
 import io.github.Hayo87.service.SessionService;
 
@@ -94,9 +93,9 @@ public class ExplorerController {
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
-            SessionData session = sessionService.getSession(sessionId);
+            sessionService.terminateSession(sessionId);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new BuildResponseDTO(session.getType(), "Error processing: " +  e.getMessage()));
+                    .body(new BuildResponseDTO( "Error processing: " +  e.getMessage()));
         }
     }
 }

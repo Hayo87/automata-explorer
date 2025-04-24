@@ -82,7 +82,6 @@ public class BuildService {
         try { 
             return handleDiffBuild(session, handler, filters);
         } catch (Exception e) {
-            sessionService.terminateSession(sessionId);
             throw new RuntimeException("Build failed", e); 
         } finally {
             session.getLock().unlock(); 

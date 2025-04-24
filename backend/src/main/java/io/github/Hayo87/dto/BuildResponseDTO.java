@@ -16,6 +16,10 @@ public class BuildResponseDTO {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<FilterActionDTO> filters;
 
+    public BuildResponseDTO(String message){
+        this(null, message, null);
+    }
+
     public BuildResponseDTO(DiffType type, String message){
         this(type, message, null);
     }
