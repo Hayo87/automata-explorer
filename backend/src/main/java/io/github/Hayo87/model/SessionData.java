@@ -8,13 +8,13 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import io.github.Hayo87.type.DiffType;
 
 public class SessionData {
-    private DiffType type; 
-    String inputReference;
-    String inputSubject;
+    private final DiffType type; 
+    private final String inputReference;
+    private final String inputSubject;
 
-    Automaton<String> reference;
-    Automaton<String> subject;
-    DiffAutomaton<String> diffAutomaton;
+    private Automaton<String> reference;
+    private Automaton<String> subject;
+    private DiffAutomaton<String> diffAutomaton;
 
     private final ReentrantLock lock = new ReentrantLock();
     private boolean ready;
