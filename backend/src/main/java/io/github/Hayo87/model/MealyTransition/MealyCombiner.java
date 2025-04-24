@@ -16,15 +16,11 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
         Mealy rMealy = right.getProperty();
 
         boolean alreadyDual = lMealy.isDual() || rMealy.isDual();
-
         boolean combinableOutput = diffPropertyCombiner.areCombinable(lMealy.getOutput(), rMealy.getOutput());
         boolean combinableInput = diffPropertyCombiner.areCombinable(lMealy.getInput(), rMealy.getInput());
-
         boolean sameDiffKind =  left.getProperty() == right.getProperty();
 
-        boolean result = ((!alreadyDual && !sameDiffKind ) && ((combinableOutput && combinableInput) || (combinableInput && !combinableOutput)));
-  
-        return  result;
+        return ((!alreadyDual && !sameDiffKind ) && ((combinableOutput && combinableInput) || (combinableInput && !combinableOutput)));
     }
     
     @Override
@@ -33,17 +29,15 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
         Mealy rMealy = right.getProperty();
         Mealy nMealy; 
 
-        System.out.println(" Combineren");
         Boolean inputCombinable = diffPropertyCombiner.areCombinable(lMealy.getInput(), rMealy.getInput());
         Boolean outputCombinable = diffPropertyCombiner.areCombinable(lMealy.getOutput(), rMealy.getOutput());
 
-        if (inputCombinable && outputCombinable ) {
-            System.out.println(" Combineren output EN input");          
+        if (inputCombinable && outputCombinable ) {          
             nMealy =  new Mealy( 
                         lMealy.getInput().getProperty(), 
                         lMealy.getOutput().getProperty(), 
                         DiffKind.UNCHANGED);
-            return new DiffProperty<Mealy>(nMealy, DiffKind.UNCHANGED);
+            return new DiffProperty<>(nMealy, DiffKind.UNCHANGED);
         }
 
         if (inputCombinable && !outputCombinable)  {   
@@ -51,17 +45,9 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
                         new DiffProperty<>(lMealy.getInput().getProperty(), DiffKind.UNCHANGED),
                         new DiffProperty<>(lMealy.getOutput().getProperty(), lMealy.getOutput().getDiffKind()),
                         new DiffProperty<>(rMealy.getOutput().getProperty(), rMealy.getOutput().getDiffKind())); 
-            return new DiffProperty<Mealy>(nMealy, DiffKind.UNCHANGED);               
+            return new DiffProperty<>(nMealy, DiffKind.UNCHANGED);               
         }
  
-        //if(outputCombinable  && !inputCombinable){
-        //    System.out.println(" Combineren output en niet input");
-        //    return new Mealy(
-        //            new DiffProperty<>(right.getInput().getProperty(), left.getInput().getDiffKind()),
-        //            new DiffProperty<>(left.getOutput().getProperty(), DiffKind.UNCHANGED),
-        //            new DiffProperty<>(right.getInput().getProperty(), right.getInput().getDiffKind()),
-        //            DualKind.INPUT);  
-        //}
         return left;
     }
 }
