@@ -40,5 +40,9 @@ public class SessionData {
     public ReentrantLock getLock() { return lock;}
     public boolean isReady() { return ready;}
     public void setReady(boolean ready) { this.ready = ready;}
+
+    public DiffType getType(){
+        return type;
+    }
 }
 
