@@ -121,7 +121,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
             edgeNode.put("head", targetId);
 
             ObjectNode attributes = mapper.createObjectNode();
-            attributes.put("diffkind", edge.getProperty().getDiffKind().toString());
+            attributes.put("diffkind", (edge.getProperty().getProperty().isDual()? "COMBINED": edge.getProperty().getDiffKind().toString()) );
 
             ArrayNode labelArray = mapper.createArrayNode();
 
