@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BuildResponse} from '../types/BuildResponse';
+import { BuildResponse, LabelEntry} from '../types/BuildResponse';
 
 const useTransformGraph = (backendData: BuildResponse | null) => {
   return useMemo(() => {
@@ -27,13 +27,30 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
     });
 
     let edges = graphData.edges.map((edge) => {
+      const labelEntries = Array.isArray(edge.attributes?.label)
+        ? edge.attributes.label as LabelEntry[]
+        : [];
+
+      const inputs = labelEntries
+      .filter((entry: LabelEntry) => entry.type === 'input')
+      .map((entry: LabelEntry) => `${entry.value} [${entry.diffkind}]`)
+      .join(', ');
+  
+    const outputs = labelEntries
+      .filter((entry: LabelEntry) => entry.type === 'output')
+      .map((entry: LabelEntry) => `${entry.value} [${entry.diffkind}]`)
+      .join(', ');
+  
+    const label = `${inputs} / ${outputs}`;
+
+
       return {
         group: "edges",
         data: {
           id: edge.id,
           source: edge.tail,
           target: edge.head,
-          label: edge.attributes?.label,
+          label: label,
           edgeType: typeof edge.attributes?.diffkind === "string"
           ? edge.attributes.diffkind.toLowerCase()
           : "",

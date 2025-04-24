@@ -13,14 +13,14 @@ const readDotFileAsText = (file: File): Promise<string> => {
 };
 
 // Post input files and initiate a session
-export const uploadFiles = async (file1: File, file2: File): Promise<string> => {
+export const uploadFiles = async (file1: File, file2: File, type:"STRING" | "MEALY"): Promise<string> => {
   try {
     // Read .dot files as text
     const reference = await readDotFileAsText(file1);
     const subject = await readDotFileAsText(file2);
 
     // Prepare JSON payload
-    const payload = { reference, subject };
+    const payload = { type, reference, subject };
 
     const response = await fetch(`${API_BASE_URL}/session`, {
       method: "POST",
@@ -58,8 +58,7 @@ export const postBuild = async (sessionId: string, filterlist:Filter[]): Promise
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        action: 'build',       
+      body: JSON.stringify({       
         filters: filterlist,
       }),
     });
