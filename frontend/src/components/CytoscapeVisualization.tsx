@@ -58,6 +58,14 @@ interface CytoscapeVisualizationProps {
 
 export interface CytoscapeVisualizationRef {
   exportPNG: () => string;
+  collapseEdges: () => void;
+  unCollapseEdges: () => void;
+  hideLoops: () => void;
+  unHideLoops: () => void;
+  showRef: () => void;
+  hideRef: () => void;
+  showSub: () => void;
+  hideSub: () => void;
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
@@ -65,6 +73,10 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const containerRef = useRef<HTMLDivElement | null>(null);
   const transformedData = useTransformGraph(data);
   const cyRef = useRef<cytoscape.Core | null>(null);
+
+  const loopsHidden = useRef(false);
+  const refHidden = useRef(false);
+  const subHidden = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -106,7 +118,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     // Fit layout
     cyInstance.fit();
     cyInstance.layout({ name: layout, fit: true }).run();
-
 
     // Attach synonym tooltips
     //attachSynonymTooltips(cyInstance, data?.filters || []);
@@ -157,13 +168,98 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   }
   }, [layout]);
 
-  useImperativeHandle(ref, () => ({
-    exportPNG: (): string => {
-      if (!cyRef.current) return "";
-      return cyRef.current.png({ full: true, bg: "white" });
-    }
-  }));
 
+  useImperativeHandle(ref, () => ({
+    exportPNG: () => cyRef.current?.png({ full: true, bg: "white" }) || "",
+  
+    collapseEdges: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      const api = (cy as any).expandCollapse('get');
+      api.collapseAllEdges();
+
+      if(refHidden.current) {
+        cy.elements('edge.cy-expand-collapse-collapsed-edge[edgeType="removed"]').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide())
+      }
+      if(subHidden.current) {
+        cy.elements('edge.cy-expand-collapse-collapsed-edge[edgeType="added"]').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide())
+      }
+    },
+  
+    unCollapseEdges: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      const api = (cy as any).expandCollapse('get');
+      api.expandAllEdges();
+
+      if(refHidden.current) {
+        cy.elements('.removed').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide())
+      }
+      if(subHidden.current) {
+        cy.elements('.added').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide())
+      }
+    },
+  
+    hideLoops: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      loopsHidden.current = true;
+      const loops = cy.edges().filter((e: cytoscape.EdgeSingular) => e.source().id() === e.target().id());
+      loops.forEach((e: cytoscape.EdgeSingular) => e.hide());
+    },
+  
+    unHideLoops: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      loopsHidden.current = false;
+    
+      const loops = cy.edges().filter((e: cytoscape.EdgeSingular) =>
+        e.source().id() === e.target().id()
+      );
+    
+      loops.forEach((e: cytoscape.EdgeSingular) => {
+        if (e.hasClass("removed") && refHidden.current) return;
+        if (e.hasClass("added") && subHidden.current) return;
+        e.show();
+      });
+    },
+    
+    hideRef: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      refHidden.current = true;
+      cy.elements('.removed, edge.cy-expand-collapse-collapsed-edge[edgeType="removed"]').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide());
+    },
+
+    showRef: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      refHidden.current = false;
+      cy.elements('.removed, edge.cy-expand-collapse-collapsed-edge[edgeType="removed"]').forEach((ele: cytoscape.SingularElementReturnValue) => {
+        const isLoop = ele.isEdge() && ele.source().id() === ele.target().id();
+        if (!loopsHidden.current || !isLoop) ele.show();
+      });
+    },
+    
+    hideSub: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      subHidden.current = true;
+      cy.elements('.added, edge.cy-expand-collapse-collapsed-edge[edgeType="added"]').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide());
+    },
+
+    showSub: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      subHidden.current = false;
+      cy.elements('.added, edge.cy-expand-collapse-collapsed-edge[edgeType="added"]').forEach((ele: cytoscape.SingularElementReturnValue) => {
+        const isLoop = ele.isEdge() && ele.source().id() === ele.target().id();
+        if (!loopsHidden.current || !isLoop) ele.show();
+      });
+    },
+    
+  }));
+  
   return <div ref={containerRef} className="graph-area"></div>;
 });
 
