@@ -33,6 +33,15 @@ h1 {
   color: #333; 
 }
 
+* {
+  caret-color: transparent;
+  user-select: none;        
+}
+
+input, textarea, select, button {
+  caret-color: auto;
+  user-select: text;
+}
 
 /* Visualization page styling */
 
