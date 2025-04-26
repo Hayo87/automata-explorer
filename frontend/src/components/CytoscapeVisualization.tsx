@@ -264,11 +264,13 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       const totalNodes = cy.nodes().length;
       const totalEdges = cy.edges().length;
       const unchangedEdges = cy.edges('.unchanged').length;
+      const combinedEdges = cy.edges('.combined').length;
 
       const stats = {
         totalNodes,
         totalEdges,
         unchangedEdges,
+        combinedEdges,
       };
       return stats;
     }

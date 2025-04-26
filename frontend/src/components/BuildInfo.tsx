@@ -14,20 +14,24 @@ const BuildInfo: React.FC<BuildInfoProps> = ({ reference, subject, stats }) => {
             <hr></hr>
             <div className = 'buildInfo'>
                 <div className = 'buildInfo-column'>
+                    <br></br>
                     <strong>Inputs</strong>
                     <div className = 'reference-file-name'><p>Reference: {reference} </p></div>
                     <div className = 'subject-file-name'><p>Subject: {subject} </p></div>
+                    <br></br>
 
-                    <strong>Matching</strong>
-                    <p>Matched edges: {stats.unchangedEdges} </p>
-                    <p>Unmatched edges: {stats.totalEdges - stats.unchangedEdges}</p>
+                    <strong>Matches (edges) </strong>
+                    <p>Full: {stats.unchangedEdges} </p>
+                    {stats.combinedEdges !== 0 && (<p>Partial: {stats.combinedEdges}</p>)}
+                    <p>No match: {stats.totalEdges - stats.unchangedEdges}</p>
+                    <br></br>
 
                     <strong>Metadata</strong>
                     <p>Number of Nodes: {stats.totalNodes} </p>
                     <p>Number of Edges: {stats.totalEdges}</p>
                 </div>
                 <div className = "buildInfo-column">
-                    <p className="percentage">{((stats.unchangedEdges / stats.totalEdges) * 100).toFixed(0)} %</p>
+                    <p className="percentage">{(((stats.unchangedEdges + stats.combinedEdges) / stats.totalEdges) * 100).toFixed(0)} %</p>
                 </div>    
             </div>
         </div>

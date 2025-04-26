@@ -46,5 +46,6 @@ export interface Stats {
     totalEdges: number;
     totalNodes: number;
     unchangedEdges: number;
+    combinedEdges: number;
 }
   
