@@ -307,6 +307,7 @@ button:focus-visible {
   cursor: move;
   position: relative;
   z-index: 10001;
+  line-height: 1.0;
 }
 
 /* Modal footer styling */
@@ -354,3 +355,4 @@ button:focus-visible {
 .toggle-input:checked + .toggle-slider::before {
   transform: translateX(20px);
 }
+
