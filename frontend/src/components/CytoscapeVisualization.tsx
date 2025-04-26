@@ -4,7 +4,7 @@ import Core from 'cytoscape';
 
 //hooks
 import useTransformGraph from "../hooks/useTransform";
-import { BuildResponse } from "../types/BuildResponse";
+import { BuildResponse, Stats } from "../types/BuildResponse";
 
 // Layout extentions
 import dagre from "cytoscape-dagre";
@@ -66,6 +66,7 @@ export interface CytoscapeVisualizationRef {
   hideRef: () => void;
   showSub: () => void;
   hideSub: () => void;
+  getStats: () => Stats
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
@@ -257,7 +258,22 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         if (!loopsHidden.current || !isLoop) ele.show();
       });
     },
-    
+
+    getStats: () => {
+      const cy = cyRef.current;
+      const totalNodes = cy.nodes().length;
+      const totalEdges = cy.edges().length;
+      const unchangedEdges = cy.edges('.unchanged').length;
+
+      const stats = {
+        totalNodes,
+        totalEdges,
+        unchangedEdges,
+      };
+      return stats;
+    }
+
+
   }));
   
   return <div ref={containerRef} className="graph-area"></div>;

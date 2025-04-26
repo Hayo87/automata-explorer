@@ -365,3 +365,22 @@ button:focus-visible {
   transform: translateX(20px);
 }
 
+
+/* BuildInfo Modal styling */
+.buildInfo{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.buildInfo-column {
+  flex: 1;
+  min-width: 280px;
+  line-height: 0.5;
+}
+
+.percentage {
+  font-size: 5rem;
+  font-weight: bold;
+  text-align: center;
+}

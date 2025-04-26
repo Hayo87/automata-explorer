@@ -8,6 +8,7 @@ import AboutContent from '../components/AboutContent';
 import FilterInfo from '../components/FilterInfo';
 import '../index.css';
 import { Filter } from '../types/BuildResponse';
+import BuildInfo from '../components/BuildInfo';
 
 
 const VisualizationPage: React.FC = () => {
@@ -25,6 +26,8 @@ const VisualizationPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(null);
+  const [showCloseButton, setShowCloseButton] = useState(true);
+
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loopsHidden, setLoopsHidden] = useState(false);
   const [refHidden, setRefHidden] = useState(false);
@@ -32,9 +35,10 @@ const VisualizationPage: React.FC = () => {
    
 
   // openModal and closeModal functions
-  const openModal = (modalContent: any) => {
+  const openModal = (modalContent: any, showCloseButton: boolean = true) => {
     setModalContent(modalContent);
     setIsModalOpen(true);
+    setShowCloseButton(showCloseButton);
   };
 
   const closeModal = () => {
@@ -120,14 +124,21 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
-  // When sessionId is available, trigger a build with the current activeFilters.
+  // Trigger build
   useEffect(() => {
     if (sessionId) {
-      buildSession(sessionId, activeFilters);
-    }
+      openModal("Loading visualization...", false);
+
+      buildSession(sessionId, activeFilters).then(() => {
+        if(cyVizRef.current){
+        openModal(<BuildInfo reference={reference} subject={subject} stats={cyVizRef.current.getStats()}/>);
+    }})
+      .catch((error) => {
+        openModal(`Build failed: ${error.message}`);
+    })}
   }, [sessionId]);
 
-  // When a build response comes back, update activeFilters from data.filters.
+  // Update activeFilters after build response 
   useEffect(() => {
     if (data && data.filters) {
       setActiveFilters(data.filters);
@@ -220,11 +231,9 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} />
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} showCloseButton={showCloseButton} />
     </div>
   );
 }
-
-
 
 export default VisualizationPage;

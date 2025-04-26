@@ -5,9 +5,10 @@ interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
   content: React.ReactNode;
+  showCloseButton?: boolean;
 }
 
-export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
+export function InfoModal({ isOpen, onClose, content, showCloseButton= true }: InfoModalProps) {
   useEffect(() => {
     if (!isOpen) return;
     const disableContextMenu = (e: MouseEvent) => {
@@ -39,8 +40,9 @@ export function InfoModal({ isOpen, onClose, content }: InfoModalProps) {
           <div className="modal-inner-content">
             <div>{content}</div>
             <div className="modal-footer">
+            {showCloseButton && (
               <button onClick={onClose}>Close</button>
-            </div>
+            )}</div>
           </div>
         </DraggableContainer>
       </div>
