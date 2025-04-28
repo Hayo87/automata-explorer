@@ -20,7 +20,7 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
         boolean combinableInput = diffPropertyCombiner.areCombinable(lMealy.getInput(), rMealy.getInput());
         boolean sameDiffKind =  left.getProperty() == right.getProperty();
 
-        return ((!alreadyDual && !sameDiffKind ) && ((combinableOutput && combinableInput) || (combinableInput && !combinableOutput)));
+        return ((!alreadyDual && !sameDiffKind ) && ((combinableOutput && combinableInput) ));
     }
     
     @Override
