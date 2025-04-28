@@ -31,15 +31,7 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
 
         Boolean inputCombinable = diffPropertyCombiner.areCombinable(lMealy.getInput(), rMealy.getInput());
         Boolean outputCombinable = diffPropertyCombiner.areCombinable(lMealy.getOutput(), rMealy.getOutput());
-
-        if (inputCombinable && outputCombinable ) {          
-            nMealy =  new Mealy( 
-                        lMealy.getInput().getProperty(), 
-                        lMealy.getOutput().getProperty(), 
-                        DiffKind.UNCHANGED);
-            return new DiffProperty<>(nMealy, DiffKind.UNCHANGED);
-        }
-        else
+        
         if (inputCombinable && !outputCombinable)  {   
             nMealy = new Mealy( 
                         new DiffProperty<>(lMealy.getInput().getProperty(), DiffKind.UNCHANGED),
@@ -47,7 +39,14 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
                         new DiffProperty<>(rMealy.getOutput().getProperty(), rMealy.getOutput().getDiffKind())); 
             return new DiffProperty<>(nMealy, DiffKind.UNCHANGED);               
         }
- 
+        else
+        if (inputCombinable && outputCombinable ) {          
+            nMealy =  new Mealy( 
+                        lMealy.getInput().getProperty(), 
+                        lMealy.getOutput().getProperty(), 
+                        DiffKind.UNCHANGED);
+            return new DiffProperty<>(nMealy, DiffKind.UNCHANGED);
+        }
         return left;
     }
 }
