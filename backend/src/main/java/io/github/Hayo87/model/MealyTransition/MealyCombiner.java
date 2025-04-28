@@ -39,7 +39,7 @@ public class MealyCombiner extends Combiner<DiffProperty<Mealy>> {
                         DiffKind.UNCHANGED);
             return new DiffProperty<>(nMealy, DiffKind.UNCHANGED);
         }
-
+        else
         if (inputCombinable && !outputCombinable)  {   
             nMealy = new Mealy( 
                         new DiffProperty<>(lMealy.getInput().getProperty(), DiffKind.UNCHANGED),
