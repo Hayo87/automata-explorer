@@ -64,10 +64,10 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
 
   return (
     <div style={{ minWidth: '600px', minHeight: '500px' }}>
-      <h2>Active Filters</h2>
+      <h2>Active Edits</h2>
 
       {filters.length === 0 ? (
-        <p>No filters added.</p>
+        <p>No modifications made.</p>
       ) : (
         <ul style={{ padding: 0, listStyle: 'none' }}>
           {filters.map((filter, index) => (
@@ -108,7 +108,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
 
       <hr style={{ margin: '12px 0' }} />
 
-      <h3>Add Filter</h3>
+      <h3>Add Edit</h3>
       <div
         style={{
           display: 'flex',
