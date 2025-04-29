@@ -4,12 +4,11 @@ const AboutContent: React.FC = () => {
   return (
     <>
       <h2>About This Application</h2>
-      <p>The Automata Explorer is a visualization tool is developed by <strong>...</strong>.</p>
+      <hr></hr>
+      <p>The Automata Explorer is a visualization tool is developed by <strong>Richard Koopmans</strong> and <strong>Marijn Verheul</strong> as part of Bachelor graduation project. </p>
+      <p>The tool offers a way to expore learned (finite) state machines with an interactive graph-based UI and uses the gLTSDiff library and Cytoscape libraries. </p>
       <p>Version: <code>1.0.0</code></p>
-      <p>© {new Date().getFullYear()} All rights reserved.</p>
-      <p>
-        Explore learned (finite) state machines with an interactive graph-based UI.
-      </p>
+      <p>2025</p>
     </>
   );
 };
