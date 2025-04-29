@@ -8,7 +8,7 @@ import { BuildResponse, Stats } from "../types/BuildResponse";
 
 // Layout extentions
 import dagre from "cytoscape-dagre";
-import coseBilkent from 'cytoscape-cose-bilkent';
+import elk from 'cytoscape-elk';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
 import popper from 'cytoscape-popper';
@@ -21,9 +21,10 @@ import expandCollapse from "cytoscape-expand-collapse";
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
 import cytoscapeStyles from '../utils/cytoscapeStyles';
 import { attachExpandCollapse } from '../utils/attachContextCollapse';
+import {exportPDF} from '../utils/exportPdf';
 
 // Register extensions 
-cytoscape.use( coseBilkent );
+cytoscape.use( elk );
 cytoscape.use( avsdf );
 cytoscape.use( dagre );
 cytoscape.use( cxtmenu );
@@ -58,6 +59,7 @@ interface CytoscapeVisualizationProps {
 
 export interface CytoscapeVisualizationRef {
   exportPNG: () => string;
+  exportPDF: (reference?: string, subject?:string) => void;
   collapseEdges: () => void;
   unCollapseEdges: () => void;
   hideLoops: () => void;
@@ -78,6 +80,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const loopsHidden = useRef(false);
   const refHidden = useRef(false);
   const subHidden = useRef(false);
+  const collapsed = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -148,6 +151,23 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
 
     switch (layout) {
 
+    case "dagre":
+      console.log('dagre gekozen');
+      {
+        cyInstance.layout({ name: 'dagre', 
+                            fit:true, 
+                            nodeSep:60,
+                            edgeSep: 20,
+                            rankSep: 100,
+                            rankdir: 'TB',
+                            ranker: 'tight-tree',
+                            padding: 20,
+                            spacingFactor: 1.1,
+                            nodeDimensionsIncludeLabels: true,         
+                          }).run();
+      }
+      break;  
+
     case "avsdf":
       {
         const numNodes = cyInstance.nodes().length;
@@ -156,11 +176,19 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       }
       break;
      
-    case "cose-bilkent":
-      console.log("Case bilkent gekozen");
-      const numNodes = cyInstance.nodes().length;
-      const spreadfactor = Math.max(9000, numNodes * 50);
-      cyInstance.layout({ name: "cose-bilkent", fit: true, randomize: false, nodeRepulsion: spreadfactor, idealEdgeLength: 100}).run();
+    case "elk":   
+      cyInstance.layout({
+        name: "elk", 
+        fit: true,
+        elk: {
+          algorithm: 'org.eclipse.elk.layered', 
+          edgeRouting: 'SPLINES',
+          spacing: 50, 
+          direction: 'RIGHT',
+          nodePlacementStrategy: 'SIMPLE'
+        }
+      }).run();
+
       break;  
 
     default:
@@ -173,11 +201,16 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   useImperativeHandle(ref, () => ({
     exportPNG: () => cyRef.current?.png({ full: true, bg: "white" }) || "",
   
+    exportPDF: async (reference?: string, subject?: string) => {
+       exportPDF(cyRef.current, reference, subject);  
+    },
+
     collapseEdges: () => {
       const cy = cyRef.current;
       if (!cy) return;
       const api = (cy as any).expandCollapse('get');
       api.collapseAllEdges();
+      collapsed.current = true;
 
       if(refHidden.current) {
         cy.elements('edge.cy-expand-collapse-collapsed-edge[edgeType="removed"]').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide())
@@ -192,6 +225,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       if (!cy) return;
       const api = (cy as any).expandCollapse('get');
       api.expandAllEdges();
+      collapsed.current = false;
 
       if(refHidden.current) {
         cy.elements('.removed').forEach((ele: cytoscape.SingularElementReturnValue) => ele.hide())
