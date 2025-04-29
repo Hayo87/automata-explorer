@@ -7,7 +7,7 @@ interface BuildInfoProps {
 }
 
 const BuildInfo: React.FC<BuildInfoProps> = ({ reference, subject, stats }) => {
-    
+
     return (
         <div>
             <h2><center>Build Result</center></h2>
@@ -20,10 +20,10 @@ const BuildInfo: React.FC<BuildInfoProps> = ({ reference, subject, stats }) => {
                     <div className = 'subject-file-name'><p>Subject: {subject} </p></div>
                     <br></br>
 
-                    <strong>Matches (edges) </strong>
+                    <strong>Matches </strong>
                     <p>Full: {stats.unchangedEdges} </p>
                     {stats.combinedEdges !== 0 && (<p>Partial: {stats.combinedEdges}</p>)}
-                    <p>No match: {stats.totalEdges - stats.unchangedEdges}</p>
+                    <p>No match: {stats.totalEdges - stats.unchangedEdges - stats.combinedEdges }</p>
                     <br></br>
 
                     <strong>Metadata</strong>

@@ -98,7 +98,7 @@ const VisualizationPage: React.FC = () => {
   };
 
 
-  const handleExport = () => {
+  const handlePNGExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
 
@@ -111,6 +111,20 @@ const VisualizationPage: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const handlePDFExport = async () => {
+    if (!cyVizRef.current) return;
+    const restore = isCollapsed;
+    if (restore) {
+      cyVizRef.current.unCollapseEdges();
+    }
+    await cyVizRef.current.exportPDF(reference, subject);
+
+    if (restore) {
+      cyVizRef.current.collapseEdges();
+    }
+  };
+
 
   const handleExit = async () => {
     try {
@@ -152,7 +166,7 @@ const VisualizationPage: React.FC = () => {
       <div className="content-container">
         <main className="graph-area">
           {loading ? (
-            <p style={{ textAlign: "center" }}>Loading visualization...</p>
+            <p style={{ textAlign: "center" }}></p>
           ) : data ? (
             <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
           ) : (
@@ -177,7 +191,7 @@ const VisualizationPage: React.FC = () => {
           <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
             <span className="material-icons">park</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("cose-bilkent")}>
+          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("elk")}>
             <span className="material-icons">park</span>
           </button>
 
@@ -205,10 +219,10 @@ const VisualizationPage: React.FC = () => {
 
           {/* Export Section */}
           <p className="sidebar-label">Export</p>
-          <button className="sidebar-button" title="Export as PNG" onClick={handleExport}>
+          <button className="sidebar-button" title="Export as PNG image" onClick={handlePNGExport}>
             <span className="material-icons">image</span>
           </button>
-          <button className="sidebar-button" title="Export as PDF">
+          <button className="sidebar-button" title="Export as PDF report" onClick = {handlePDFExport}>
             <span className="material-icons">picture_as_pdf</span>
           </button>
 
