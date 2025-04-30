@@ -11,10 +11,6 @@ import dagre from "cytoscape-dagre";
 import elk from 'cytoscape-elk';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
-import popper from 'cytoscape-popper';
-import tippy, { Props, Instance, sticky } from 'tippy.js';
-import 'tippy.js/dist/tippy.css';
-import type { VirtualElement } from '@popperjs/core';
 import expandCollapse from "cytoscape-expand-collapse";
 
 // Utils 
@@ -29,26 +25,6 @@ cytoscape.use( avsdf );
 cytoscape.use( dagre );
 cytoscape.use( cxtmenu );
 cytoscape.use(expandCollapse);
-cytoscape.use(popper(tippyFactory));
-
-function tippyFactory(ref: VirtualElement, content: HTMLElement): Instance<Props> {
-  const dummyDomEle = document.createElement('div');
-
-  const tip = tippy(dummyDomEle, {
-    getReferenceClientRect: ref.getBoundingClientRect,
-    trigger: 'manual',
-    content, 
-    arrow: true,
-    placement: 'bottom',
-    hideOnClick: false,
-    interactive: true,
-    appendTo: document.body,
-    plugins: [sticky],
-    sticky: true       
-  });
-
-  return tip;
-}
 
 interface CytoscapeVisualizationProps {
   data: BuildResponse;
@@ -123,15 +99,11 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     cyInstance.fit();
     cyInstance.layout({ name: layout, fit: true }).run();
 
-    // Attach synonym tooltips
-    //attachSynonymTooltips(cyInstance, data?.filters || []);
-
     // Apply the ctx-menus
     attachCytoscapeMenus(cyInstance, openModal);
 
     // Attach expand and collapse functionality
     attachExpandCollapse(cyInstance);
-
 
     if (onCy) {
       onCy(cyInstance);
