@@ -105,6 +105,11 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     // Attach expand and collapse functionality
     attachExpandCollapse(cyInstance);
 
+    // Style start nodes
+    const startNodes = cyInstance.nodes().roots();
+    startNodes.forEach((n: cytoscape.NodeSingular) => 
+      n.addClass('start'));
+
     if (onCy) {
       onCy(cyInstance);
     }
