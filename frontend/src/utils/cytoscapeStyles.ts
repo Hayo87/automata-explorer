@@ -174,9 +174,12 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
         {
           selector: 'edge.combined',
           style: {
-            "line-color": "lightblue",
-            "target-arrow-color": "lightblue",
-            "color": "lightblue",
+            "width": 1,
+            "line-color": "red",
+            "line-outline-color": "green",
+            "line-outline-width": 2,
+            "target-arrow-color": "black",
+            "color": "black",
           }
         },
         {
