@@ -8,6 +8,7 @@ import AboutContent from '../components/AboutContent';
 import FilterInfo from '../components/FilterInfo';
 import '../index.css';
 import { Filter } from '../types/BuildResponse';
+import BuildInfo from '../components/BuildInfo';
 
 
 const VisualizationPage: React.FC = () => {
@@ -15,22 +16,43 @@ const VisualizationPage: React.FC = () => {
   const location = useLocation();
   const { reference, subject } = location.state as { reference: string; subject: string };
   const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
-  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
-
-  const { data, buildSession, loading } = useSession();
-  const [currentLayout, setCurrentLayout] = useState("dagre");
 
   const navigate = useNavigate();
   const { terminateSession } = useSession();
+  const { data, buildSession, loading } = useSession();
 
-  // Modal state for InfoModal
+  // States
+  const [currentLayout, setCurrentLayout] = useState("dagre");
+  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(null);
+  const [modalKey, setModalKey] = useState(0);
+  const [showCloseButton, setShowCloseButton] = useState(true);
 
-  // openModal and closeModal functions
-  const openModal = (modalContent: any) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [loopsHidden, setLoopsHidden] = useState(false);
+  const [refHidden, setRefHidden] = useState(false);
+  const [subjHidden, setSubjHidden] = useState(false);
+   
+
+  const waitForVizRef = async (): Promise<CytoscapeVisualizationRef> => {
+    return new Promise((resolve) => {
+      const check = () => {
+        if (cyVizRef.current) {
+          resolve(cyVizRef.current);
+        } else {
+          setTimeout(check, 50);
+        }
+      };
+      check();
+    });
+  };
+
+  const openModal = (modalContent: any, showCloseButton: boolean = true) => {
     setModalContent(modalContent);
+    setModalKey(prev => prev + 1);
     setIsModalOpen(true);
+    setShowCloseButton(showCloseButton);
   };
 
   const closeModal = () => {
@@ -52,29 +74,44 @@ const VisualizationPage: React.FC = () => {
   };
 
   const handleCollapse = () => {
-    if (!cyVizRef.current) return;
-    const cy = cyVizRef.current
-    const api = (cy as any).expandCollapse('get');
-
-    const collapsedEdges = (cy as any).edges('.cy-expand-collapse-collapsed-edge');
-
-    if (collapsedEdges.length === 0) {
-      const edges = (cy as any).edges(":selected");
-      if (edges.length >= 2) {
-        api.collapseEdges(edges);
-      } else { 
-      api.collapseAllEdges();
-      } 
+    if (isCollapsed) {
+      cyVizRef.current?.unCollapseEdges();
     } else {
-      api.expandAllEdges();
+      cyVizRef.current?.collapseEdges();
+    }
+    setIsCollapsed(prev => !prev);
+  };
+
+  const handleLoop = () => {
+    if (loopsHidden) {
+      cyVizRef.current?.unHideLoops();
+    } else {
+      cyVizRef.current?.hideLoops();
+    }
+    setLoopsHidden(prev => !prev);
+  };
+
+  const handleRef = () => {
+    const newState = !refHidden;
+    setRefHidden(newState);
+    if (newState) {
+      cyVizRef.current?.hideRef();   
+    } else {
+      cyVizRef.current?.showRef(); 
+    }
+  };
+  
+  const handleSubj = () => {
+    const newState = !subjHidden;
+    setSubjHidden(newState);
+    if (newState) {
+      cyVizRef.current?.hideSub();   
+    } else {
+      cyVizRef.current?.showSub(); 
     }
   };
 
-  const handleZones = () => {
-    //dummy
-  }
-  
-  const handleExport = () => {
+  const handlePNGExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
 
@@ -86,6 +123,19 @@ const VisualizationPage: React.FC = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handlePDFExport = async () => {
+    if (!cyVizRef.current) return;
+    const restore = isCollapsed;
+    if (restore) {
+      cyVizRef.current.unCollapseEdges();
+    }
+    await cyVizRef.current.exportPDF(reference, subject);
+
+    if (restore) {
+      cyVizRef.current.collapseEdges();
+    }
   };
 
   const handleExit = async () => {
@@ -100,14 +150,22 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
-  // When sessionId is available, trigger a build with the current activeFilters.
+  // Trigger build including Modals
   useEffect(() => {
     if (sessionId) {
-      buildSession(sessionId, activeFilters);
-    }
+      openModal("Loading visualization...", false);
+
+      buildSession(sessionId, activeFilters).then(async () => {
+        const viz = await waitForVizRef();
+        closeModal();
+        openModal(<BuildInfo reference={reference} subject={subject} stats={viz.getStats()}/>);
+    })
+      .catch((error) => {
+        openModal(`Build failed: ${error.message}`);
+    })}
   }, [sessionId]);
 
-  // When a build response comes back, update activeFilters from data.filters.
+  // Update activeFilters after build response 
   useEffect(() => {
     if (data && data.filters) {
       setActiveFilters(data.filters);
@@ -121,9 +179,9 @@ const VisualizationPage: React.FC = () => {
       <div className="content-container">
         <main className="graph-area">
           {loading ? (
-            <p style={{ textAlign: "center" }}>Loading visualization...</p>
+            <p style={{ textAlign: "center" }}></p>
           ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal}  onCy={(cy) => {cyVizRef.current = cy}} />
+            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
           ) : (
             <p style={{ textAlign: "center" }}>No data available</p>
 
@@ -133,43 +191,51 @@ const VisualizationPage: React.FC = () => {
         <aside className="sidebar">
         
           {/* Layout Section */}
-          <p className="sidebar-label">Layouts</p>
+          <p className="sidebar-label">Layout</p>
+          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre" onClick={() => setCurrentLayout("dagre")}>
+            <span className="material-icons">swap_horiz</span>
+          </button> 
           <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular" onClick={() => setCurrentLayout("avsdf")}>
             <span className="material-icons">radio_button_unchecked</span>
           </button>
           <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid" onClick={() => setCurrentLayout("grid")}>
             <span className="material-icons">grid_view</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre" onClick={() => setCurrentLayout("dagre")}>
-            <span className="material-icons">swap_horiz</span>
-          </button>
           <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
             <span className="material-icons">park</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("cose-bilkent")}>
+          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("elk")}>
             <span className="material-icons">park</span>
           </button>
 
+          {/* Filter Section */}
+          <p className="sidebar-label">Filter</p>
+          <button className={`sidebar-button ${isCollapsed ? "active" : ""}`} title="Toggle collapse filter" onClick={handleCollapse}>
+            <span className="material-icons"> {isCollapsed ? "unfold_more" : "unfold_less"} </span>
+          </button>
+          <button className={`sidebar-button ${loopsHidden ? "active" : ""}`} title="Toggle Loop filter" onClick={handleLoop}>
+            <span className="material-icons"> {loopsHidden ? "sync_disabled" : "sync"} </span>
+          </button>
+          <button className={`sidebar-button ${!refHidden ? "" : "active"}`} title="Reference on/off" onClick={handleRef} >
+            {refHidden ? <s>REF</s> : "REF"}
+          </button>
+          <button className={`sidebar-button ${!subjHidden ? "" : "active"}`} title="Subject on/off" onClick={handleSubj} >
+            {subjHidden ? <s>SUB</s> : "SUB"}
+          </button>
 
-          {/* Tools Section */}
-          <p className="sidebar-label">Filters</p>
+          {/* Modify Section */}
+          <p className="sidebar-label">Modify</p>
           <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
-            <span className="material-icons">filter_alt</span>
-          </button>
-          <button className="sidebar-button" title="Collapse edges" onClick={handleCollapse} >
-            <span className="material-icons">track_changes</span>
-          </button>
-          <button className="sidebar-button" title="Enable zones " onClick={handleZones} >
-            <span className="material-icons">track_changes</span>
+            <span className="material-icons">edit</span>
           </button>
 
 
           {/* Export Section */}
           <p className="sidebar-label">Export</p>
-          <button className="sidebar-button" title="Export as PNG" onClick={handleExport}>
+          <button className="sidebar-button" title="Export as PNG image" onClick={handlePNGExport}>
             <span className="material-icons">image</span>
           </button>
-          <button className="sidebar-button" title="Export as PDF">
+          <button className="sidebar-button" title="Export as PDF report" onClick = {handlePDFExport}>
             <span className="material-icons">picture_as_pdf</span>
           </button>
 
@@ -192,11 +258,9 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} />
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} contentKey= {modalKey} showCloseButton={showCloseButton} />
     </div>
   );
 }
-
-
 
 export default VisualizationPage;

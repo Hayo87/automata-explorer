@@ -33,6 +33,15 @@ h1 {
   color: #333; 
 }
 
+* {
+  caret-color: transparent;
+  user-select: none;        
+}
+
+input, textarea, select, button {
+  caret-color: auto;
+  user-select: text;
+}
 
 /* Visualization page styling */
 
@@ -191,7 +200,7 @@ button:focus-visible {
 /* Sidebar styling */
 
 .sidebar {
-  width: 50px;
+  width: 60px;
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.8) !important;
@@ -205,6 +214,14 @@ button:focus-visible {
 .sidebar-button {
   width: 40;
   height: 40px;
+  min-width: 60px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 18px;
+  font-weight: bold;
   color: whitesmoke;
   border: none;
   padding: none;
@@ -299,6 +316,7 @@ button:focus-visible {
   cursor: move;
   position: relative;
   z-index: 10001;
+  line-height: 1.0;
 }
 
 /* Modal footer styling */
@@ -345,4 +363,24 @@ button:focus-visible {
 
 .toggle-input:checked + .toggle-slider::before {
   transform: translateX(20px);
+}
+
+
+/* BuildInfo Modal styling */
+.buildInfo{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.buildInfo-column {
+  flex: 1;
+  min-width: 280px;
+  line-height: 0.5;
+}
+
+.percentage {
+  font-size: 5rem;
+  font-weight: bold;
+  text-align: center;
 }

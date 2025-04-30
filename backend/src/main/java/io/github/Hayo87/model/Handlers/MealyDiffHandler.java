@@ -146,7 +146,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
             // Additional input (optional)
             if (additional != null) {
                 ObjectNode addNode = mapper.createObjectNode();
-                addNode.put("type", "input");
+                addNode.put("type", "output");
                 addNode.put("value", additional.getProperty());
                 addNode.put("diffkind", additional.getDiffKind().toString());
                 labelArray.add(addNode);

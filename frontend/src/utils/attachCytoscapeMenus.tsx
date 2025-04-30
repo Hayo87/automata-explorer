@@ -76,6 +76,15 @@ export function attachCytoscapeMenus(cyInstance: cytoscape.Core, openModal: (el:
                 ele.toggleClass('pie');
                 },
             },
+
+            {
+                content: '<span class="fa fa-link fa-2x"></span>',
+                select: (node: cytoscape.NodeSingular ) => {
+                  cyInstance.elements().unselect();
+                  node.select();
+                  node.neighborhood().select();
+                },  
+            },
     
             ],
             fillColor: "rgba(0, 0, 0, 0.75)",
@@ -104,24 +113,12 @@ export function attachCytoscapeMenus(cyInstance: cytoscape.Core, openModal: (el:
                 }
             },
             {
-                content: '<span class="fa fa-cogs fa-2x"></span>',
-                select: (edge: cytoscape.EdgeSingular) => {
-                if (edge.tippyInstance) {
-                    edge.tippyInstance.destroy();
-                    delete edge.tippyInstance;
-                } else {
-                    const tip = edge.popper({
-                    content: () => {
-                        const content  = document.createElement('div');
-                        content .innerHTML = `Dummy Operation`;
-                        return content ;
-                    },
-                    });
-            
-                    tip.show();
-                    edge.tippyInstance = tip;
-                }
-                }
+                content: '<span class="fa fa-link fa-2x"></span>',
+                select: (edge: cytoscape.EdgeSingular ) => {
+                  cyInstance.elements().unselect();
+                  edge.select();
+                  edge.connectedNodes().select();
+                },  
             },
             ],
             fillColor: "rgba(0, 0, 0, 0.75)",

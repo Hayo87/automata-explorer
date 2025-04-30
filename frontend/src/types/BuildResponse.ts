@@ -41,4 +41,11 @@ export interface Filter {
     values: string[];
     decoratedName: string;
 }
+
+export interface Stats {
+    totalEdges: number;
+    totalNodes: number;
+    unchangedEdges: number;
+    combinedEdges: number;
+}
   
