@@ -26,6 +26,7 @@ const VisualizationPage: React.FC = () => {
   const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(null);
+  const [modalKey, setModalKey] = useState(0);
   const [showCloseButton, setShowCloseButton] = useState(true);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -34,9 +35,22 @@ const VisualizationPage: React.FC = () => {
   const [subjHidden, setSubjHidden] = useState(false);
    
 
-  // openModal and closeModal functions
+  const waitForVizRef = async (): Promise<CytoscapeVisualizationRef> => {
+    return new Promise((resolve) => {
+      const check = () => {
+        if (cyVizRef.current) {
+          resolve(cyVizRef.current);
+        } else {
+          setTimeout(check, 50);
+        }
+      };
+      check();
+    });
+  };
+
   const openModal = (modalContent: any, showCloseButton: boolean = true) => {
     setModalContent(modalContent);
+    setModalKey(prev => prev + 1);
     setIsModalOpen(true);
     setShowCloseButton(showCloseButton);
   };
@@ -97,7 +111,6 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
-
   const handlePNGExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
@@ -125,7 +138,6 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
-
   const handleExit = async () => {
     try {
       if(sessionId){
@@ -138,15 +150,16 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
-  // Trigger build
+  // Trigger build including Modals
   useEffect(() => {
     if (sessionId) {
       openModal("Loading visualization...", false);
 
-      buildSession(sessionId, activeFilters).then(() => {
-        if(cyVizRef.current){
-        openModal(<BuildInfo reference={reference} subject={subject} stats={cyVizRef.current.getStats()}/>);
-    }})
+      buildSession(sessionId, activeFilters).then(async () => {
+        const viz = await waitForVizRef();
+        closeModal();
+        openModal(<BuildInfo reference={reference} subject={subject} stats={viz.getStats()}/>);
+    })
       .catch((error) => {
         openModal(`Build failed: ${error.message}`);
     })}
@@ -245,7 +258,7 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} showCloseButton={showCloseButton} />
+      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} contentKey= {modalKey} showCloseButton={showCloseButton} />
     </div>
   );
 }
