@@ -204,7 +204,7 @@ const VisualizationPage: React.FC = () => {
           <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
             <span className="material-icons">park</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="coseBilkent" onClick={() => setCurrentLayout("elk")}>
+          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="Elk Layered" onClick={() => setCurrentLayout("elk")}>
             <span className="material-icons">park</span>
           </button>
 
