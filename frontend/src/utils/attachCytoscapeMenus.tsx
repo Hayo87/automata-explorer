@@ -79,13 +79,46 @@ export function attachCytoscapeMenus(cyInstance: cytoscape.Core, openModal: (el:
 
             {
                 content: '<span class="fa fa-link fa-2x"></span>',
-                select: (node: cytoscape.NodeSingular ) => {
+                select: (node: cytoscape.NodeSingular) => {
                   cyInstance.elements().unselect();
                   node.select();
                   node.neighborhood().select();
                 },  
             },
-    
+            {
+                content: '<span class="fa fa-tag fa-2x"></span>',
+                select: (node: cytoscape.NodeSingular) => {
+                  const key = '__tippy';
+                  const tip = node.scratch('__tippy');
+                  const text = node.data('tooltip');
+              
+                  if (!text) {
+                    const content = document.createElement('div');
+                    content.textContent = 'Edit label';
+                    content.contentEditable = 'true';
+                    content.style.outline = 'none';
+                    content.style.minWidth = '100px';
+                    content.style.padding = '4px';
+                    content.style.cursor = 'text';
+              
+                    // Save on blur
+                    content.onblur = () => {
+                      const updated = content.textContent?.trim();
+                      if (updated) node.data('tooltip', updated);
+                    };
+              
+                    const instance = node.popper({ content: () => content });
+                    instance.show();
+                    node.data('tooltip', 'Edit me label');
+                    node.scratch(key, instance);
+                  } else {
+                    node.removeData('tooltip');
+                    tip?.destroy?.();
+                    node.removeScratch(key);
+                  }
+                }
+              },
+              
             ],
             fillColor: "rgba(0, 0, 0, 0.75)",
             activeFillColor: "rgba(0, 0, 0, 1)",

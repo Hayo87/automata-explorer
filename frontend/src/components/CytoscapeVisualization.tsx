@@ -12,6 +12,10 @@ import elk from 'cytoscape-elk';
 import avsdf from 'cytoscape-avsdf';
 import cxtmenu from 'cytoscape-cxtmenu';
 import expandCollapse from "cytoscape-expand-collapse";
+import popper from 'cytoscape-popper';
+import tippy, { Props, Instance, sticky } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+import type { VirtualElement } from '@popperjs/core';
 
 // Utils 
 import { attachCytoscapeMenus } from "../utils/attachCytoscapeMenus";
@@ -25,6 +29,26 @@ cytoscape.use( avsdf );
 cytoscape.use( dagre );
 cytoscape.use( cxtmenu );
 cytoscape.use(expandCollapse);
+cytoscape.use(popper(popperFactory));
+
+function popperFactory(ref: VirtualElement, content: HTMLElement): Instance<Props> {
+  const dummyDomEle = document.createElement('div');
+
+  const tip = tippy(dummyDomEle, {
+    getReferenceClientRect: ref.getBoundingClientRect,
+    trigger: 'manual',
+    content, 
+    arrow: true,
+    placement: 'bottom',
+    hideOnClick: false,
+    interactive: true,
+    appendTo: document.body,
+    plugins: [sticky],
+    sticky: true,
+    zIndex: 10,       
+  });
+  return tip;
+}
 
 interface CytoscapeVisualizationProps {
   data: BuildResponse;
@@ -165,8 +189,17 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
           nodePlacementStrategy: 'SIMPLE'
         }
       }).run();
-
       break;  
+
+    case "breadthfirst": 
+      {
+        cyInstance.layout({ 
+          name: 'breadthfirst', 
+          roots: '.start',
+          directed: true,
+        }).run();
+      }
+      break;
 
     default:
       cyInstance.layout({ name: layout, fit:true }).run();
