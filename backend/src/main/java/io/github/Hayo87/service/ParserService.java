@@ -49,23 +49,47 @@ public class ParserService {
         // Initialize variables
         Automaton<String> automaton = new Automaton<>();
         Map<Integer, State<AutomatonStateProperty>> stateMap = new HashMap<>();
+        int startNodeId = -1;
+        int dummyId = -1;
+
+        // Find possible start node
+        for (JsonNode node : graphJson.get("objects")) {
+            boolean isDummy = node.path("label").asText().isEmpty()
+            && "none".equals(node.path("shape").asText());
+
+            if(isDummy) {
+                dummyId = node.path("_gvid").asInt();
+                System.out.println("Is Dummy" + dummyId);
+
+                for (JsonNode edge : graphJson.get("edges")) {
+                    if(dummyId == (edge.path("source").asInt())){
+                        startNodeId = edge.path("target").asInt();
+                        System.out.println("Startnode: " + startNodeId);    
+                    }
+                }
+            }
+        }    
     
         // Parse nodes
         for (JsonNode node : graphJson.get("objects")) {
             int stateId = node.get("_gvid").asInt();
-            Boolean startState = node.has("peripheries") && node.get("peripheries").asInt() >= 2;
 
-            State<AutomatonStateProperty> state = automaton.addState(new AutomatonStateProperty(startState, false));
-            stateMap.put(stateId, state); 
-        }
+            if (stateId != dummyId)  {
+                Boolean startState = (stateId == startNodeId);
+                State<AutomatonStateProperty> state = automaton.addState(new AutomatonStateProperty(startState, false));
+                stateMap.put(stateId, state); 
+            }
+        }    
     
         // Parse edges
         for (JsonNode edge : graphJson.get("edges")) {
             int from = edge.get("tail").asInt();
             int to = edge.get("head").asInt();
             String label = edge.get("label") != null ? edge.get("label").asText() : "";
-    
-            automaton.addTransition(stateMap.get(from), label , stateMap.get(to));
+
+            if (!(from == dummyId || ((to == startNodeId) && "".equals(label)))) {
+                automaton.addTransition(stateMap.get(from), label , stateMap.get(to));
+            }
         }
         return automaton;
     }
