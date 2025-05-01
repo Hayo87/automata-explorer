@@ -185,10 +185,13 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
         {
           selector: 'edge.cy-expand-collapse-collapsed-edge[edgeType="combined"]',
           style: {
-            'line-color': 'lightblue',
-            "target-arrow-color": "lightblue",
-            "source-arrow-color": "lightblue",
-            "color": "lightblue",
+            "line-color": "red",
+            "width": 1,
+            "line-outline-color": "green",
+            "line-outline-width": 2,
+            "target-arrow-color": "black",
+            "source-arrow-color": "black",
+            "color": "black",
           }
         },
         {
