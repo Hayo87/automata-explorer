@@ -139,6 +139,9 @@ const VisualizationPage: React.FC = () => {
   };
 
   const handleExit = async () => {
+    if (cyVizRef.current) {
+    cyVizRef.current.clearPopper();
+    }
     try {
       if(sessionId){
         await terminateSession(sessionId);

@@ -68,7 +68,8 @@ export interface CytoscapeVisualizationRef {
   hideRef: () => void;
   showSub: () => void;
   hideSub: () => void;
-  getStats: () => Stats
+  getStats: () => Stats;
+  clearPopper: () => void;
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
@@ -317,9 +318,14 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         combinedEdges,
       };
       return stats;
-    }
+    },
 
-
+    clearPopper: () => {
+      document.querySelectorAll('[data-tippy-root]').forEach((el) => {
+        const instance = (el as any)._tippy;
+        instance?.destroy?.();
+      });
+    },  
   }));
   
   return <div ref={containerRef} className="graph-area"></div>;
