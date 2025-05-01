@@ -1,5 +1,6 @@
 package io.github.Hayo87.model.Handlers;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +20,6 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
-import com.github.tno.gltsdiff.operators.hiders.SubstitutionHider;
 
 import io.github.Hayo87.model.Filters.DiffAutomatonFilter;
 import io.github.Hayo87.model.Utils.LabelUtils;
@@ -39,7 +39,8 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
     @Override
     public DiffAutomaton<String> build(DiffAutomaton<String> reference, DiffAutomaton<String> subject) {
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
-        builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>(""));
+        //builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>(""));
+        builder.setRewriters(Collections.emptyList());
         var comparator = builder.createComparator();
 
         return comparator.compare(reference, subject);
