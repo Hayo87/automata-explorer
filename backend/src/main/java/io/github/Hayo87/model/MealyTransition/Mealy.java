@@ -23,11 +23,10 @@ public class Mealy {
     }
 
     /**
-     * Constructor to create  a Mealy transition property with multiple inputs or outputs.
-     * The diffkinds should differ for the different inputs or outputs.
+     * Constructor to create  a Mealy transition property with multiple inputs.
      * @param input
      * @param output
-     * @param additional
+     * @param additionalInput
      * @param dualKind
      */
     public Mealy(DiffProperty<String> input, DiffProperty<String> output, DiffProperty<String> additional) {
@@ -41,6 +40,5 @@ public class Mealy {
     public DiffProperty<String> getOutput() { return output; }
     public DiffProperty<String> getAdditionalInput() { return additionalInput; }
     public boolean isDual() { return dual; }
-
 }
    

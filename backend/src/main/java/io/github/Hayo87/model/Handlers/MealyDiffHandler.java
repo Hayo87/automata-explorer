@@ -43,9 +43,10 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
         // Process states
         for (State<AutomatonStateProperty> s: input.getStates()) {
             int stateId = s.getId();
+            boolean isStart = s.getProperty().isInitial();
 
             State<DiffAutomatonStateProperty> state = automaton.addState(
-                new DiffAutomatonStateProperty(false, diffKind, Optional.empty())
+                new DiffAutomatonStateProperty(isStart, diffKind, Optional.empty())
             );
             stateMap.put(stateId, state); 
         }
