@@ -36,7 +36,7 @@ public class SynonymRewriter implements DiffAutomatonProcessor<Mealy> {
     public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, ProcessingActionDTO action) {
         String name = action.name();
         List<String> synonyms = action.values();
-        SubType subtype = action.subType();
+        SubType subtype = action.subtype();
 
         Function<Mealy, String> extract;
         BiFunction<Mealy, String, Mealy> replace;

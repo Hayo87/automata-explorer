@@ -29,9 +29,9 @@ public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
             ));
         }
 
-    protected DiffAutomaton<T> applyFilters(DiffAutomaton<T> automaton, List<ProcessingActionDTO> actions) {
+    protected DiffAutomaton<T> applyProcessing(DiffAutomaton<T> automaton, List<ProcessingActionDTO> actions) {
         for (ProcessingActionDTO action : actions) {
-            ActionKey key = new ActionKey(action.type(), action.subType());
+            ActionKey key = new ActionKey(action.type(), action.subtype());
             DiffAutomatonProcessor<T> processor = actionRegistry.get(key);
      
             if (processor != null) {
@@ -43,11 +43,11 @@ public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
         
     @Override
     public DiffAutomaton<T> preProcessing(DiffAutomaton<T> automaton, List<ProcessingActionDTO> filters) {
-        return applyFilters(automaton, filters);
+        return applyProcessing(automaton, filters);
     }
 
     @Override
     public DiffAutomaton<T> postProcessing(DiffAutomaton<T> automaton, List<ProcessingActionDTO> filters) {
-        return applyFilters(automaton, filters);
+        return applyProcessing(automaton, filters);
     }
 }

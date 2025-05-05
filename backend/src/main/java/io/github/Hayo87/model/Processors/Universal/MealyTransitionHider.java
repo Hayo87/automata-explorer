@@ -34,7 +34,7 @@ public class MealyTransitionHider implements DiffAutomatonProcessor<Mealy> {
     @Override
     public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, ProcessingActionDTO action) {
         List<String> values = action.values();
-        SubType subtype = action.subType();
+        SubType subtype = action.subtype();
         Function<Mealy, String> extract;
 
         switch (subtype) {
