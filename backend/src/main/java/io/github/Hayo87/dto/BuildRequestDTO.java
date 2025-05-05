@@ -1,16 +1,9 @@
 package io.github.Hayo87.dto;
 
 import java.util.List;
-
-public class BuildRequestDTO {
-    private List<ProcessingActionDTO> filters;
-
-    public List<ProcessingActionDTO> getFilters() {
-        return filters == null ? List.of() : filters;
-    }
-    
-    public void setFilters(List<ProcessingActionDTO> filters) {
-        this.filters = filters;
-    }
-}
-    
+/**
+ * Represents a client request to start a build with certain processing actions.
+ */
+public record BuildRequestDTO(
+    List<ProcessingActionDTO> actions
+){}

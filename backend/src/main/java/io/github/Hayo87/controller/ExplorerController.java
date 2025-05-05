@@ -1,7 +1,7 @@
 package io.github.Hayo87.controller;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -99,7 +99,7 @@ public class ExplorerController {
         } catch (Exception e) {
             sessionService.terminateSession(sessionId);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new BuildResponseDTO( "Error processing: " +  e.getMessage()));
+                    .body(new BuildResponseDTO(null, "Error processing: " +  e.getMessage(), null, null));
         }
     }
 }

@@ -84,15 +84,15 @@ public class BuildService {
 
     public BuildResponseDTO buildDiff(String sessionId, BuildRequestDTO request) {
         SessionData session = sessionService.getSession(sessionId);
-        List<ProcessingActionDTO> filters = request.getFilters() == null
+        List<ProcessingActionDTO> actions = request.actions() == null
             ? List.of()
-            : mapper.convertValue(request.getFilters(), new TypeReference<>() {});
+            : mapper.convertValue(request.actions(), new TypeReference<>() {});
     
         DiffHandler<?> handler = handlerService.getHandler(session.getType());
     
         session.getLock().lock();
         try { 
-            return handleDiffBuild(session, handler, filters);
+            return handleDiffBuild(session, handler, actions);
         } catch (Exception e) {
             throw new RuntimeException("Build failed", e); 
         } finally {
