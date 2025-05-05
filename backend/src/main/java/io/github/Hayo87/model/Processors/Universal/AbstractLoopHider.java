@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Filters;
+package io.github.Hayo87.model.Processors.Universal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,25 +11,25 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.dto.FilterActionDTO;
-import io.github.Hayo87.type.FilterSubtype;
-import io.github.Hayo87.type.FilterType;
+import io.github.Hayo87.dto.ProcessingActionDTO;
+import io.github.Hayo87.model.Handlers.AbstractDiffHandler.ActionKey;
+import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
+import io.github.Hayo87.model.Processors.ProcessingModel.SubType;
+import io.github.Hayo87.model.Processors.ProcessingModel.Type;
+
 
 @Component
-public abstract class AbstractLoopHider<T> implements DiffAutomatonFilter<T> {
+public abstract class AbstractLoopHider<T> implements DiffAutomatonProcessor<T> {
 
     @Override
-    public FilterType getType() {
-        return FilterType.HIDER; 
-    }
-
+    public Set<ActionKey> keys() {
+        return Set.of(
+            new ActionKey(Type.HIDER, SubType.LOOP)
+        );
+    }     
+    
     @Override
-    public Set<FilterSubtype> getSupportedSubtypes() {
-        return Set.of(FilterSubtype.LOOP);
-    }
-
-    @Override
-    public DiffAutomaton<T> apply(DiffAutomaton<T> diffAutomaton, FilterActionDTO action) {
+    public DiffAutomaton<T> apply(DiffAutomaton<T> diffAutomaton, ProcessingActionDTO action) {
         List<Transition<DiffAutomatonStateProperty, DiffProperty<T>>> toRemove = new ArrayList<>();
 
         // Add all transitions with same source, target

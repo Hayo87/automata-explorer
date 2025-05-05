@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Filters;
+package io.github.Hayo87.model.Processors.Universal;
 
 import org.springframework.stereotype.Component;
 

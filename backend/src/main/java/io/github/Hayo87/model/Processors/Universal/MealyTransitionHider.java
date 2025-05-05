@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Filters;
+package io.github.Hayo87.model.Processors.Universal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,36 +12,37 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.dto.FilterActionDTO;
+import io.github.Hayo87.dto.ProcessingActionDTO;
+import io.github.Hayo87.model.Handlers.AbstractDiffHandler.ActionKey;
 import io.github.Hayo87.model.MealyTransition.Mealy;
-import io.github.Hayo87.type.FilterSubtype;
-import io.github.Hayo87.type.FilterType;
+import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
+import io.github.Hayo87.model.Processors.ProcessingModel.SubType;
+import io.github.Hayo87.model.Processors.ProcessingModel.Type;
+
 
 @Component
-public class InputOutputHider implements DiffAutomatonFilter<Mealy> {
+public class MealyTransitionHider implements DiffAutomatonProcessor<Mealy> {
 
     @Override
-    public FilterType getType() {
-        return FilterType.HIDER;
-    }
+    public Set<ActionKey> keys() {
+        return Set.of(
+            new ActionKey(Type.HIDER, SubType.INPUT),
+            new ActionKey(Type.HIDER, SubType.OUTPUT)
+        );
+    }    
 
     @Override
-    public Set<FilterSubtype> getSupportedSubtypes() {
-        return Set.of(FilterSubtype.INPUT, FilterSubtype.OUTPUT);
-    }
-
-    @Override
-    public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, FilterActionDTO action) {
-        List<String> values = action.getValues();
-        FilterSubtype subtype = action.getSubtype();
+    public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, ProcessingActionDTO action) {
+        List<String> values = action.values();
+        SubType subtype = action.subType();
         Function<Mealy, String> extract;
 
         switch (subtype) {
             case INPUT -> {
-                extract = mealy -> mealy.getInput().getProperty();
+                extract = mealy -> mealy.input();
             }
             case OUTPUT -> {
-                extract = mealy -> mealy.getOutput().getProperty();
+                extract = mealy -> mealy.output();
             }
             default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
         }

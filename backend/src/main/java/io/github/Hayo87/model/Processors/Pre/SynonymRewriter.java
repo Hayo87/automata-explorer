@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Filters;
+package io.github.Hayo87.model.Processors.Pre;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,43 +13,42 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.dto.FilterActionDTO;
+import io.github.Hayo87.dto.ProcessingActionDTO;
+import io.github.Hayo87.model.Handlers.AbstractDiffHandler.ActionKey;
 import io.github.Hayo87.model.MealyTransition.Mealy;
+import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
+import io.github.Hayo87.model.Processors.ProcessingModel.SubType;
+import io.github.Hayo87.model.Processors.ProcessingModel.Type;
 import io.github.Hayo87.model.Utils.LabelUtils;
-import io.github.Hayo87.type.FilterSubtype;
-import io.github.Hayo87.type.FilterType;
 
 @Component
-public class SynonymFilter implements DiffAutomatonFilter<Mealy> {
+public class SynonymRewriter implements DiffAutomatonProcessor<Mealy> {
 
     @Override
-    public FilterType getType() {
-        return FilterType.SYNONYM;
-    }
+    public Set<ActionKey> keys() {
+        return Set.of(
+            new ActionKey(Type.SYNONYM, SubType.INPUT),
+            new ActionKey(Type.SYNONYM, SubType.OUTPUT)
+        );
+    }     
 
     @Override
-    public Set<FilterSubtype> getSupportedSubtypes() {
-        return Set.of(FilterSubtype.INPUT, FilterSubtype.OUTPUT);
-    }
-
-    @Override
-    public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, FilterActionDTO action) {
-
-        String name = action.getName();
-        List<String> synonyms = action.getValues();
-        FilterSubtype subtype = action.getSubtype();
+    public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, ProcessingActionDTO action) {
+        String name = action.name();
+        List<String> synonyms = action.values();
+        SubType subtype = action.subType();
 
         Function<Mealy, String> extract;
         BiFunction<Mealy, String, Mealy> replace;
 
         switch (subtype) {
             case INPUT -> {
-                extract = mealy -> mealy.getInput().getProperty();
-                replace = (old, newVal) -> new Mealy(newVal, old.getOutput().getProperty(), old.getInput().getDiffKind());
+                extract = mealy -> mealy.input();
+                replace = (old, newVal) -> new Mealy(newVal, old.output());
             }
             case OUTPUT -> {
-                extract = mealy -> mealy.getOutput().getProperty();
-                replace = (old, newVal) -> new Mealy(old.getInput().getProperty(), newVal, old.getOutput().getDiffKind());
+                extract = mealy -> mealy.output();
+                replace = (old, newVal) -> new Mealy(old.input(), newVal);
             }
             default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
         }
@@ -74,6 +73,6 @@ public class SynonymFilter implements DiffAutomatonFilter<Mealy> {
         toRemove.forEach(diffAutomaton::removeTransition);
 
         return diffAutomaton;
-    }     
+    }
 }
 
