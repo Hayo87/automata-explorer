@@ -1,9 +1,12 @@
-package io.github.Hayo87.model.Processors;
-
-import io.github.Hayo87.model.Processors.ProcessingModel.*;
-import io.github.Hayo87.type.AutomataType;
+package io.github.Hayo87.processors;
 
 import java.util.List;
+
+import io.github.Hayo87.model.AutomataType;
+import io.github.Hayo87.processors.ProcessingModel.Stage;
+import io.github.Hayo87.processors.ProcessingModel.SubType;
+import io.github.Hayo87.processors.ProcessingModel.Type;
+import io.github.Hayo87.processors.ProcessingModel.processingRule;
 
 /**
  * Provides a centralize list of valid {@ ProcessingRule} combinations for processing logic. 

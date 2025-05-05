@@ -1,6 +1,6 @@
 package io.github.Hayo87.dto;
 
-import io.github.Hayo87.type.AutomataType;
+import io.github.Hayo87.model.AutomataType;
 
 public class SessionRequestDTO {
     private AutomataType type;

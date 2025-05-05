@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Handlers;
+package io.github.Hayo87.handlers;
 
 import java.util.List;
 import java.util.Map;
@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
 import io.github.Hayo87.dto.ProcessingActionDTO;
-import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
-import io.github.Hayo87.model.Processors.ProcessingModel.SubType;
-import io.github.Hayo87.model.Processors.ProcessingModel.Type;
+import io.github.Hayo87.processors.DiffAutomatonProcessor;
+import io.github.Hayo87.processors.ProcessingModel.SubType;
+import io.github.Hayo87.processors.ProcessingModel.Type;
 
 public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
     

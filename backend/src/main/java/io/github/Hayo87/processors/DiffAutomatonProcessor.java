@@ -1,11 +1,11 @@
-package io.github.Hayo87.model.Processors;
+package io.github.Hayo87.processors;
 
 import java.util.Set;
 
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
 import io.github.Hayo87.dto.ProcessingActionDTO;
-import io.github.Hayo87.model.Handlers.AbstractDiffHandler.ActionKey;
+import io.github.Hayo87.handlers.AbstractDiffHandler.ActionKey;
 
 /**
  * The processor applies a transformation to a {@link DiffAutomaton} based on the

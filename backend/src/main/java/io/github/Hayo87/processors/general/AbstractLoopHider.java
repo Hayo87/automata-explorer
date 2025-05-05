@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Processors.Universal;
+package io.github.Hayo87.processors.general;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,10 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
 import io.github.Hayo87.dto.ProcessingActionDTO;
-import io.github.Hayo87.model.Handlers.AbstractDiffHandler.ActionKey;
-import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
-import io.github.Hayo87.model.Processors.ProcessingModel.SubType;
-import io.github.Hayo87.model.Processors.ProcessingModel.Type;
+import io.github.Hayo87.handlers.AbstractDiffHandler.ActionKey;
+import io.github.Hayo87.processors.DiffAutomatonProcessor;
+import io.github.Hayo87.processors.ProcessingModel.SubType;
+import io.github.Hayo87.processors.ProcessingModel.Type;
 
 
 @Component

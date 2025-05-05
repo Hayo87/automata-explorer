@@ -5,10 +5,10 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import io.github.Hayo87.model.Handlers.DiffHandler;
-import io.github.Hayo87.model.Handlers.MealyDiffHandler;
-import io.github.Hayo87.model.Handlers.StringDiffHandler;
-import io.github.Hayo87.type.AutomataType;
+import io.github.Hayo87.handlers.DiffHandler;
+import io.github.Hayo87.handlers.MealyDiffHandler;
+import io.github.Hayo87.handlers.StringDiffHandler;
+import io.github.Hayo87.model.AutomataType;
 
 @Service
 public class HandlerService {

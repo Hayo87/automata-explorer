@@ -1,4 +1,4 @@
-package io.github.Hayo87.type;
+package io.github.Hayo87.model;
 
 /**
 * Enum for the kind of diff automaton for the session.  

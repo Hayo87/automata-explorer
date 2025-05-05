@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Handlers;
+package io.github.Hayo87.handlers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +21,10 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.model.MealyTransition.Mealy;
-import io.github.Hayo87.model.MealyTransition.MealyCombiner;
-import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
-import io.github.Hayo87.model.Utils.LabelUtils;
+import io.github.Hayo87.model.LabelUtils;
+import io.github.Hayo87.model.Mealy;
+import io.github.Hayo87.model.MealyCombiner;
+import io.github.Hayo87.processors.DiffAutomatonProcessor;
 
 @Component
 public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {

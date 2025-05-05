@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.MealyTransition;
+package io.github.Hayo87.model;
 
 import com.github.tno.gltsdiff.operators.combiners.Combiner;
 import com.github.tno.gltsdiff.operators.combiners.EqualityCombiner;

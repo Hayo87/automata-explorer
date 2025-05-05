@@ -14,9 +14,8 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.ProcessingActionDTO;
-import io.github.Hayo87.model.Handlers.DiffHandler;
-import io.github.Hayo87.model.Processors.ProcessingModel.Stage;
-import io.github.Hayo87.model.SessionData;
+import io.github.Hayo87.handlers.DiffHandler;
+import io.github.Hayo87.processors.ProcessingModel.Stage;
 
 /**
  * Manages all build related actions for Difference Automata's.

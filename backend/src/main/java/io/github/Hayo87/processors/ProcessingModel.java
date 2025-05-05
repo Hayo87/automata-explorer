@@ -1,6 +1,6 @@
-package io.github.Hayo87.model.Processors;
+package io.github.Hayo87.processors;
 
-import io.github.Hayo87.type.AutomataType;
+import io.github.Hayo87.model.AutomataType;
 
 /**
  * Contains all enums and data structurse for processing actions.

@@ -1,6 +1,5 @@
-package io.github.Hayo87.model.MealyTransition;
+package io.github.Hayo87.model;
 
-import io.github.Hayo87.model.Utils.LabelUtils;
 /**
  * Represents a Mealy transition with an input and an output.
  * 

@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.github.Hayo87.type.AutomataType;
+import io.github.Hayo87.model.AutomataType;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BuildResponseDTO {

@@ -1,11 +1,11 @@
-package io.github.Hayo87.model;
+package io.github.Hayo87.service;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
-import io.github.Hayo87.type.AutomataType;
+import io.github.Hayo87.model.AutomataType;
 
 public class SessionData {
     private final AutomataType type; 

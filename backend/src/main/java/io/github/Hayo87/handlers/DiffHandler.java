@@ -1,4 +1,4 @@
-package io.github.Hayo87.model.Handlers;
+package io.github.Hayo87.handlers;
 
 import java.util.List;
 

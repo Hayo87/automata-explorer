@@ -7,8 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import io.github.Hayo87.dto.SessionResponseDTO;
-import io.github.Hayo87.model.SessionData;
-import io.github.Hayo87.type.AutomataType;
+import io.github.Hayo87.model.AutomataType;
 
 /**
  * Manages session creation, storage and deletion
