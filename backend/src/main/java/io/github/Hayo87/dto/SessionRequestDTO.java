@@ -1,15 +1,15 @@
 package io.github.Hayo87.dto;
 
-import io.github.Hayo87.type.DiffType;
+import io.github.Hayo87.type.AutomataType;
 
 public class SessionRequestDTO {
-    private DiffType type;
+    private AutomataType type;
     private String reference;
     private String subject;
 
     public SessionRequestDTO() {}
 
-    public SessionRequestDTO(DiffType type, String reference, String subject) {
+    public SessionRequestDTO(AutomataType type, String reference, String subject) {
         this.type = type;
         this.reference = reference;
         this.subject = subject;
@@ -31,10 +31,10 @@ public class SessionRequestDTO {
         this.subject = subject;
     }
 
-    public DiffType getType() {
+    public AutomataType getType() {
         return type;
     }
-    public void setType(DiffType type) {
+    public void setType(AutomataType type) {
         this.type = type;
     }
 
