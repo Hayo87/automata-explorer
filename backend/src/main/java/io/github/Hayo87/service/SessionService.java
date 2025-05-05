@@ -52,11 +52,11 @@ public class SessionService {
      */
     public SessionResponseDTO terminateSession(String sessionId) {
         if (!sessions.containsKey(sessionId)) {
-            return new SessionResponseDTO(sessionId, " Session not found");
+            return new SessionResponseDTO(sessionId, " Session not found", null);
         }
         else {  
             sessions.remove(sessionId);
-            return new SessionResponseDTO( sessionId, " Deleted succesfully");
+            return new SessionResponseDTO( sessionId, " Deleted succesfully", null);
         }
     }
 

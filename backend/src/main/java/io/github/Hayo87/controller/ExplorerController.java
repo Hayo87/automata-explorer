@@ -1,6 +1,7 @@
 package io.github.Hayo87.controller;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
+import io.github.Hayo87.dto.ProcessingOptionDTO;
 import io.github.Hayo87.dto.SessionRequestDTO;
 import io.github.Hayo87.dto.SessionResponseDTO;
 import io.github.Hayo87.service.BuildService;
@@ -51,14 +53,16 @@ public class ExplorerController {
      */
     @PostMapping("/session")
     public ResponseEntity<SessionResponseDTO> createSession(@RequestBody SessionRequestDTO input) {
-        String sessionId = sessionService.createSession(input.getType(), input.getReference(), input.getSubject());
+        String sessionId = sessionService.createSession(input.type(), input.reference(), input.subject());
 
         // Parse inputs in background
         CompletableFuture.runAsync(() -> {
             buildService.buildInputs(sessionId);
         });
 
-        return ResponseEntity.ok(new SessionResponseDTO(sessionId, "Created"));
+        List<ProcessingOptionDTO> options = buildService.getProcessingOptions(input.type());
+
+        return ResponseEntity.ok(new SessionResponseDTO(sessionId, "Created", options));
     }
 
     /**

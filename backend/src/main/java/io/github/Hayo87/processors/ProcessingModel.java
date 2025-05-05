@@ -31,7 +31,7 @@ public class ProcessingModel {
      * @param type      The processing category
      * @param subtype   the processing sub-category
      */
-    public record processingRule(Stage stage, AutomataType difftype, Type type, SubType subType) {}
+    public record ProcessingRule(Stage stage, AutomataType difftype, Type type, SubType subType) {}
 
     private ProcessingModel() {} // prevent instantiation
 }

@@ -14,8 +14,11 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.ProcessingActionDTO;
+import io.github.Hayo87.dto.ProcessingOptionDTO;
 import io.github.Hayo87.handlers.DiffHandler;
+import io.github.Hayo87.model.AutomataType;
 import io.github.Hayo87.processors.ProcessingModel.Stage;
+import io.github.Hayo87.processors.ProcessingRules;
 
 /**
  * Manages all build related actions for Difference Automata's.
@@ -34,6 +37,15 @@ public class BuildService {
         this.parserService = parserService;
         this.handlerService = handlerService;
         this.mapper = mapper;
+    }
+    /**
+     * Get a grouped list of processing options available for the given
+     * automata type for the ProcessingRules.
+     * @param type
+     * @return grouped list with options
+     */
+    public List<ProcessingOptionDTO> getProcessingOptions(AutomataType type){
+        return ProcessingRules.optionsFor(type);
     }
 
     public void buildInputs(String sessionId) {
