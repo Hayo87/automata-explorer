@@ -13,8 +13,9 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
-import io.github.Hayo87.dto.FilterActionDTO;
+import io.github.Hayo87.dto.ProcessingActionDTO;
 import io.github.Hayo87.model.Handlers.DiffHandler;
+import io.github.Hayo87.model.Processors.ProcessingModel.Stage;
 import io.github.Hayo87.model.SessionData;
 
 /**
@@ -72,7 +73,7 @@ public class BuildService {
 
     public BuildResponseDTO buildDiff(String sessionId, BuildRequestDTO request) {
         SessionData session = sessionService.getSession(sessionId);
-        List<FilterActionDTO> filters = request.getFilters() == null
+        List<ProcessingActionDTO> filters = request.getFilters() == null
             ? List.of()
             : mapper.convertValue(request.getFilters(), new TypeReference<>() {});
     
@@ -88,32 +89,30 @@ public class BuildService {
         }
     }
 
-    private <T> BuildResponseDTO handleDiffBuild( SessionData session, DiffHandler<T> handler, List<FilterActionDTO> filters) {
+    private <T> BuildResponseDTO handleDiffBuild( SessionData session, DiffHandler<T> handler, List<ProcessingActionDTO> actions) {
 
-         // Get the type specific Diffautomata's
+         // Convert to type specific
         DiffAutomaton<T> reference = handler.convert(session.getReference(), true);
         DiffAutomaton<T> subject = handler.convert(session.getSubject(), false);
 
-        // Seperate filters
-        List<FilterActionDTO> preFilters = filterActionsByStage(filters, true);
-        List<FilterActionDTO> postFilters = filterActionsByStage(filters, false);
-
-        // Process pre filters
-        reference = handler.preFilter(reference, preFilters);
-        subject = handler.preFilter(subject, preFilters);
+        // Pre processing 
+        List<ProcessingActionDTO> preProcessingActions = filterByStage(actions, Stage.PRE);
+        reference = handler.preProcessing(reference, preProcessingActions);
+        subject = handler.preProcessing(subject, preProcessingActions);
 
         // Build
         DiffAutomaton<T> result = handler.build(reference, subject);
 
-        // Process post filters
-        result = handler.postFilter(result, postFilters);
+        // Post processing 
+        List<ProcessingActionDTO> postProcessingActions = filterByStage(actions, Stage.POST);
+        result = handler.postProcessing(result, postProcessingActions);
 
-        return new BuildResponseDTO(session.getType(), "Build succesfull", handler.serialize(result), filters);
+        return new BuildResponseDTO(session.getType(), "Build succesfull", handler.serialize(result), actions);
     }
 
-    private List<FilterActionDTO> filterActionsByStage(List<FilterActionDTO> filters, boolean preStage) {
-        return filters.stream()
-            .filter(f -> f.getType().isPre() == preStage)
+    private List<ProcessingActionDTO> filterByStage(List<ProcessingActionDTO> actions, Stage stage) {
+        return actions.stream()
+            .filter(action -> action.stage() == stage)
             .toList();
     }   
 }

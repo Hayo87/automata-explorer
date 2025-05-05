@@ -21,13 +21,13 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.model.Filters.DiffAutomatonFilter;
+import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
 import io.github.Hayo87.model.Utils.LabelUtils;
 
 @Component
 public class StringDiffHandler extends AbstractDiffHandler<String> {
 
-    public StringDiffHandler(List<DiffAutomatonFilter<String>> filters) {
+    public StringDiffHandler(List<DiffAutomatonProcessor<String>> filters) {
         super(filters);
     }
 

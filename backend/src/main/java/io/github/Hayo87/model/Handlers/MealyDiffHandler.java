@@ -21,15 +21,15 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.model.Filters.DiffAutomatonFilter;
 import io.github.Hayo87.model.MealyTransition.Mealy;
 import io.github.Hayo87.model.MealyTransition.MealyCombiner;
+import io.github.Hayo87.model.Processors.DiffAutomatonProcessor;
 import io.github.Hayo87.model.Utils.LabelUtils;
 
 @Component
 public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
 
-    public MealyDiffHandler(List<DiffAutomatonFilter<Mealy>> filters) {
+    public MealyDiffHandler(List<DiffAutomatonProcessor<Mealy>> filters) {
         super(filters);
     }
 
@@ -63,7 +63,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
             automaton.addTransition(
                 new Transition<>(
                     stateMap.get(source),
-                    new DiffProperty<>(new Mealy(inputLabel, outputLabel, diffKind), diffKind),
+                    new DiffProperty<>(new Mealy(inputLabel, outputLabel), diffKind),
                     stateMap.get(target)
                 )
             );
@@ -75,7 +75,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     public DiffAutomaton<Mealy> build(DiffAutomaton<Mealy> reference, DiffAutomaton<Mealy> subject) {
         DiffAutomatonStructureComparatorBuilder<Mealy> builder = new DiffAutomatonStructureComparatorBuilder<>();
         builder.setDiffAutomatonTransitionPropertyHider((Mealy property) -> property);
-        builder.setTransitionPropertyCombiner(new MealyCombiner());
+        builder.setDiffAutomatonTransitionPropertyCombiner(new MealyCombiner());
         var comparator = builder.createComparator();
 
         return comparator.compare(reference, subject);
@@ -109,11 +109,12 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
         for (Transition<DiffAutomatonStateProperty, DiffProperty<Mealy>> edge : value.getTransitions()) {
             int sourceId = edge.getSource().getId();
             int targetId = edge.getTarget().getId();
-            String key = sourceId + "->" + targetId;
+            DiffKind diffKind = edge.getProperty().getDiffKind();
+            Mealy property = edge.getProperty().getProperty();
 
+            String key = sourceId + "->" + targetId;
             int index = edgeCount.getOrDefault(key, 0) + 1;
             edgeCount.put(key, index);
-
             String edgeId = sourceId + "-" + index + "-" + targetId;
 
             ObjectNode edgeNode = mapper.createObjectNode();
@@ -122,36 +123,21 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
             edgeNode.put("head", targetId);
 
             ObjectNode attributes = mapper.createObjectNode();
-            attributes.put("diffkind", (edge.getProperty().getProperty().isDual()? "COMBINED": edge.getProperty().getDiffKind().toString()) );
+            attributes.put("diffkind", diffKind.toString());
 
             ArrayNode labelArray = mapper.createArrayNode();
-
-            DiffProperty<String> input = edge.getProperty().getProperty().getInput();
-            DiffProperty<String> output = edge.getProperty().getProperty().getOutput();
-            DiffProperty<String> additional = edge.getProperty().getProperty().getAdditionalInput();
 
             // Input
             ObjectNode inputNode = mapper.createObjectNode();
             inputNode.put("type", "input");
-            inputNode.put("value", input.getProperty());
-            inputNode.put("diffkind", input.getDiffKind().toString());
+            inputNode.put("value", property.input());
             labelArray.add(inputNode);
 
             // Output
             ObjectNode outputNode = mapper.createObjectNode();
             outputNode.put("type", "output");
-            outputNode.put("value", output.getProperty());
-            outputNode.put("diffkind", output.getDiffKind().toString());
+            outputNode.put("value", property.output());
             labelArray.add(outputNode);
-
-            // Additional input (optional)
-            if (additional != null) {
-                ObjectNode addNode = mapper.createObjectNode();
-                addNode.put("type", "output");
-                addNode.put("value", additional.getProperty());
-                addNode.put("diffkind", additional.getDiffKind().toString());
-                labelArray.add(addNode);
-            }
 
             attributes.set("label", labelArray);
             edgeNode.set("attributes", attributes);
