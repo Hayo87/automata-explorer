@@ -16,7 +16,7 @@ public class ProcessingModel {
     /**
      * The general category of the a processing action. 
      */
-    public enum Type{SYNONYM, HIDER}
+    public enum Type{SYNONYM, HIDER, MERGER}
 
     /**
      * The subcategory of the a processing action. 

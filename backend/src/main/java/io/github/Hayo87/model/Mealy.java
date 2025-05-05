@@ -8,7 +8,22 @@ package io.github.Hayo87.model;
  * @param input the input for the transition
  * @param output, the output for the transition
  */
-public record Mealy(String input, String output) {
+public class Mealy {
+    private final String input;
+    private final String output;
+
+    public Mealy(String input, String output) {
+        this.input = input;
+        this.output = output;
+    }
+
+    public String input(){
+        return input;
+    }
+
+    public String output() {
+        return output; 
+    }
 
     @Override
     public String toString() {
