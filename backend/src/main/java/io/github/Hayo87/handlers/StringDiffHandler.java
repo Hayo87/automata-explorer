@@ -53,7 +53,7 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
             .toList();
 
         // Serialize edges    
-        AtomicInteger counter = new AtomicInteger(0); 
+        AtomicInteger counter = new AtomicInteger(nodes.size() -1); 
         List<BuildDTO.Edge> edges = automaton.getTransitions().stream()
             .map(transition -> {
                 int edgeId = counter.incrementAndGet();
@@ -63,6 +63,8 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
                 transition.getSource().getId(), 
                 transition.getTarget().getId(), 
                 new BuildDTO.EdgeAttributes(
+                    transition.getProperty().getDiffKind().toString(),
+                    transition.getProperty().getProperty(),
                     List.of(new BuildDTO.LabelEntry(
                         BuildDTO.LabelType.LABEL, 
                         transition.getProperty().getProperty(), 

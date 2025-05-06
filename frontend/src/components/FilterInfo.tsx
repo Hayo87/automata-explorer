@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Filter } from '../types/BuildResponse';
+import { ProcessAction } from '../types/BuildResponse';
 
 interface Props {
-  initialFilters: Filter[]; 
-  onProcess: (filters: Filter[]) => void;
+  initialFilters: ProcessAction[]; 
+  onProcess: (filters: ProcessAction[]) => void;
 }
 
 const filterTypes = ['synonym', 'hider'] as const;
@@ -11,14 +11,14 @@ const filterSubtypes = ['input', 'output'];
 const hiderSubtypes = ['input', 'output', 'loop'];
 
 const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
-  const [filters, setFilters] = useState<Filter[]>([]);
-  const [newFilter, setNewFilter] = useState<Filter>({
+  const [filters, setFilters] = useState<ProcessAction[]>([]);
+  const [newFilter, setNewFilter] = useState<ProcessAction>({
+    stage: 'POST',
     type: 'synonym',
     subtype: 'output',
     name: '',
     values: [],
     order: 0,
-    decoratedName: ''
   });
   const [valueInput, setValueInput] = useState('');
 
@@ -28,7 +28,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
 
   const handleAdd = () => {
     if ((!valueInput.trim() && !(newFilter.type === 'hider' && newFilter.subtype === 'loop')) || !newFilter.subtype) return;
-    if (newFilter.type !== 'hider' && !newFilter.name.trim()) return;
+    if (newFilter.type !== 'hider' && !newFilter.name!.trim()) return;
 
     const splitValues = valueInput
       .split(',')
@@ -37,17 +37,17 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
 
     if (splitValues.length === 0 && !(newFilter.type === 'hider' && newFilter.subtype === 'loop')) return;
 
-    const newEntry: Filter = {
+    const newEntry: ProcessAction = {
+      stage: "POST",
       type: newFilter.type,
       name: newFilter.name,
       values: newFilter.type === 'hider' && newFilter.subtype === 'loop' ? [] : splitValues,
       subtype: newFilter.subtype,
       order: filters.length + 1,
-      decoratedName: '',
     };
 
     setFilters([...filters, newEntry]);
-    setNewFilter({ type: 'synonym', name: '', values: [], subtype: 'output', order: 0, decoratedName: ''});
+    setNewFilter({ stage: "POST", type: 'synonym', name: '', values: [], subtype: 'output', order: 0});
     setValueInput('');
   };
 
@@ -86,7 +86,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
                 {filter.subtype && <> [{filter.subtype}]</>}
                 {filter.name && <> → {filter.name}</>}
                 {' = '}
-                {filter.values.join(', ')}
+                {filter.values!.join(', ')}
                 {' (Order: ' + filter.order + ')'}
               </span>
               <button
@@ -121,7 +121,7 @@ const FilterInfo: React.FC<Props> = ({ initialFilters, onProcess }) => {
         <select
           value={newFilter.type}
           onChange={(e) => {
-            const selectedType = e.target.value as Filter['type'];
+            const selectedType = e.target.value as ProcessAction['type'];
             setNewFilter({
               ...newFilter,
               type: selectedType,

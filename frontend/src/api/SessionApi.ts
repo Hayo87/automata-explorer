@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
-import { Filter } from '../types/BuildResponse';
+import { ProcessAction } from '../types/BuildResponse';
 
 
 // Function to read a .dot file as plain text
@@ -51,7 +51,7 @@ export const uploadFiles = async (file1: File, file2: File, type:"STRING" | "MEA
 };
 
 // Post build action and get visualization data for a session
-export const postBuild = async (sessionId: string, filterlist:Filter[]): Promise<any> => {
+export const postBuild = async (sessionId: string, filterlist:ProcessAction[]): Promise<any> => {
   try {
     const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`, {
       method: 'POST',

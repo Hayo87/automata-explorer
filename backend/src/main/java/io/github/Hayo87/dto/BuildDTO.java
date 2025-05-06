@@ -26,12 +26,14 @@ public record BuildDTO(
 
     public record Edge(
         String id,
-        int head,
-        int tail,
+        int source,
+        int target,
         EdgeAttributes attributes
     ) {}
 
     public record EdgeAttributes(
+        String diffkind,
+        String labeltext, 
         List<LabelEntry> label
     ){}
 

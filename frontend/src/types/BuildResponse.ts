@@ -1,45 +1,53 @@
 export interface BuildResponse  {
   type: string;
   message: string;
-  build: GraphData;
-  filters: Filter[];
+  build: Build;
+  actions: ProcessAction[];
 }
 
-export interface GraphData {
-  name: string, 
-  nodes: NodeData[],
-  edges: EdgeData[],
+export interface Build {
+  name: string; 
+  nodes: Node[];
+  edges: Edge[];
 }
 
-export interface NodeData {
-  name: string;
-  attributes?: Attributes;
+export interface Node {
+  id: number;
+  attributes?: NodeAttributes;
 }
 
-export interface EdgeData {
+export interface NodeAttributes{
+  label: string;
+  isInitial: boolean;
+  diffkind: string;
+}
+
+export interface Edge {
   id: string;
-  tail: string | number;
-  head: string | number;
-  attributes?: Attributes;
+  source: number;
+  target: number;
+  attributes?: EdgeAttributes;
 }
 
+export interface EdgeAttributes{
+  diffkind: string;
+  labeltext: string;
+  label: LabelEntry[];
+}
 export interface LabelEntry {
-  type: 'input' | 'output';
+  type: 'input' | 'output' | 'label';
   value: string;
   diffkind?: 'UNCHANGED' | 'ADDED' | 'REMOVED'; 
 }
 
-export interface Attributes {
-  [key: string]: string | number | boolean | LabelEntry[];
-}
 
-export interface Filter {
-    order: number,
+export interface ProcessAction {
+    stage: String,
     type: string; 
     subtype?: string;
-    name: string;  
-    values: string[];
-    decoratedName: string;
+    order: number;
+    name?: string;  
+    values?: string[];
 }
 
 export interface Stats {
@@ -48,4 +56,3 @@ export interface Stats {
     unchangedEdges: number;
     combinedEdges: number;
 }
-  

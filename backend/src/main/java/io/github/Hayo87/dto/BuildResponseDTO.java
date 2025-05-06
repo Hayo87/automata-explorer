@@ -13,6 +13,6 @@ public record BuildResponseDTO (
     AutomataType type,
     String message,
     BuildDTO build,
-    @JsonInclude(JsonInclude.Include.NON_EMPTY) List<ProcessingActionDTO> filters
+    @JsonInclude(JsonInclude.Include.NON_EMPTY) List<ProcessingActionDTO> actions
 ){}
   

@@ -7,7 +7,7 @@ import  InfoModal from '../components/InfoModal';
 import AboutContent from '../components/AboutContent';
 import FilterInfo from '../components/FilterInfo';
 import '../index.css';
-import { Filter } from '../types/BuildResponse';
+import { ProcessAction } from '../types/BuildResponse';
 import BuildInfo from '../components/BuildInfo';
 
 
@@ -23,7 +23,7 @@ const VisualizationPage: React.FC = () => {
 
   // States
   const [currentLayout, setCurrentLayout] = useState("dagre");
-  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
+  const [activeFilters, setActiveFilters] = useState<ProcessAction[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(null);
   const [modalKey, setModalKey] = useState(0);

@@ -11,4 +11,9 @@ public class MergedMealy extends Mealy {
     public String addedOutput() {
         return addedOutput;
     }
+    @Override
+    public String toString() {
+        String outputLabel = super.output() +"[R], " + addedOutput + "[A]";
+        return LabelUtils.build(super.input(), outputLabel);
+    }
 }

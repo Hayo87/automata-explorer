@@ -108,17 +108,20 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
             .toList();
 
         // Serialize edges    
-        AtomicInteger counter = new AtomicInteger(0); 
+        AtomicInteger counter = new AtomicInteger(nodes.size() -1);
         List<BuildDTO.Edge> edges = automaton.getTransitions().stream()
             .map(transition -> {
                 int edgeId = counter.incrementAndGet();
+                Mealy mealy = transition.getProperty().getProperty();
                 
                 return new BuildDTO.Edge(
                 String.valueOf(edgeId), 
                 transition.getSource().getId(), 
                 transition.getTarget().getId(), 
                 new BuildDTO.EdgeAttributes(
-                    toLabelEntries(transition.getProperty().getProperty() , transition.getProperty().getDiffKind())
+                    (mealy instanceof MergedMealy)? "COMBINED": transition.getProperty().getDiffKind().toString(),
+                    mealy.toString(), 
+                    toLabelEntries(mealy , transition.getProperty().getDiffKind())
                 ));
             })           
             .toList();

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { uploadFiles, postBuild, closeSession } from "../api/SessionApi";
-import { Filter } from '../types/BuildResponse';
+import { ProcessAction } from '../types/BuildResponse';
 
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export const useSession = () => {
   };
 
   // Build session data for visualization
-  const buildSession = async (sessionId: string, filters: Filter[]) => {
+  const buildSession = async (sessionId: string, filters: ProcessAction[]) => {
     try {
       setLoading(true);
       setError(null);
