@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import com.github.tno.gltsdiff.glts.Transition;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
@@ -22,6 +24,7 @@ import io.github.Hayo87.processors.ProcessingModel.Type;
 /**
  * Processor(POST) to merge paralell mealy transtitions with the same input.  
  */
+@Component
 public class MealyMerger implements DiffAutomatonProcessor<Mealy>{
 
     @Override
@@ -34,8 +37,6 @@ public class MealyMerger implements DiffAutomatonProcessor<Mealy>{
     @Override
     public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, ProcessingActionDTO action) {
         List<Transition<DiffAutomatonStateProperty, DiffProperty<Mealy>>> toRemove = new ArrayList<>();
-
-
 
         // Get a list without unchanged transition
         var allTranstitions = diffAutomaton.getTransitions();

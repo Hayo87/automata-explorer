@@ -34,8 +34,8 @@ import io.github.Hayo87.processors.ProcessingModel.Type;
 @Component
 public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
 
-    public MealyDiffHandler(List<DiffAutomatonProcessor<Mealy>> filters) {
-        super(filters);
+    public MealyDiffHandler(List<DiffAutomatonProcessor<Mealy>> actions) {
+        super(actions);
     }
 
     @Override
