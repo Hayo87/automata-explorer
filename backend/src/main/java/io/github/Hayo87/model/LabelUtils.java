@@ -35,7 +35,7 @@ public class LabelUtils {
         if (input.isEmpty() || output.isEmpty()) {
             return input.trim() + output.trim();
         } else {}
-        return input.trim() + "/" + output.trim();
+        return input.trim() + " / " + output.trim();
     }
 
     public static String writeSynonymLabel(String input) {
