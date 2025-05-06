@@ -15,6 +15,7 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 import io.github.Hayo87.dto.ProcessingActionDTO;
 import io.github.Hayo87.handlers.AbstractDiffHandler.ActionKey;
 import io.github.Hayo87.model.Mealy;
+import io.github.Hayo87.model.MergedMealy;
 import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
@@ -35,14 +36,16 @@ public class MealyTransitionHider implements DiffAutomatonProcessor<Mealy> {
     public DiffAutomaton<Mealy> apply(DiffAutomaton<Mealy> diffAutomaton, ProcessingActionDTO action) {
         List<String> values = action.values();
         SubType subtype = action.subtype();
-        Function<Mealy, String> extract;
+        Function<Mealy, List<String>> extract;
 
         switch (subtype) {
             case INPUT -> {
-                extract = mealy -> mealy.input();
+                extract = mealy -> List.of(mealy.input());
             }
             case OUTPUT -> {
-                extract = mealy -> mealy.output();
+                extract = mealy -> (mealy instanceof MergedMealy merged)
+                    ? List.of(merged.output(), merged.addedOutput())     
+                    : List.of(mealy.output());
             }
             default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
         }
@@ -51,9 +54,9 @@ public class MealyTransitionHider implements DiffAutomatonProcessor<Mealy> {
         // Check all transitions
         for (var t : diffAutomaton.getTransitions()) {
             Mealy oldLabel = t.getProperty().getProperty();
-            String currentValue = extract.apply(oldLabel);
+            List<String> currentValues = extract.apply(oldLabel);
         
-            if (values.contains(currentValue)) {
+            if (currentValues.stream().anyMatch(values::contains)) {
                 toRemove.add(t);
             }
         }

@@ -21,10 +21,14 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
+import io.github.Hayo87.dto.ProcessingActionDTO;
 import io.github.Hayo87.model.LabelUtils;
 import io.github.Hayo87.model.Mealy;
 import io.github.Hayo87.model.MealyCombiner;
 import io.github.Hayo87.processors.DiffAutomatonProcessor;
+import io.github.Hayo87.processors.ProcessingModel.Stage;
+import io.github.Hayo87.processors.ProcessingModel.SubType;
+import io.github.Hayo87.processors.ProcessingModel.Type;
 
 @Component
 public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
@@ -78,7 +82,13 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
         builder.setDiffAutomatonTransitionPropertyCombiner(new MealyCombiner());
         var comparator = builder.createComparator();
 
-        return comparator.compare(reference, subject);
+        // First level matching
+        var result = comparator.compare(reference, subject);
+
+        // Second level matching(merger)
+        List<ProcessingActionDTO> action = List.of(new ProcessingActionDTO(Stage.POST, Type.MERGER, SubType.INPUT, 0, null, null));
+
+        return applyProcessing(result, action);
     }
 
     @Override
