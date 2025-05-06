@@ -1,27 +1,18 @@
 package io.github.Hayo87.handlers;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
-import com.github.tno.gltsdiff.glts.State;
-import com.github.tno.gltsdiff.glts.Transition;
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomata;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
-import io.github.Hayo87.model.LabelUtils;
+import io.github.Hayo87.dto.BuildDTO;
 import io.github.Hayo87.processors.DiffAutomatonProcessor;
 
 @Component
@@ -47,72 +38,40 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
     }
 
     @Override
-    public JsonNode serialize(DiffAutomaton<String> automaton) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-
+    public BuildDTO serialize(DiffAutomaton<String> automaton) {
+        
         // Serialize nodes
-        ArrayNode nodesArray = mapper.createArrayNode();
-        for (State<DiffAutomatonStateProperty> state : automaton.getStates()) {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("name", state.getId());
+        List<BuildDTO.Node> nodes = automaton.getStates().stream()
+            .map(state -> new BuildDTO.Node(
+                state.getId(), 
+                new BuildDTO.NodeAttributes(
+                    ("S" + state.getId()),
+                    state.getProperty().isInitial(), 
+                    state.getProperty().getStateDiffKind().toString()
+                )
+            ))
+            .toList();
 
-            ObjectNode attributes = mapper.createObjectNode();
-            attributes.put("label", "S" + state.getId());
-            attributes.put("isInitial", state.getProperty().isInitial());
-            attributes.put("diffkind", state.getProperty().getStateDiffKind().toString());
+        // Serialize edges    
+        AtomicInteger counter = new AtomicInteger(0); 
+        List<BuildDTO.Edge> edges = automaton.getTransitions().stream()
+            .map(transition -> {
+                int edgeId = counter.incrementAndGet();
+                
+                return new BuildDTO.Edge(
+                String.valueOf(edgeId), 
+                transition.getSource().getId(), 
+                transition.getTarget().getId(), 
+                new BuildDTO.EdgeAttributes(
+                    List.of(new BuildDTO.LabelEntry(
+                        BuildDTO.LabelType.LABEL, 
+                        transition.getProperty().getProperty(), 
+                        transition.getProperty().getDiffKind().toString())
+                    )
+                ));
+            })           
+            .toList();
 
-            node.set("attributes", attributes);
-            nodesArray.add(node);
-        }
-        root.set("nodes", nodesArray);
-
-        // Serialize edges
-        ArrayNode edgesArray = mapper.createArrayNode();
-        Map<String, Integer> edgeCount = new HashMap<>();
-
-        for (Transition<DiffAutomatonStateProperty, DiffProperty<String>> edge : automaton.getTransitions()) {
-            int sourceId = edge.getSource().getId();
-            int targetId = edge.getTarget().getId();
-            String key = sourceId + "->" + targetId;
-
-            int index = edgeCount.getOrDefault(key, 0) + 1;
-            edgeCount.put(key, index);
-
-            String edgeId = sourceId + "-" + index + "-" + targetId;
-
-            ObjectNode edgeNode = mapper.createObjectNode();
-            edgeNode.put("id", edgeId);
-            edgeNode.put("tail", sourceId);
-            edgeNode.put("head", targetId);
-
-            ObjectNode attributes = mapper.createObjectNode();
-            String diffKind = edge.getProperty().getDiffKind().toString();
-            attributes.put("diffkind", diffKind);
-
-            ArrayNode labelArray = mapper.createArrayNode();
-
-            String input = LabelUtils.extractInput(edge.getProperty().getProperty());
-            String output = LabelUtils.extractOutput(edge.getProperty().getProperty());
-    
-            // Input
-            ObjectNode inputNode = mapper.createObjectNode();
-            inputNode.put("type", "input");
-            inputNode.put("value", input);
-            labelArray.add(inputNode);
-
-            // Output
-            ObjectNode outputNode = mapper.createObjectNode();
-            outputNode.put("type", "output");
-            outputNode.put("value", output);
-            labelArray.add(outputNode);
-
-            attributes.set("label", labelArray);
-            edgeNode.set("attributes", attributes);
-            edgesArray.add(edgeNode);
-        }
-
-        root.set("edges", edgesArray);
-        return root; 
+        return new BuildDTO(nodes, edges); 
     }
 }

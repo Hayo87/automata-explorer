@@ -29,4 +29,7 @@ public class Mealy {
     public String toString() {
         return LabelUtils.build(input, output);
     }
+
+    public record MealyLabel(String type, String value) {}
+    
 }

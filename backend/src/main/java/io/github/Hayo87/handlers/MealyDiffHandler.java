@@ -4,13 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.tno.gltsdiff.builders.lts.automaton.diff.DiffAutomatonStructureComparatorBuilder;
 import com.github.tno.gltsdiff.glts.State;
 import com.github.tno.gltsdiff.glts.Transition;
@@ -21,10 +18,14 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
+import io.github.Hayo87.dto.BuildDTO;
+import io.github.Hayo87.dto.BuildDTO.LabelEntry;
+import io.github.Hayo87.dto.BuildDTO.LabelType;
 import io.github.Hayo87.dto.ProcessingActionDTO;
 import io.github.Hayo87.model.LabelUtils;
 import io.github.Hayo87.model.Mealy;
 import io.github.Hayo87.model.MealyCombiner;
+import io.github.Hayo87.model.MergedMealy;
 import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.Stage;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
@@ -92,70 +93,57 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     }
 
     @Override
-    public JsonNode serialize(DiffAutomaton<Mealy> value) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
+    public BuildDTO serialize(DiffAutomaton<Mealy> automaton) {
 
         // Serialize nodes
-        ArrayNode nodesArray = mapper.createArrayNode();
-        for (State<DiffAutomatonStateProperty> state : value.getStates()) {
-            ObjectNode node = mapper.createObjectNode();
-            node.put("name", state.getId());
+        List<BuildDTO.Node> nodes = automaton.getStates().stream()
+            .map(state -> new BuildDTO.Node(
+                state.getId(), 
+                new BuildDTO.NodeAttributes(
+                    ("S" + state.getId()),
+                    state.getProperty().isInitial(), 
+                    state.getProperty().getStateDiffKind().toString()
+                )
+            ))
+            .toList();
 
-            ObjectNode attributes = mapper.createObjectNode();
-            attributes.put("label", "S" + state.getId());
-            attributes.put("isInitial", state.getProperty().isInitial());
-            attributes.put("diffkind", state.getProperty().getStateDiffKind().toString());
+        // Serialize edges    
+        AtomicInteger counter = new AtomicInteger(0); 
+        List<BuildDTO.Edge> edges = automaton.getTransitions().stream()
+            .map(transition -> {
+                int edgeId = counter.incrementAndGet();
+                
+                return new BuildDTO.Edge(
+                String.valueOf(edgeId), 
+                transition.getSource().getId(), 
+                transition.getTarget().getId(), 
+                new BuildDTO.EdgeAttributes(
+                    toLabelEntries(transition.getProperty().getProperty() , transition.getProperty().getDiffKind())
+                ));
+            })           
+            .toList();
 
-            node.set("attributes", attributes);
-            nodesArray.add(node);
+        return new BuildDTO(nodes, edges); 
+    }
+    /**
+     * Helper method to build the label entries.
+     * @param mealy the mealy property
+     * @param diffkind the diffkind for the property
+     * @return list of label entries
+     */
+    private List<LabelEntry> toLabelEntries(Mealy mealy, DiffKind diffkind){
+        if(mealy instanceof MergedMealy merged) {
+            return List.of(
+                new BuildDTO.LabelEntry(LabelType.INPUT, merged.input(), DiffKind.UNCHANGED.toString()),
+                new BuildDTO.LabelEntry(LabelType.OUTPUT, merged.output(), DiffKind.REMOVED.toString()),
+                new BuildDTO.LabelEntry(LabelType.OUTPUT, merged.addedOutput(), DiffKind.ADDED.toString())
+            );
+
+        } else {
+            return List.of(
+                new BuildDTO.LabelEntry(LabelType.INPUT, mealy.input(), diffkind.toString()),
+                new BuildDTO.LabelEntry(LabelType.OUTPUT, mealy.output(), diffkind.toString())
+            );
         }
-        root.set("nodes", nodesArray);
-
-        // Serialize edges
-        Map<String, Integer> edgeCount = new HashMap<>();
-        ArrayNode edgesArray = mapper.createArrayNode();
-
-        for (Transition<DiffAutomatonStateProperty, DiffProperty<Mealy>> edge : value.getTransitions()) {
-            int sourceId = edge.getSource().getId();
-            int targetId = edge.getTarget().getId();
-            DiffKind diffKind = edge.getProperty().getDiffKind();
-            Mealy property = edge.getProperty().getProperty();
-
-            String key = sourceId + "->" + targetId;
-            int index = edgeCount.getOrDefault(key, 0) + 1;
-            edgeCount.put(key, index);
-            String edgeId = sourceId + "-" + index + "-" + targetId;
-
-            ObjectNode edgeNode = mapper.createObjectNode();
-            edgeNode.put("id", edgeId);
-            edgeNode.put("tail", sourceId);
-            edgeNode.put("head", targetId);
-
-            ObjectNode attributes = mapper.createObjectNode();
-            attributes.put("diffkind", diffKind.toString());
-
-            ArrayNode labelArray = mapper.createArrayNode();
-
-            // Input
-            ObjectNode inputNode = mapper.createObjectNode();
-            inputNode.put("type", "input");
-            inputNode.put("value", property.input());
-            labelArray.add(inputNode);
-
-            // Output
-            ObjectNode outputNode = mapper.createObjectNode();
-            outputNode.put("type", "output");
-            outputNode.put("value", property.output());
-            labelArray.add(outputNode);
-
-            attributes.set("label", labelArray);
-            edgeNode.set("attributes", attributes);
-            edgesArray.add(edgeNode);
-        }
-
-        root.set("edges", edgesArray);
-
-        return root;
     }
 }
