@@ -59,12 +59,10 @@ public class ParserService {
 
             if(isDummy) {
                 dummyId = node.path("_gvid").asInt();
-                System.out.println("Is Dummy" + dummyId);
 
                 for (JsonNode edge : graphJson.get("edges")) {
                     if(dummyId == (edge.path("source").asInt())){
-                        startNodeId = edge.path("target").asInt();
-                        System.out.println("Startnode: " + startNodeId);    
+                        startNodeId = edge.path("target").asInt();   
                     }
                 }
             }
