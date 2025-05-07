@@ -1,5 +1,5 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
-import { Filter } from '../types/BuildResponse';
+import { ProcessAction, SessionResponse } from '../types/RequestResponse';
 
 
 // Function to read a .dot file as plain text
@@ -13,7 +13,7 @@ const readDotFileAsText = (file: File): Promise<string> => {
 };
 
 // Post input files and initiate a session
-export const uploadFiles = async (file1: File, file2: File, type:"STRING" | "MEALY"): Promise<string> => {
+export const uploadFiles = async (file1: File, file2: File, type:"STRING" | "MEALY"): Promise<SessionResponse> => {
   try {
     // Read .dot files as text
     const reference = await readDotFileAsText(file1);
@@ -40,7 +40,7 @@ export const uploadFiles = async (file1: File, file2: File, type:"STRING" | "MEA
       if (!jsonResponse.sessionId) {
         throw new Error("Invalid response: Missing sessionId");
       }
-      return jsonResponse.sessionId;
+      return jsonResponse;
     } catch (error) {
       throw new Error("Failed to parse JSON response.");
     }
@@ -51,7 +51,7 @@ export const uploadFiles = async (file1: File, file2: File, type:"STRING" | "MEA
 };
 
 // Post build action and get visualization data for a session
-export const postBuild = async (sessionId: string, filterlist:Filter[]): Promise<any> => {
+export const postBuild = async (sessionId: string, actionlist:ProcessAction[]): Promise<any> => {
   try {
     const response = await fetch(`${API_BASE_URL}/session/${sessionId}/build`, {
       method: 'POST',
@@ -59,7 +59,7 @@ export const postBuild = async (sessionId: string, filterlist:Filter[]): Promise
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({       
-        filters: filterlist,
+        actions: actionlist,
       }),
     });
 

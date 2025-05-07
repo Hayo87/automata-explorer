@@ -1,29 +1,19 @@
 package io.github.Hayo87.dto;
 
-public class SessionResponseDTO {
-    private String sessionId;
-    private String message;
+import java.util.List;
 
-    public SessionResponseDTO(String sessionId, String message) {
-        this.sessionId = sessionId;
-        this.message = message;
-    }
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-    public String getSessionId() {
-        return sessionId;
-    }
-    public String getMessage() {
-        return message;
-    }
+/**
+ * Response on a client session request. 
+ */
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record SessionResponseDTO(
+    String sessionId,
+    String message,
+    List<ProcessingOptionDTO> processingOptions
+){}
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-}
 
 
 

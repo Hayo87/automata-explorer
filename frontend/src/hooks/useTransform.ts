@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BuildResponse, LabelEntry} from '../types/BuildResponse';
+import { BuildResponse} from '../types/RequestResponse';
 
 const useTransformGraph = (backendData: BuildResponse | null) => {
   return useMemo(() => {
@@ -10,7 +10,7 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
       return {
         group: "nodes",
         data: {
-          id: node.name,
+          id: node.id,
           label: node.attributes?.label,
           NodeType:typeof node.attributes?.diffkind === "string"
           ? node.attributes.diffkind.toLowerCase()
@@ -27,36 +27,13 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
     });
 
     let edges = graphData.edges.map((edge) => {
-      const labelEntries = Array.isArray(edge.attributes?.label)
-      ? (edge.attributes.label as LabelEntry[])
-      : [];
-    
-    const edgeDiffKind = edge.attributes?.diffkind;
-    
-    const showDetailed = edgeDiffKind === "COMBINED";
-    
-    const format = (entry: LabelEntry) =>
-      showDetailed ? `${entry.value} [${entry.diffkind}]` : entry.value;
-    
-    const inputs = labelEntries
-      .filter(entry => entry.type === "input")
-      .map(format)
-      .join(", ");
-    
-    const outputs = labelEntries
-      .filter(entry => entry.type === "output")
-      .map(format)
-      .join(", ");
-    
-    const label = `${inputs} / ${outputs}`;
-
       return {
         group: "edges",
         data: {
           id: edge.id,
-          source: edge.tail,
-          target: edge.head,
-          label: label,
+          source: edge.source,
+          target: edge.target,
+          label: edge.attributes?.labeltext,
           edgeType: typeof edge.attributes?.diffkind === "string"
           ? edge.attributes.diffkind.toLowerCase()
           : "",

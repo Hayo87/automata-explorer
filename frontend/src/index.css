@@ -248,7 +248,6 @@ button:focus-visible {
   border-top-right-radius: 8px;
 }
 
-
 .reference-file-name {
   color: red; 
 }
@@ -309,7 +308,6 @@ button:focus-visible {
   border: 1px solid #333;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  max-width: 600px;
   width: 95%;
   max-height: 80%;
   overflow-y: hidden;
@@ -325,6 +323,27 @@ button:focus-visible {
   margin-top: 10px;
 }
 
+
+/* BuildInfo Modal styling */
+.buildInfo{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.buildInfo-column {
+  flex: 1;
+  min-width: 280px;
+  line-height: 0.5;
+}
+
+.percentage {
+  font-size: 5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Toggle upload page */
 .toggle-label {
   display: flex;
   align-items: center;
@@ -363,24 +382,4 @@ button:focus-visible {
 
 .toggle-input:checked + .toggle-slider::before {
   transform: translateX(20px);
-}
-
-
-/* BuildInfo Modal styling */
-.buildInfo{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.buildInfo-column {
-  flex: 1;
-  min-width: 280px;
-  line-height: 0.5;
-}
-
-.percentage {
-  font-size: 5rem;
-  font-weight: bold;
-  text-align: center;
 }

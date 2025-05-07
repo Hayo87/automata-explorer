@@ -1,41 +1,17 @@
 package io.github.Hayo87.dto;
 
-import io.github.Hayo87.type.DiffType;
+import io.github.Hayo87.domain.rules.AutomataType;
 
-public class SessionRequestDTO {
-    private DiffType type;
-    private String reference;
-    private String subject;
+/**
+ * Represents a client request to start a new session.
+ * 
+ * @param type          The type of automaton for the session
+ * @param reference     The reference input(dot format)
+ * @param subject       The subject input (dot format)
+ */
+public record SessionRequestDTO (
+    AutomataType type,
+    String reference,
+    String subject
+){}
 
-    public SessionRequestDTO() {}
-
-    public SessionRequestDTO(DiffType type, String reference, String subject) {
-        this.type = type;
-        this.reference = reference;
-        this.subject = subject;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public DiffType getType() {
-        return type;
-    }
-    public void setType(DiffType type) {
-        this.type = type;
-    }
-
-}

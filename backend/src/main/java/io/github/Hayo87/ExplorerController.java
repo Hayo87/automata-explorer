@@ -1,0 +1,100 @@
+package io.github.Hayo87;
+
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.github.Hayo87.dto.BuildRequestDTO;
+import io.github.Hayo87.dto.BuildResponseDTO;
+import io.github.Hayo87.dto.ProcessingOptionDTO;
+import io.github.Hayo87.dto.SessionRequestDTO;
+import io.github.Hayo87.dto.SessionResponseDTO;
+import io.github.Hayo87.services.BuildService;
+import io.github.Hayo87.services.SessionService;
+
+/**
+ * REST Controller for session management, and the building and exploring of 
+ * the difference automata(Diff Machine) based on the gLTSDiff library.
+ * 
+ */
+@RestController
+@RequestMapping("/api")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+public class ExplorerController {
+    private final SessionService sessionService;
+    private final BuildService buildService;
+
+    /**
+     * Constructor - Injects required services.
+     * 
+     */
+    public ExplorerController(SessionService sessionService, BuildService buildService) {
+        this.sessionService = sessionService;
+        this.buildService = buildService;
+    }
+
+    /**
+     * Creates a new session and builds the input.
+     *
+     * @param input {@link SessionRequestDTO} 
+     * @return {@link SessionResponseDTO} 
+     */
+    @PostMapping("/session")
+    public ResponseEntity<SessionResponseDTO> createSession(@RequestBody SessionRequestDTO input) {
+        String sessionId = sessionService.createSession(input.type(), input.reference(), input.subject());
+
+        // Parse inputs in background
+        CompletableFuture.runAsync(() -> {
+            buildService.buildInputs(sessionId);
+        });
+
+        List<ProcessingOptionDTO> options = buildService.getProcessingOptions(input.type());
+
+        return ResponseEntity.ok(new SessionResponseDTO(sessionId, "Created", options));
+    }
+
+    /**
+     * Deletes a session and clears its data.
+     *
+     * @param sessionId The ID of the session to be deleted.
+     * @return {@link SessionResponseDTO}
+     */
+    @DeleteMapping("/session/{sessionId}")
+    public ResponseEntity<SessionResponseDTO> deleteSession(@PathVariable String sessionId) {        
+        return ResponseEntity.ok(sessionService.terminateSession(sessionId)); 
+    }
+
+    /**
+     * Handles the build for a given session.
+     *
+     * @param sessionId The unique identifier of the session.
+     * @param request {@link BuildRequestDTO}
+     * @return {@link BuildResponseDTO}
+     */
+    @PostMapping("/session/{sessionId}/build")
+    public ResponseEntity<BuildResponseDTO> handleBuildRequest(
+            @PathVariable String sessionId, 
+            @RequestBody BuildRequestDTO request) {
+
+        try {
+            BuildResponseDTO response = buildService.buildDiff(sessionId, request);
+
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            sessionService.terminateSession(sessionId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new BuildResponseDTO(null, "Error processing: " +  e.getMessage(), null, null));
+        }
+    }
+}
+

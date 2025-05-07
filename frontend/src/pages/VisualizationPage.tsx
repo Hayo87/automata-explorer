@@ -5,25 +5,35 @@ import { useSession} from '../hooks/useSession';
 import { useNavigate, useLocation  } from "react-router-dom";
 import  InfoModal from '../components/InfoModal';
 import AboutContent from '../components/AboutContent';
-import FilterInfo from '../components/FilterInfo';
+import ActionModal from '../components/ActionModal';
 import '../index.css';
-import { Filter } from '../types/BuildResponse';
+import { ProcessAction, ProcessOption} from '../types/RequestResponse';
 import BuildInfo from '../components/BuildInfo';
 
 
 const VisualizationPage: React.FC = () => {
+  // Pull sessionId from URL parameter
   const { sessionId} = useParams<{ sessionId: string }>();
-  const location = useLocation();
-  const { reference, subject } = location.state as { reference: string; subject: string };
-  const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
 
-  const navigate = useNavigate();
-  const { terminateSession } = useSession();
-  const { data, buildSession, loading } = useSession();
+  // Get the state from navigate parameters
+  const { reference, subject, options } = (useLocation().state || {}) as {
+    reference: string;
+    subject: string;
+    options: ProcessOption[];
+  };
+  
+  // Pull values from the useSession hook
+  const { data, buildSession, loading, terminateSession} = useSession();
+
+  // Route 
+  const navigate = useNavigate()
+
+  // Create a mutable reference to the visualization component
+  const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
 
   // States
   const [currentLayout, setCurrentLayout] = useState("dagre");
-  const [activeFilters, setActiveFilters] = useState<Filter[]>([]);
+  const [activeActions, setActiveActions] = useState<ProcessAction[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(null);
   const [modalKey, setModalKey] = useState(0);
@@ -60,14 +70,15 @@ const VisualizationPage: React.FC = () => {
     setModalContent(null);
   };
 ;
-  const openFilterModal = () => {
+  const openActionModal = () => {
     openModal(
-      <FilterInfo
-        initialFilters={activeFilters}
-        onProcess={async (updatedFilters) => {
-          setActiveFilters(updatedFilters); 
+      <ActionModal
+        setActions={activeActions}
+        options={options}
+        onProcess={async (updatedActions) => {
+          setActiveActions(updatedActions); 
           closeModal();
-          await buildSession(sessionId!, updatedFilters);
+          await buildSession(sessionId!, updatedActions);
         }}
       />
     );
@@ -155,7 +166,7 @@ const VisualizationPage: React.FC = () => {
     if (sessionId) {
       openModal("Loading visualization...", false);
 
-      buildSession(sessionId, activeFilters).then(async () => {
+      buildSession(sessionId, activeActions).then(async () => {
         const viz = await waitForVizRef();
         closeModal();
         openModal(<BuildInfo reference={reference} subject={subject} stats={viz.getStats()}/>);
@@ -168,7 +179,7 @@ const VisualizationPage: React.FC = () => {
   // Update activeFilters after build response 
   useEffect(() => {
     if (data && data.filters) {
-      setActiveFilters(data.filters);
+      setActiveActions(data.filters);
     }
   }, [data]);
 
@@ -225,7 +236,7 @@ const VisualizationPage: React.FC = () => {
 
           {/* Modify Section */}
           <p className="sidebar-label">Modify</p>
-          <button className="sidebar-button" title="Open filters" onClick={openFilterModal}>
+          <button className="sidebar-button" title="Open filters" onClick={openActionModal}>
             <span className="material-icons">edit</span>
           </button>
 
@@ -254,10 +265,12 @@ const VisualizationPage: React.FC = () => {
           </aside>
       </div>
 
+      {/* Input filename section */}
       <div className="bottom-left-info">
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
+
       <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} contentKey= {modalKey} showCloseButton={showCloseButton} />
     </div>
   );

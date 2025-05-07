@@ -17,12 +17,13 @@ const UploadPage: React.FC = () => {
     const selectedType: "STRING" | "MEALY" = parseAsMealy ? "MEALY" : "STRING";
 
     try {
-      const sessionId = await startSession(file1, file2,selectedType);
+      const {sessionId, options } = await startSession(file1, file2,selectedType);
       if (sessionId) {
         navigate(`/visualization/${sessionId}`, {
           state: {
             reference: file1?.name,
             subject: file2?.name,
+            options: options,
           }
         });
       }
