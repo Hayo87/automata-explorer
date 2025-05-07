@@ -1,5 +1,6 @@
 package io.github.Hayo87.handlers;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,18 +80,19 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     @Override
     public DiffAutomaton<Mealy> build(DiffAutomaton<Mealy> reference, DiffAutomaton<Mealy> subject) {
         DiffAutomatonStructureComparatorBuilder<Mealy> builder = new DiffAutomatonStructureComparatorBuilder<>();
-        builder.setDiffAutomatonTransitionPropertyHider((Mealy property) -> property);
+        builder.setRewriters(Collections.emptyList());
         builder.setDiffAutomatonTransitionPropertyCombiner(new MealyCombiner());
         var comparator = builder.createComparator();
 
         // First level matching
         var result = comparator.compare(reference, subject);
-
+          
         // Second level matching(merger)
         List<ProcessingActionDTO> action = List.of(new ProcessingActionDTO(Stage.POST, Type.MERGER, SubType.INPUT, 0, null, null));
 
         return applyProcessing(result, action);
     }
+ 
 
     @Override
     public BuildDTO serialize(DiffAutomaton<Mealy> automaton) {

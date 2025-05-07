@@ -30,7 +30,6 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
     @Override
     public DiffAutomaton<String> build(DiffAutomaton<String> reference, DiffAutomaton<String> subject) {
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
-        //builder.setDiffAutomatonTransitionPropertyHider(new SubstitutionHider<>(""));
         builder.setRewriters(Collections.emptyList());
         var comparator = builder.createComparator();
 
