@@ -1,6 +1,6 @@
 package io.github.Hayo87.dto;
 
-import io.github.Hayo87.model.AutomataType;
+import io.github.Hayo87.domain.rules.AutomataType;
 
 /**
  * Represents a client request to start a new session.

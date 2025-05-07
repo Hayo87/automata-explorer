@@ -2,9 +2,9 @@ package io.github.Hayo87.dto;
 
 import java.util.List;
 
-import io.github.Hayo87.processors.ProcessingModel.Stage;
-import io.github.Hayo87.processors.ProcessingModel.SubType;
-import io.github.Hayo87.processors.ProcessingModel.Type;
+import io.github.Hayo87.domain.rules.ProcessingModel.Stage;
+import io.github.Hayo87.domain.rules.ProcessingModel.SubType;
+import io.github.Hayo87.domain.rules.ProcessingModel.Type;
 
 /**
  * Represents a user requested processing action. The `stage`, `kind` , `type` and `subtype`
