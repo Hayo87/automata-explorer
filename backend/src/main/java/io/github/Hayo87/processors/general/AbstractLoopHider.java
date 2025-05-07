@@ -17,7 +17,9 @@ import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
-
+/**
+ * Universal hider for transitions with the same source and target (loops). 
+ */
 @Component
 public abstract class AbstractLoopHider<T> implements DiffAutomatonProcessor<T> {
 

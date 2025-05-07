@@ -21,6 +21,9 @@ import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
+/**
+ * Pre-processor to overwrite input or output to implement to concept of synonyms. 
+ */
 @Component
 public class SynonymRewriter implements DiffAutomatonProcessor<Mealy> {
 

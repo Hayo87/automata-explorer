@@ -7,7 +7,7 @@ import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
 /**
- * Represents a grouped processing option for a stage an type.
+ * Represents a grouped processing option for a stage and type.
  * 
  */
 public record ProcessingOptionDTO(

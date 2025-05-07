@@ -22,7 +22,8 @@ import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
 /**
- * Processor(POST) to merge paralell mealy transtitions with the same input.  
+ * Post-processor to merge parallel Mealy transtitions with the same input into a 
+ * merged transtion property {@link MergedMealy}.  
  */
 @Component
 public class MealyMerger implements DiffAutomatonProcessor<Mealy>{
@@ -87,6 +88,4 @@ public class MealyMerger implements DiffAutomatonProcessor<Mealy>{
 
         return diffAutomaton;
     }
-
-
 }

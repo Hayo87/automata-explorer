@@ -12,7 +12,6 @@ import io.github.Hayo87.model.AutomataType;
 /**
  * Manages session creation, storage and deletion
  * 
- * @author Marijn Verheul
  */
 @Service
 public class SessionService {
@@ -22,7 +21,7 @@ public class SessionService {
     }
 
     /**
-     * Creates a new (empty) session
+     * Creates a new session, by storing the session inputs.
      *
      * @return string with the unique session ID.
      */
@@ -59,6 +58,5 @@ public class SessionService {
             return new SessionResponseDTO( sessionId, " Deleted succesfully", null);
         }
     }
-
 }
 

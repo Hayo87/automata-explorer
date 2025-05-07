@@ -3,33 +3,28 @@ package io.github.Hayo87.service;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
 import io.github.Hayo87.model.AutomataType;
-
+/**
+ * Stores all session related data including the raw and processed inputs, has a
+ * reentrant lock to manage concurrent access.  
+ */
 public class SessionData {
     private final AutomataType type; 
-    private final String inputReference;
-    private final String inputSubject;
-
+    private final String rawReference;
+    private final String rawSubject;
     private Automaton<String> reference;
     private Automaton<String> subject;
-    private DiffAutomaton<String> diffAutomaton;
-
     private final ReentrantLock lock = new ReentrantLock();
-    private boolean ready;
 
     public SessionData(AutomataType type, String inputReference, String inputSubject) {
         this.type = type;
-        this.inputReference = inputReference;
-        this.inputSubject = inputSubject;
+        this.rawReference = inputReference;
+        this.rawSubject = inputSubject;
     }
 
-    public String getInputReference() { return inputReference;}
-    public String getInputSubject() { return inputSubject;}
-
-    public DiffAutomaton<String> getDiffAutomaton() { return diffAutomaton;}
-    public void setDiffAutomaton(DiffAutomaton<String> diffAutomaton) { this.diffAutomaton = diffAutomaton;}
+    public String getRawReference() { return rawReference;}
+    public String getRawSubject() { return rawSubject;}
 
     public Automaton<String> getReference() { return reference;}
     public void setReference(Automaton<String> reference) { this.reference = reference;}
@@ -38,9 +33,7 @@ public class SessionData {
     public void setSubject(Automaton<String> subject) { this.subject = subject;}
 
     public ReentrantLock getLock() { return lock;}
-    public boolean isReady() { return ready;}
-    public void setReady(boolean ready) { this.ready = ready;}
-
+    
     public AutomataType getType(){
         return type;
     }

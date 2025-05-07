@@ -25,11 +25,11 @@ public class Mealy {
         return output; 
     }
 
+    /**
+     * Writes a string of the form <code>input/output</code>.
+     */
     @Override
     public String toString() {
         return LabelUtils.build(input, output);
-    }
-
-    public record MealyLabel(String type, String value) {}
-    
+    } 
 }

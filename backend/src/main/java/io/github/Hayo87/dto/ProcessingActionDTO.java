@@ -7,7 +7,7 @@ import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
 /**
- * Represents a user configured processing action. The `stage`, `kind` , `type` and `subtype`
+ * Represents a user requested processing action. The `stage`, `kind` , `type` and `subtype`
  * define the processing rule to be applied. The `name` and value are user inputs. 
  */
 public record ProcessingActionDTO (

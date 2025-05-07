@@ -14,7 +14,7 @@ import io.github.Hayo87.handlers.AbstractDiffHandler.ActionKey;
 public interface DiffAutomatonProcessor<T> {
 
     /**
-     * Returns the set of (Type, Subtype) pairst that this processor supports.
+     * Returns the set of (Type, Subtype) pairs that this processor supports.
      */
     Set<ActionKey> keys();
 

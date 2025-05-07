@@ -17,6 +17,9 @@ import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
+/**
+ * Hider that hides transitions based on their label text. 
+ */
 @Component
 public class StringTransitionHider implements DiffAutomatonProcessor<String> {
 

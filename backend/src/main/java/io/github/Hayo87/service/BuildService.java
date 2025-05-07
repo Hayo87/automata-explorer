@@ -21,9 +21,10 @@ import io.github.Hayo87.processors.ProcessingModel.Stage;
 import io.github.Hayo87.processors.ProcessingRules;
 
 /**
- * Manages all build related actions for Difference Automata's.
- * 
-/** */
+ * Manages the generic, type-independent build process for difference automatons including 
+ * processing actions and responses.
+ */
+
  @Service
 public class BuildService {
     private final SessionService sessionService;
@@ -38,23 +39,29 @@ public class BuildService {
         this.handlerService = handlerService;
         this.mapper = mapper;
     }
+
     /**
      * Get a grouped list of processing options available for the given
      * automata type for the ProcessingRules.
-     * @param type
+     * @param type the automata type
      * @return grouped list with options
      */
     public List<ProcessingOptionDTO> getProcessingOptions(AutomataType type){
         return ProcessingRules.optionsFor(type);
     }
 
+    /**
+     * Builds the input automatons for a given session.
+     * 
+     * @param sessionId 
+     */
     public void buildInputs(String sessionId) {
         SessionData session = sessionService.getSession(sessionId);
 
         session.getLock().lock();
         try {
-            session.setReference(buildInput(session.getInputReference()));
-            session.setSubject(buildInput(session.getInputSubject()));
+            session.setReference(buildInput(session.getRawReference()));
+            session.setSubject(buildInput(session.getRawSubject()));
     
         } catch (Exception e) {
             System.err.println("Rebuilding inputs failed: " + e.getMessage());
@@ -64,10 +71,11 @@ public class BuildService {
     }
 
     /**
-     * Build an input automaton
+     * Helper method to build the single input automaton. 
      * 
-     * @param input the input string
-     * @param isReference wheter the input is the reference automata
+     * @param input the input dot string
+     * @param isReference if input is the reference automata
+     * @return the automaton
      */
     private Automaton<String> buildInput(String input){
         Automaton<String> result; 
@@ -82,6 +90,12 @@ public class BuildService {
         return result; 
     }
 
+    /**
+     * Builds the difference machine for a given session. 
+     * @param sessionId
+     * @param request {@link BuildRequestDTO}
+     * @return {@link BuildResponseDTO}
+     */
     public BuildResponseDTO buildDiff(String sessionId, BuildRequestDTO request) {
         SessionData session = sessionService.getSession(sessionId);
         List<ProcessingActionDTO> actions = request.actions() == null
@@ -100,6 +114,15 @@ public class BuildService {
         }
     }
 
+    /**
+     * Handles the full diff build for a given session using the specified handler.
+     * 
+     * @param <T> the transition property type
+     * @param session the current sessionData {@link SessionData}
+     * @param handler the handler for the automaton type 
+     * @param actions list of user defined processing actions to apply 
+     * @return {@link BuildResponseDTO}
+     */
     private <T> BuildResponseDTO handleDiffBuild( SessionData session, DiffHandler<T> handler, List<ProcessingActionDTO> actions) {
 
          // Convert to type specific
@@ -121,6 +144,13 @@ public class BuildService {
         return new BuildResponseDTO(session.getType(), "Build succesfull", handler.serialize(result), actions);
     }
 
+    /**
+     * Helper method to filter the processing actions by stage
+     * 
+     * @param actions the list of actions to be filtered
+     * @param stage the requested stage
+     * @return the filtered action list
+     */
     private List<ProcessingActionDTO> filterByStage(List<ProcessingActionDTO> actions, Stage stage) {
         return actions.stream()
             .filter(action -> action.stage() == stage)

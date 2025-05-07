@@ -11,6 +11,12 @@ import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
+/**
+ * Base implementation for the {@link DiffHandler} that provides the common logic for
+ * pre- and post-processing. 
+ * 
+ * @param <T> the automaton transition property type
+ */
 public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
     
     public static record ActionKey(Type type, SubType subtype) {}
@@ -29,6 +35,13 @@ public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
             ));
         }
 
+    /**
+     * Helper method to apply the actual actions. 
+     * 
+     * @param automaton the automaton to be modified
+     * @param actions the list of actions to be aplied
+     * @return the modified automaton
+     */    
     protected DiffAutomaton<T> applyProcessing(DiffAutomaton<T> automaton, List<ProcessingActionDTO> actions) {
         for (ProcessingActionDTO action : actions) {
             ActionKey key = new ActionKey(action.type(), action.subtype());

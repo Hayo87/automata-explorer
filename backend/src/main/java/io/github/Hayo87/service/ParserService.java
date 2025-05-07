@@ -20,13 +20,10 @@ import com.github.tno.gltsdiff.glts.lts.automaton.AutomatonStateProperty;
 
 import jakarta.annotation.PostConstruct;
 
-
 /**
- * Manages input parsing for dotStrings  .
+ * Manages input parsing for dotStrings using the Graphviz CLI. 
  * 
- * @author Marijn Verheul 
  */
-
 @Service
 public class ParserService {
     private final ObjectMapper objectMapper;
@@ -93,16 +90,13 @@ public class ParserService {
     }
 
     /**
-     * Converts DOT file (String) to a Json representaton using the Graphviz CLI.
+     * Helper method to convert a dot string to a Json for easier parsing.
      *
-     * @param dotContent The DOT file content.
-     * @return JSON representation for the file 
+     * @param dotContent The DOT string.
+     * @return JSON representation for the dot string  
      * @throws IOException If an error occurs.
      */
-    @SuppressWarnings("CallToPrintStackTrace")
-    private JsonNode convertDotStringToJson(String dotContent) throws IOException {
-        long startTime = System.nanoTime();
-
+    private JsonNode convertDotStringToJson(String dotContent) throws IOException { 
         // Create and start process
         ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tdot_json");
         processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
@@ -116,9 +110,6 @@ public class ParserService {
             writerPipe.write(dotContent);
             writerPipe.flush();
             writerPipe.close();
-
-            long elapsedTime = System.nanoTime() - startTime;
-            System.out.println("Process conversion took: " + (elapsedTime / 1_000_000.0) + " ms");
             
             // Read result as JsonNode
             return objectMapper.readTree(reader);    
@@ -129,7 +120,7 @@ public class ParserService {
     }
     
     /**
-     * Method to improve the performance by warming up the process initially
+     * Method to improve the performance by warming up the Graphviz process initially
      */
     @PostConstruct
     public void warmup() {

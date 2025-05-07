@@ -23,9 +23,8 @@ import io.github.Hayo87.service.SessionService;
 
 /**
  * REST Controller for session management, and the building and exploring of 
- * Difference Automata(Diff Machine) based on the gLTSDiff library.
+ * the difference automata(Diff Machine) based on the gLTSDiff library.
  * 
- * @author Marijn Verheul
  */
 @RestController
 @RequestMapping("/api")
@@ -37,19 +36,17 @@ public class ExplorerController {
     /**
      * Constructor - Injects required services.
      * 
-     * @param sessionService Manages session storage.
-     * @param buildService Builds diff automaton.
      */
     public ExplorerController(SessionService sessionService, BuildService buildService) {
         this.sessionService = sessionService;
         this.buildService = buildService;
     }
 
-   /**
+    /**
      * Creates a new session and builds the input.
      *
-     * @param input A JSON object containing "reference" and "subject" DOT file content.
-     * @return A unique session ID wrapped in a DTO.
+     * @param input {@link SessionRequestDTO} 
+     * @return {@link SessionResponseDTO} 
      */
     @PostMapping("/session")
     public ResponseEntity<SessionResponseDTO> createSession(@RequestBody SessionRequestDTO input) {
@@ -66,10 +63,10 @@ public class ExplorerController {
     }
 
     /**
-     * Deletes a session and clears its history.
+     * Deletes a session and clears its data.
      *
      * @param sessionId The ID of the session to be deleted.
-     * @return ResponseEntity (idempotent, always succes).
+     * @return {@link SessionResponseDTO}
      */
     @DeleteMapping("/session/{sessionId}")
     public ResponseEntity<SessionResponseDTO> deleteSession(@PathVariable String sessionId) {        
@@ -77,15 +74,12 @@ public class ExplorerController {
     }
 
     /**
-     * Handles build-related actions for a given session.
+     * Handles the build for a given session.
      *
      * @param sessionId The unique identifier of the session.
-     * @param request The {@link BuildRequestDTO} containing the action to perform.
-     * @return A {@link ResponseEntity} indicating the success or failure of the action.
-     *         - HTTP 200 OK → Action executed successfully, results returned in DTO.
-     *         - HTTP 400 Bad Request → Invalid action provided.
+     * @param request {@link BuildRequestDTO}
+     * @return {@link BuildResponseDTO}
      */
-
     @PostMapping("/session/{sessionId}/build")
     public ResponseEntity<BuildResponseDTO> handleBuildRequest(
             @PathVariable String sessionId, 

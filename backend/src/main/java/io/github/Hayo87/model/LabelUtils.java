@@ -1,6 +1,9 @@
 package io.github.Hayo87.model;
 
-
+/**
+ * Utility class for handeling label formatting and conversion logic related 
+ * to automaton labels. 
+ */
 public class LabelUtils {
 
     /**
@@ -29,7 +32,7 @@ public class LabelUtils {
      * Build a new label of the form <code>input/output</code>
      * @param input
      * @param output
-     * @return
+     * @return a formatted label
      */
     public static String build(String input, String output) {
         if (input.isEmpty() || output.isEmpty()) {
@@ -37,7 +40,11 @@ public class LabelUtils {
         } else {}
         return input.trim() + " / " + output.trim();
     }
-
+    /**
+     * Build a new synonymlabel of the form <code>↦ [input]</code>
+     * @param input
+     * @return a synonym label
+     */
     public static String writeSynonymLabel(String input) {
         return "↦ [" + input + "]";
     }

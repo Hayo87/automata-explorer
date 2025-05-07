@@ -20,7 +20,9 @@ import io.github.Hayo87.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.processors.ProcessingModel.SubType;
 import io.github.Hayo87.processors.ProcessingModel.Type;
 
-
+/**
+ * Hider that hides transitions based on their input or output. 
+ */
 @Component
 public class MealyTransitionHider implements DiffAutomatonProcessor<Mealy> {
 

@@ -93,7 +93,6 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
         return applyProcessing(result, action);
     }
  
-
     @Override
     public BuildDTO serialize(DiffAutomaton<Mealy> automaton) {
 
@@ -130,6 +129,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
 
         return new BuildDTO(nodes, edges); 
     }
+    
     /**
      * Helper method to build the label entries.
      * @param mealy the mealy property
