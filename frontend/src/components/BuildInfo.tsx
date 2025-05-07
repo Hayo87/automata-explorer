@@ -1,4 +1,4 @@
-import { Stats } from "../types/BuildResponse";
+import { Stats } from "../types/RequestResponse";
 
 interface BuildInfoProps {
   stats: Stats

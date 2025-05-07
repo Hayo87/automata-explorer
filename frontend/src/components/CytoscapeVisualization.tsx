@@ -4,7 +4,7 @@ import Core from 'cytoscape';
 
 //hooks
 import useTransformGraph from "../hooks/useTransform";
-import { BuildResponse, Stats } from "../types/BuildResponse";
+import { BuildResponse, Stats } from "../types/RequestResponse";
 
 // Layout extentions
 import dagre from "cytoscape-dagre";

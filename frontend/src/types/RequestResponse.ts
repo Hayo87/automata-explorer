@@ -1,3 +1,17 @@
+// Interfaces for session response
+export interface SessionResponse {
+  sessionId: string;
+  message: string;
+  processingOptions: ProcessOption[];
+}
+
+export interface ProcessOption {
+  stage:"PRE" | "POST"
+  type: string,
+  subtypes: string[]
+}
+
+// Interfaces for build settings and responses
 export interface BuildResponse  {
   type: string;
   message: string;
@@ -40,7 +54,6 @@ export interface LabelEntry {
   diffkind?: 'UNCHANGED' | 'ADDED' | 'REMOVED'; 
 }
 
-
 export interface ProcessAction {
     stage: String,
     type: string; 
@@ -50,6 +63,7 @@ export interface ProcessAction {
     values?: string[];
 }
 
+// Interal interface for build stats 
 export interface Stats {
     totalEdges: number;
     totalNodes: number;

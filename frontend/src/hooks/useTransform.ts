@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { BuildResponse} from '../types/BuildResponse';
+import { BuildResponse} from '../types/RequestResponse';
 
 const useTransformGraph = (backendData: BuildResponse | null) => {
   return useMemo(() => {
