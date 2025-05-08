@@ -55,12 +55,12 @@ public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
     }
         
     @Override
-    public DiffAutomaton<T> preProcessing(DiffAutomaton<T> automaton, List<ProcessingActionDTO> filters) {
+    public DiffAutomaton<T> preProcessingInternal(DiffAutomaton<T> automaton, List<ProcessingActionDTO> filters) {
         return applyProcessing(automaton, filters);
     }
 
     @Override
-    public DiffAutomaton<T> postProcessing(DiffAutomaton<T> automaton, List<ProcessingActionDTO> filters) {
-        return applyProcessing(automaton, filters);
+    public DiffAutomaton<T> postProcessingInternal(DiffAutomaton<T> automaton, List<ProcessingActionDTO> filters) {
+        return applyProcessing(automaton, filters);    
     }
 }

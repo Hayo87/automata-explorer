@@ -1,20 +1,17 @@
 package io.github.Hayo87.services;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
+import io.github.Hayo87.controller.BadRequestException;
 import io.github.Hayo87.domain.handlers.DiffHandler;
-import io.github.Hayo87.domain.rules.ProcessingRules;
-import io.github.Hayo87.domain.rules.ProcessingModel.Stage;
 import io.github.Hayo87.domain.rules.AutomataType;
+import io.github.Hayo87.domain.rules.ProcessingModel.Stage;
+import io.github.Hayo87.domain.rules.ProcessingRules;
 import io.github.Hayo87.dto.BuildRequestDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.ProcessingActionDTO;
@@ -30,14 +27,12 @@ public class BuildService {
     private final SessionService sessionService;
     private final ParserService parserService; 
     private final HandlerService handlerService;
-    private final ObjectMapper mapper;
 
     @Autowired
-    public BuildService( SessionService sessionService, ParserService parserService, HandlerService handlerService, ObjectMapper mapper) {
+    public BuildService( SessionService sessionService, ParserService parserService, HandlerService handlerService ) {
         this.sessionService = sessionService;
         this.parserService = parserService;
         this.handlerService = handlerService;
-        this.mapper = mapper;
     }
 
     /**
@@ -58,36 +53,16 @@ public class BuildService {
     public void buildInputs(String sessionId) {
         SessionData session = sessionService.getSession(sessionId);
 
-        session.getLock().lock();
         try {
-            session.setReference(buildInput(session.getRawReference()));
-            session.setSubject(buildInput(session.getRawSubject()));
-    
-        } catch (Exception e) {
-            System.err.println("Rebuilding inputs failed: " + e.getMessage());
-        } finally {
-            session.getLock().unlock();
+           session.setReference(parserService.convertDotStringToAutomaton(session.getRawReference())); 
+        } catch (BadRequestException e) {
+            throw new BadRequestException("Invalid reference DOT format", e); 
         }
-    }
-
-    /**
-     * Helper method to build the single input automaton. 
-     * 
-     * @param input the input dot string
-     * @param isReference if input is the reference automata
-     * @return the automaton
-     */
-    private Automaton<String> buildInput(String input){
-        Automaton<String> result; 
-
-        try{
-            result =  parserService.convertDotStringToAutomaton(input); 
-
-        } catch (IOException e) {
-            System.err.println("Parsing failed: " + e.getMessage());
-            throw new IllegalArgumentException("Invalid DOT file format.");
-        }
-        return result; 
+        try {
+           session.setSubject(parserService.convertDotStringToAutomaton(session.getRawSubject())); 
+        } catch (BadRequestException e) {
+            throw new BadRequestException("Invalid subject DOT format", e); 
+        }  
     }
 
     /**
@@ -98,19 +73,17 @@ public class BuildService {
      */
     public BuildResponseDTO buildDiff(String sessionId, BuildRequestDTO request) {
         SessionData session = sessionService.getSession(sessionId);
-        List<ProcessingActionDTO> actions = request.actions() == null
-            ? List.of()
-            : mapper.convertValue(request.actions(), new TypeReference<>() {});
+        List<ProcessingActionDTO> actions = 
+            request.actions() == null? List.of() : request.actions();
     
         DiffHandler<?> handler = handlerService.getHandler(session.getType());
     
-        session.getLock().lock();
         try { 
             return handleDiffBuild(session, handler, actions);
         } catch (Exception e) {
+            // TODO
             throw new RuntimeException("Build failed", e); 
         } finally {
-            session.getLock().unlock(); 
         }
     }
 
@@ -124,24 +97,29 @@ public class BuildService {
      * @return {@link BuildResponseDTO}
      */
     private <T> BuildResponseDTO handleDiffBuild( SessionData session, DiffHandler<T> handler, List<ProcessingActionDTO> actions) {
+        
+        try {
+            // Convert to type specific
+            DiffAutomaton<T> reference = handler.convert(session.getReference(), true);
+            DiffAutomaton<T> subject = handler.convert(session.getSubject(), false);
 
-         // Convert to type specific
-        DiffAutomaton<T> reference = handler.convert(session.getReference(), true);
-        DiffAutomaton<T> subject = handler.convert(session.getSubject(), false);
+            // Pre processing 
+            List<ProcessingActionDTO> preProcessingActions = filterByStage(actions, Stage.PRE);
+            reference = handler.preProcessing(reference, preProcessingActions);
+            subject = handler.preProcessing(subject, preProcessingActions);
 
-        // Pre processing 
-        List<ProcessingActionDTO> preProcessingActions = filterByStage(actions, Stage.PRE);
-        reference = handler.preProcessing(reference, preProcessingActions);
-        subject = handler.preProcessing(subject, preProcessingActions);
+            // Build
+            DiffAutomaton<T> result = handler.build(reference, subject);
 
-        // Build
-        DiffAutomaton<T> result = handler.build(reference, subject);
+            // Post processing 
+            List<ProcessingActionDTO> postProcessingActions = filterByStage(actions, Stage.POST);
+            result = handler.postProcessing(result, postProcessingActions);
 
-        // Post processing 
-        List<ProcessingActionDTO> postProcessingActions = filterByStage(actions, Stage.POST);
-        result = handler.postProcessing(result, postProcessingActions);
-
-        return new BuildResponseDTO(session.getType(), "Build succesfull", handler.serialize(result), actions);
+            return new BuildResponseDTO(session.getType(), handler.serialize(result), actions);
+   
+        } catch (Exception e) {
+            throw new RuntimeException("Build failed: " + e.getMessage(),e);
+        }
     }
 
     /**

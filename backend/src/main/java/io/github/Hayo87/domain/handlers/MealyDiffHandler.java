@@ -40,7 +40,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     }
 
     @Override
-    public DiffAutomaton<Mealy> convert(Automaton<String> input, boolean isReference) {
+    public DiffAutomaton<Mealy> convertInternal(Automaton<String> input, boolean isReference) {
         DiffAutomaton<Mealy> automaton = new DiffAutomaton<>();
         DiffKind diffKind = isReference ? DiffKind.REMOVED : DiffKind.ADDED;
         
@@ -78,7 +78,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     }
 
     @Override
-    public DiffAutomaton<Mealy> build(DiffAutomaton<Mealy> reference, DiffAutomaton<Mealy> subject) {
+    public DiffAutomaton<Mealy> buildInternal(DiffAutomaton<Mealy> reference, DiffAutomaton<Mealy> subject) {
         DiffAutomatonStructureComparatorBuilder<Mealy> builder = new DiffAutomatonStructureComparatorBuilder<>();
         builder.setRewriters(Collections.emptyList());
         builder.setDiffAutomatonTransitionPropertyCombiner(new MealyCombiner());
@@ -94,7 +94,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     }
  
     @Override
-    public BuildDTO serialize(DiffAutomaton<Mealy> automaton) {
+    public BuildDTO serializeInternal(DiffAutomaton<Mealy> automaton) {
 
         // Serialize nodes
         List<BuildDTO.Node> nodes = automaton.getStates().stream()

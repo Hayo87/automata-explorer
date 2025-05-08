@@ -1,13 +1,10 @@
 package io.github.Hayo87.services;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 
 import io.github.Hayo87.domain.rules.AutomataType;
 /**
- * Stores all session related data including the raw and processed inputs, has a
- * reentrant lock to manage concurrent access.  
+ * Stores all session related data including the raw and processed inputs.  
  */
 public class SessionData {
     private final AutomataType type; 
@@ -15,7 +12,6 @@ public class SessionData {
     private final String rawSubject;
     private Automaton<String> reference;
     private Automaton<String> subject;
-    private final ReentrantLock lock = new ReentrantLock();
 
     public SessionData(AutomataType type, String inputReference, String inputSubject) {
         this.type = type;
@@ -31,8 +27,6 @@ public class SessionData {
 
     public Automaton<String> getSubject() { return subject;}
     public void setSubject(Automaton<String> subject) { this.subject = subject;}
-
-    public ReentrantLock getLock() { return lock;}
     
     public AutomataType getType(){
         return type;

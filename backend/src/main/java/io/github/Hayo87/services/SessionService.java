@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import io.github.Hayo87.controller.BadRequestException;
 import io.github.Hayo87.domain.rules.AutomataType;
 import io.github.Hayo87.dto.SessionResponseDTO;
 
@@ -23,9 +24,9 @@ public class SessionService {
     /**
      * Creates a new session, by storing the session inputs.
      *
-     * @return string with the unique session ID.
+     * @return string with the unique session ID. 
      */
-    public String createSession(AutomataType type, String dotReference, String dotSubject) {
+    public String createSession(AutomataType type, String dotReference, String dotSubject)  {
         String sessionId = UUID.randomUUID().toString();
         sessions.put(sessionId, new SessionData(type, dotReference, dotSubject));
         return sessionId;
@@ -38,7 +39,7 @@ public class SessionService {
      */
     public SessionData getSession (String sessionId) {
         if (!sessions.containsKey(sessionId)) {
-            throw new IllegalArgumentException("Session ID not found.");
+            throw new IllegalArgumentException("Session does not exist");
         }
         return sessions.get(sessionId);
     }
@@ -49,13 +50,13 @@ public class SessionService {
      * @param sessionId The ID of the session to be removed.
      * @return DeleteSessionResponseDTO 
      */
-    public SessionResponseDTO terminateSession(String sessionId) {
+    public SessionResponseDTO terminateSession(String sessionId)  {
         if (!sessions.containsKey(sessionId)) {
-            return new SessionResponseDTO(sessionId, " Session not found", null);
+            throw new BadRequestException("Session does not exist");
         }
         else {  
             sessions.remove(sessionId);
-            return new SessionResponseDTO( sessionId, " Deleted succesfully", null);
+            return new SessionResponseDTO( sessionId +  " deleted succesfully", null);
         }
     }
 }

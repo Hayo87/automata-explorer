@@ -23,12 +23,12 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
     }
 
     @Override
-    public DiffAutomaton<String> convert( Automaton<String> input, boolean isReference) {
+    public DiffAutomaton<String> convertInternal( Automaton<String> input, boolean isReference) {
         return DiffAutomata.fromAutomaton(input, (isReference ? DiffKind.REMOVED : DiffKind.ADDED));
     }
 
     @Override
-    public DiffAutomaton<String> build(DiffAutomaton<String> reference, DiffAutomaton<String> subject) {
+    public DiffAutomaton<String> buildInternal(DiffAutomaton<String> reference, DiffAutomaton<String> subject) {
         DiffAutomatonStructureComparatorBuilder<String> builder = new DiffAutomatonStructureComparatorBuilder<>();
         builder.setRewriters(Collections.emptyList());
         var comparator = builder.createComparator();
@@ -37,7 +37,7 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
     }
 
     @Override
-    public BuildDTO serialize(DiffAutomaton<String> automaton) {
+    public BuildDTO serializeInternal(DiffAutomaton<String> automaton) {
         
         // Serialize nodes
         List<BuildDTO.Node> nodes = automaton.getStates().stream()
