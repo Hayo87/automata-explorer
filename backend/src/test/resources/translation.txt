@@ -1,0 +1,14 @@
+TestCase | Reference | Source 
+
+TestCase 1: Own creation  
+TestCase 2: Own creation
+TestCase 3: scandium-2.0.0_psk.dot | scandium_latest_psk.dot
+TestCase 4: GnuTLS_3.3.8_client_regular.dot | GnuTLS_3.3.12_client_regular.dot
+TestCase 5: OpenSSL_1.0.1g_client_regular.dot | OpenSSL_1.0.1j_client_regular.dot
+TestCase 6: TCP_Linux_Server.dot | TCP_Windows8_Server.dot
+TestCase 7: BitVise.dot | DropBear.dot
+TestCase 8: ActiveMQ__non_clean.dot | mosquitto__non_clean.dot
+TestCase 9: hyp.0.obf.dot | hyp.10.obf.dot
+TestCase 10: learnresult_old_device-simple_fix.dot | learnresult_new_device-simple_fix.dot
+TestCase 11: jsse-12_rsa_cert_nreq.dot | jsse-12_rsa_cert_req.dot
+TestCase 12: Rabo_learnresult_MAESTRO_fix.dot | Volksbank_learnresult_MAESTRO_fix.dot

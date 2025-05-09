@@ -1,0 +1,9 @@
+digraph g {
+
+	s0 [shape="circle" label="s0"];
+	s0 -> s0 [label="KEX / TO"];
+	s0 -> s0 [label="FIN / TO"];
+	s0 -> s0 [label="APP / TO"];
+	s0 -> s0 [label="AL_W / TO"];
+	s0 -> s0 [label="AL_F / TO"];
+}
