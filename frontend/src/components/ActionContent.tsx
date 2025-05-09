@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ProcessAction, ProcessOption } from "../types/RequestResponse";
+import { ProcessAction, ProcessOption } from "../api/RequestResponse";
 
 interface ActionModalProps {
   setActions: ProcessAction[];
