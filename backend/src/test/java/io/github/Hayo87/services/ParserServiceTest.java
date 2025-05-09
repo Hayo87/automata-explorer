@@ -1,8 +1,9 @@
 package io.github.Hayo87.services;
 
-import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,8 +22,9 @@ public class ParserServiceTest {
 
     private final ParserService parserService= new ParserService(new ObjectMapper());
 
-    static Stream<Path> loadDotFiles() throws IOException{
-        return Files.list(Path.of("src/test/java/resources/"))
+    static Stream<Path> loadDotFiles() throws Exception{
+        URI uri = Objects.requireNonNull(ParserServiceTest.class.getResource("/")).toURI();
+        return Files.list(Path.of(uri))
             .filter(path -> path.toString().endsWith(".dot"));
     }
 

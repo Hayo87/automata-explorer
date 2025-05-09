@@ -61,7 +61,7 @@ public class ExplorerControllerTest {
     private BuildService buildservice;
 
     private String loadJson(String name) throws IOException {
-        return new String(getClass().getResourceAsStream("/resources/" + name).readAllBytes(), StandardCharsets.UTF_8);
+        return new String(getClass().getResourceAsStream("/" + name).readAllBytes(), StandardCharsets.UTF_8);
     }
     
     @Test
