@@ -48,7 +48,7 @@ public class SessionService {
      * Terminates a session by removing it from session history.
      *
      * @param sessionId The ID of the session to be removed.
-     * @return DeleteSessionResponseDTO 
+     * @return {@link SessionResponseDTO} 
      */
     public SessionResponseDTO terminateSession(String sessionId)  {
         if (!sessions.containsKey(sessionId)) {

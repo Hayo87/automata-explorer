@@ -43,7 +43,7 @@ public class ParserService {
      */
     public Automaton<String> convertDotStringToAutomaton(String dotContent) {
         JsonNode graphJson = convertDotStringToJson(dotContent);
-    
+
         // Initialize variables
         Automaton<String> automaton = new Automaton<>();
         Map<Integer, State<AutomatonStateProperty>> stateMap = new HashMap<>();
@@ -115,11 +115,18 @@ public class ParserService {
             writerPipe.close();
             
             // Read result as JsonNode
-            return objectMapper.readTree(reader);   
+            JsonNode json =  objectMapper.readTree(reader);
 
+            // Validate
+            if(!json.has("objects") || !json.has("edges")){
+                throw new BadRequestException("Invalid dot structure");
+            }
+
+            return json;
+            
             }
             catch (IOException e) {
-                throw new BadRequestException("Failed to convert dotString to JSon", e);
+                throw new BadRequestException("Failed to convert dotString to Json", e);
             }
             
         } catch (IOException e) {

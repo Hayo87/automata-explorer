@@ -1,7 +1,6 @@
 // Interfaces for session response
 export interface SessionResponse {
   sessionId: string;
-  message: string;
   processingOptions: ProcessOption[];
 }
 
@@ -14,7 +13,6 @@ export interface ProcessOption {
 // Interfaces for build settings and responses
 export interface BuildResponse  {
   type: string;
-  message: string;
   build: Build;
   actions: ProcessAction[];
 }

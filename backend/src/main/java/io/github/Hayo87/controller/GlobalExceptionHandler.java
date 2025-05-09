@@ -26,6 +26,20 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles the (@link BadRequestException) thrown in the application. 
+     * @param e the exception during processing
+     * @return a 400 bad request response with error information
+     */
+    @ExceptionHandler( BadRequestException.class)
+    public ResponseEntity<ErrorDTO> handleBadRequest(BadRequestException e) {
+        return ResponseEntity.badRequest()
+            .body(new ErrorDTO("Invalid request: " + e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+    }
+
+
+
+
+    /**
     * Handles validation failures for request DTOs annotated with {@code @Valid}
     *
     * @param e the exception with validation details
@@ -35,7 +49,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDTO> handleValidation(MethodArgumentNotValidException e) {
         String message = "Input validation failed";
 
-        // Get (first) field error if available
         if(!e.getBindingResult().getFieldErrors().isEmpty()) {
             message = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         }
@@ -44,19 +57,9 @@ public class GlobalExceptionHandler {
             .body(new ErrorDTO(message, HttpStatus.BAD_REQUEST.value()));
     }
 
-
-
-
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorDTO> handleIllegalArgument(IllegalArgumentException e) {
-        return ResponseEntity.badRequest()
-            .body(new ErrorDTO(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
-    }
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDTO> handleGeneralException(Exception e) {
-        return ResponseEntity.badRequest()
-            .body(new ErrorDTO("Internal server error " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        return ResponseEntity.internalServerError()
+            .body(new ErrorDTO("Internal server error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 }

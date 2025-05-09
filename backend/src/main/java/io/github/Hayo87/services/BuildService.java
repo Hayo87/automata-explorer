@@ -78,13 +78,7 @@ public class BuildService {
     
         DiffHandler<?> handler = handlerService.getHandler(session.getType());
     
-        try { 
-            return handleDiffBuild(session, handler, actions);
-        } catch (Exception e) {
-            // TODO
-            throw new RuntimeException("Build failed", e); 
-        } finally {
-        }
+        return handleDiffBuild(session, handler, actions);
     }
 
     /**
