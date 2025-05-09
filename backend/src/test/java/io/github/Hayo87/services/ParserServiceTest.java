@@ -22,10 +22,9 @@ public class ParserServiceTest {
     private final ParserService parserService= new ParserService(new ObjectMapper());
 
     static Stream<Path> loadDotFiles() throws IOException{
-        return Files.list(Path.of("src/test/java/io/github/Hayo87/resources/dot-files/"))
+        return Files.list(Path.of("src/test/java/resources/"))
             .filter(path -> path.toString().endsWith(".dot"));
     }
-
 
     @ParameterizedTest
     @MethodSource("loadDotFiles")

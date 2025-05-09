@@ -27,7 +27,7 @@ public class ExplorerIntegrationTest {
     private MockMvc mockMvc;
 
     private String loadJson(String name) throws IOException {
-        return new String(getClass().getResourceAsStream("../resources/json/" + name).readAllBytes(), StandardCharsets.UTF_8);
+        return new String(getClass().getResourceAsStream("/resources/" + name).readAllBytes(), StandardCharsets.UTF_8);
     }
 
     private ResultActions  startSession(String requestJson) throws Exception {
