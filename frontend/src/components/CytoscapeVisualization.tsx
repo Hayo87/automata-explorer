@@ -4,7 +4,7 @@ import Core from 'cytoscape';
 
 //hooks
 import useTransformGraph from "../hooks/useTransform";
-import { BuildResponse, Stats } from "../types/RequestResponse";
+import { BuildResponse } from "../api/RequestResponse";
 
 // Layout extentions
 import dagre from "cytoscape-dagre";
@@ -69,6 +69,14 @@ export interface CytoscapeVisualizationRef {
   showSub: () => void;
   hideSub: () => void;
   getStats: () => Stats
+}
+
+// Interface for build stats 
+export interface Stats {
+  totalEdges: number;
+  totalNodes: number;
+  unchangedEdges: number;
+  combinedEdges: number;
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
@@ -153,7 +161,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     switch (layout) {
 
     case "dagre":
-      console.log('dagre gekozen');
       {
         cyInstance.layout({ name: 'dagre', 
                             fit:true, 
@@ -318,7 +325,6 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       };
       return stats;
     }
-
 
   }));
   
