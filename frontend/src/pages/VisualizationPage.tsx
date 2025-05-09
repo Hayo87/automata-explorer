@@ -1,20 +1,18 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState, useRef, useContext} from 'react';
+import { useNavigate, useLocation, useParams  } from "react-router-dom";
+import { ModalContext } from '../App';
+import '../index.css';
 import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components/CytoscapeVisualization";
 import { useSession} from '../hooks/useSession';
-import { useNavigate, useLocation  } from "react-router-dom";
-import  InfoModal from '../components/InfoModal';
 import AboutContent from '../components/AboutContent';
-import ActionModal from '../components/ActionModal';
-import '../index.css';
-import { ProcessAction, ProcessOption} from '../types/RequestResponse';
-import BuildInfo from '../components/BuildInfo';
-
+import ActionModal from '../components/ActionContent';
+import BuildInfo from '../components/BuildContent';
+import { ProcessAction, ProcessOption} from '../api/RequestResponse';
 
 const VisualizationPage: React.FC = () => {
   // Pull sessionId from URL parameter
   const { sessionId} = useParams<{ sessionId: string }>();
-
+  
   // Get the state from navigate parameters
   const { reference, subject, options } = (useLocation().state || {}) as {
     reference: string;
@@ -31,13 +29,12 @@ const VisualizationPage: React.FC = () => {
   // Create a mutable reference to the visualization component
   const cyVizRef = useRef<CytoscapeVisualizationRef>(null);
 
+  // Get modal functions
+  const { openModal, closeModal } = useContext(ModalContext);
+
   // States
   const [currentLayout, setCurrentLayout] = useState("dagre");
   const [activeActions, setActiveActions] = useState<ProcessAction[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<any>(null);
-  const [modalKey, setModalKey] = useState(0);
-  const [showCloseButton, setShowCloseButton] = useState(true);
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [loopsHidden, setLoopsHidden] = useState(false);
@@ -58,18 +55,6 @@ const VisualizationPage: React.FC = () => {
     });
   };
 
-  const openModal = (modalContent: any, showCloseButton: boolean = true) => {
-    setModalContent(modalContent);
-    setModalKey(prev => prev + 1);
-    setIsModalOpen(true);
-    setShowCloseButton(showCloseButton);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalContent(null);
-  };
-;
   const openActionModal = () => {
     openModal(
       <ActionModal
@@ -170,13 +155,10 @@ const VisualizationPage: React.FC = () => {
         const viz = await waitForVizRef();
         closeModal();
         openModal(<BuildInfo reference={reference} subject={subject} stats={viz.getStats()}/>);
-    })
-      .catch((error) => {
-        openModal(`Build failed: ${error.message}`);
     })}
   }, [sessionId]);
 
-  // Update activeFilters after build response 
+  // Update activeActions after build response 
   useEffect(() => {
     if (data && data.filters) {
       setActiveActions(data.filters);
@@ -270,8 +252,6 @@ const VisualizationPage: React.FC = () => {
       <p> Reference: <span className="reference-file-name">{reference}</span> </p>
       <p> Subject: <span className="subject-file-name">{subject}</span> </p>
       </div>
-
-      <InfoModal isOpen={isModalOpen} onClose={closeModal} content={modalContent} contentKey= {modalKey} showCloseButton={showCloseButton} />
     </div>
   );
 }

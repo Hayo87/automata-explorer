@@ -1,4 +1,4 @@
-import { Stats } from "../types/RequestResponse";
+import { Stats } from "../components/CytoscapeVisualization";
 
 interface BuildInfoProps {
   stats: Stats

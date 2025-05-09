@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import ElementInfo from '../components/ElementInfo';
+import ElementInfo from '../components/ElementContent';
 
 export function attachCytoscapeMenus(cyInstance: cytoscape.Core, openModal: (el: any) => void) {
       if (!cyInstance) return;

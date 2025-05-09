@@ -28,8 +28,10 @@ jobs:
       # Step 3: Permissions
       - name: Set File Permissions
         run: |
-          ls -R ./backend/src/test/java/io/github/Hayo87/resources 
-          chmod -R 755 ./backend/src/test/java/io/github/Hayo87/resources  
+          ls -R ./backend/src/test/resources 
+          chmod -R 755 ./backend/src/test/resources 
+
+          
       
        # Step 4: Install Graphviz   
       - name: Install Graphviz

@@ -1,7 +1,12 @@
-// Interfaces for session response
+// Interfaces for sessions
+export interface SessionRequest{
+  type: "MEALY" | "STRING";
+  reference: string;
+  subject: string;
+}
+
 export interface SessionResponse {
   sessionId: string;
-  message: string;
   processingOptions: ProcessOption[];
 }
 
@@ -12,9 +17,11 @@ export interface ProcessOption {
 }
 
 // Interfaces for build settings and responses
+export interface BuildRequest{
+  actions?: ProcessAction[];
+}
 export interface BuildResponse  {
   type: string;
-  message: string;
   build: Build;
   actions: ProcessAction[];
 }
@@ -61,12 +68,4 @@ export interface ProcessAction {
     order: number;
     name?: string;  
     values?: string[];
-}
-
-// Interal interface for build stats 
-export interface Stats {
-    totalEdges: number;
-    totalNodes: number;
-    unchangedEdges: number;
-    combinedEdges: number;
 }

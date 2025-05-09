@@ -1,9 +1,7 @@
-package io.github.Hayo87;
+package io.github.Hayo87.controller;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +18,7 @@ import io.github.Hayo87.dto.SessionRequestDTO;
 import io.github.Hayo87.dto.SessionResponseDTO;
 import io.github.Hayo87.services.BuildService;
 import io.github.Hayo87.services.SessionService;
+import jakarta.validation.Valid;
 
 /**
  * REST Controller for session management, and the building and exploring of 
@@ -49,17 +48,20 @@ public class ExplorerController {
      * @return {@link SessionResponseDTO} 
      */
     @PostMapping("/session")
-    public ResponseEntity<SessionResponseDTO> createSession(@RequestBody SessionRequestDTO input) {
+    public ResponseEntity<SessionResponseDTO> createSession( @RequestBody @Valid SessionRequestDTO input) {
+
         String sessionId = sessionService.createSession(input.type(), input.reference(), input.subject());
 
-        // Parse inputs in background
-        CompletableFuture.runAsync(() -> {
+        try {
             buildService.buildInputs(sessionId);
-        });
-
+        } catch (Exception e) {
+            sessionService.terminateSession(sessionId);
+            throw e;
+        }
+        
         List<ProcessingOptionDTO> options = buildService.getProcessingOptions(input.type());
 
-        return ResponseEntity.ok(new SessionResponseDTO(sessionId, "Created", options));
+        return ResponseEntity.ok(new SessionResponseDTO(sessionId, options));
     }
 
     /**
@@ -83,17 +85,16 @@ public class ExplorerController {
     @PostMapping("/session/{sessionId}/build")
     public ResponseEntity<BuildResponseDTO> handleBuildRequest(
             @PathVariable String sessionId, 
-            @RequestBody BuildRequestDTO request) {
+            @RequestBody @Valid BuildRequestDTO request
+            ) {
 
         try {
             BuildResponseDTO response = buildService.buildDiff(sessionId, request);
-
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
             sessionService.terminateSession(sessionId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new BuildResponseDTO(null, "Error processing: " +  e.getMessage(), null, null));
+            throw e;
         }
     }
 }

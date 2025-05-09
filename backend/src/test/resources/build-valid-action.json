@@ -1,0 +1,5 @@
+{
+    "actions": [ { "stage": "PRE", "type": "SYNONYM", "subtype": "INPUT", "name": "test", "values": ["GEN_CRYPTOGRAM", "USB8_CRYPTOGRAM"], "order": 1
+    }
+  ]
+  }

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { uploadFiles, postBuild, closeSession } from "../api/SessionApi";
-import { ProcessAction, ProcessOption } from '../types/RequestResponse';
+import { requestSession, requestBuild, requestSessionClose } from "../api/SessionApi";
+import { ProcessAction, ProcessOption } from '../api/RequestResponse';
 
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -14,45 +14,31 @@ export const useSession = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await uploadFiles(file1, file2, type);
+      const response = await requestSession(file1, file2, type);
       setSessionId(response.sessionId);
       setProcessOptions(response.processingOptions);
-      return {
-        sessionId: response.sessionId,
-        options: response.processingOptions
-      }
-    } catch (err) {
-      setError((err as Error).message);
-      throw err;
+      return response;   
     } finally {
       setLoading(false);
     }
   };
 
   // Build session data for visualization
-  const buildSession = async (sessionId: string, actions: ProcessAction[]) => {
+  const buildDiff = async (sessionId: string, actions: ProcessAction[]) => {
     try {
       setLoading(true);
       setError(null);
-      const sessionData = await postBuild(sessionId, actions);
+      const sessionData = await requestBuild(sessionId, actions);
       setData(sessionData);
-    } catch (err) {
-      setError((err as Error).message);
-      throw err;
     } finally {
       setLoading(false);
     }
   };
 
   // Close session using the API's closeSession function.
-  const terminateSession = async (sessionId: string) => {
-    try {
-      await closeSession(sessionId);
-    } catch (err) {
-      setError((err as Error).message);
-      throw err;
-    }
+  const endSession = async (sessionId: string) => {
+    await requestSessionClose(sessionId);
   };
 
-  return { sessionId, processOptions, data, loading, error, startSession, buildSession, terminateSession };
+  return { sessionId, processOptions, data, loading, error, startSession, buildSession: buildDiff, terminateSession: endSession };
 };

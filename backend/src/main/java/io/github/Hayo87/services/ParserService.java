@@ -18,6 +18,7 @@ import com.github.tno.gltsdiff.glts.State;
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.AutomatonStateProperty;
 
+import io.github.Hayo87.controller.BadRequestException;
 import jakarta.annotation.PostConstruct;
 
 /**
@@ -40,9 +41,9 @@ public class ParserService {
      * @return Parsed DiffAutomaton object.
      * @throws IOException If parsing fails.
      */
-    public Automaton<String> convertDotStringToAutomaton(String dotContent) throws IOException {
+    public Automaton<String> convertDotStringToAutomaton(String dotContent) {
         JsonNode graphJson = convertDotStringToJson(dotContent);
-    
+
         // Initialize variables
         Automaton<String> automaton = new Automaton<>();
         Map<Integer, State<AutomatonStateProperty>> stateMap = new HashMap<>();
@@ -96,33 +97,48 @@ public class ParserService {
      * @return JSON representation for the dot string  
      * @throws IOException If an error occurs.
      */
-    private JsonNode convertDotStringToJson(String dotContent) throws IOException { 
+    private JsonNode convertDotStringToJson(String dotContent) { 
         // Create and start process
         ProcessBuilder processBuilder = new ProcessBuilder("dot", "-Tdot_json");
         processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE);
-        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);   
-        Process process = processBuilder.start();
-        
-        try (BufferedWriter writerPipe = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        processBuilder.redirectOutput(ProcessBuilder.Redirect.PIPE);  
+
+        try {
+            Process process = processBuilder.start();
             
+            try (BufferedWriter writerPipe = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+           
             // Inject dotContent as input
             writerPipe.write(dotContent);
             writerPipe.flush();
             writerPipe.close();
             
             // Read result as JsonNode
-            return objectMapper.readTree(reader);    
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Failed to convert dotString to Json", e);
-        }
+            JsonNode json =  objectMapper.readTree(reader);
+
+            // Validate
+            if(!json.has("objects") || !json.has("edges")){
+                throw new BadRequestException("Invalid dot structure");
+            }
+
+            return json;
+            
+            }
+            catch (IOException e) {
+                throw new BadRequestException("Failed to convert dotString to Json", e);
+            }
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to start Graphviz dot process", e);
+        } 
     }
     
     /**
      * Method to improve the performance by warming up the Graphviz process initially
      */
     @PostConstruct
+    @SuppressWarnings("empty-statement")
     public void warmup() {
     CompletableFuture.runAsync(() -> {
         try {
