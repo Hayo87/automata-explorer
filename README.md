@@ -1,88 +1,33 @@
+<p align="center">
+<img src="/frontend/public/logo_nofill.svg" alt="Visualization Page" width="45%" style="border:1px solid #ccc;" />
+</p>
 
-# AutomataExplorer
+# AutomataExplorer: visualize and compare automata's
 
-This is the AutomateExplorer
+The Automata Explores is a web-based tool to visualize differences and similarities between (finite) state machines. The tool is interactive and helps users to analyze, interpreted and understand the comparison results. The tool offers multiple filters and manipulations to investigate the results from different viewpoints and perspectives. The tool uses the [gLTSdiff library](https://github.com/TNO/gLTSdiff) to compare and merge the reference and subject inputs into a difference automata. The difference automata is a single combined automata where common parts, reference only and subject only are color coded, an example can be found below under preview. 
 
-## Features
-- Full-stack application with a Spring Boot backend and a React frontend.
-- Backend exposed on `http://localhost:8080`.
-- Frontend served through Nginx on `http://localhost:3000`.
-- Dockerized setup for easy development and deployment.
+This Automata Explores is developed in the context of automata learning and support two kinds of automata's. A regular automata where the matching for the difference machine is based on the complete label. And the Mealy machine where the matching is based on input and output under the condition that labels are structured as *input/output*. The (backend) build and processing actions are standardized (type based) and therefore easy to extend to support new types or (gLTSDiff) build configurations.
 
-## Getting Started
+## Core Feature
+- **Input** two automata's in the [`.dot format`](https://graphviz.org/doc/info/lang.html) and visualize the difference machine. 
+- Select a **graph layout** that is most suitable for the visualization. 
+- Use **filters** and/or custom **processing actions** to investigate the result. 
+- Use the **context menu**'s on visualization elements to work through the result or get detailed element information. 
+- **Export** the result as a `.pgn` or comprehensive `.pdf` report. 
 
-### Prerequisites
+## Preview
 
-- Docker (for containerized deployment)
-- Node.js (for the frontend build)
-- Maven (for the Spring Boot backend build)
+<p align="center">
+  <img src="docs/img/UploadPage.png" alt="Upload page" width="45%" style="border:1px solid #ccc;margin-right:10px;"/>
+  <img src="docs/img/VisualizationPage.png" alt="Visualization Page" width="45%" style="border:1px solid #ccc;" />
+</p>
 
-### Installation
+## Documentation
 
-1. **Clone the repository:**
-
-   ```bash
-   git clone https://github.com/yourusername/StateMachineExplorer.git
-   cd StateMachineExplorer
-   ```
-
-2. **Install dependencies for the backend** (Spring Boot):
-
-   ```bash
-   cd backend
-   ./mvnw install  # On Windows, use mvnw.cmd
-   ```
-
-3. **Install dependencies for the frontend** (React/Vite):
-
-   ```bash
-   cd frontend
-   npm install
-   ```
-
-### Running the Project with Docker
-
-This project uses Docker Compose to build and run both the frontend and backend services.
-
-1. **Build and start both the frontend and backend containers**:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-2. **Access the frontend** at [http://localhost:3000](http://localhost:3000).
-
-3. **Access the backend** at [http://localhost:8080](http://localhost:8080).
-
-### Stopping the Containers
-
-To stop and remove the containers, use the following command:
-
-```bash
-docker-compose down
-```
-
-## Project Structure
-
-```plaintext
-StateMachineExplorer/
-│
-├── backend/              # Spring Boot backend project
-│   ├── src/              # Backend source code
-│   ├── pom.xml           # Maven configuration
-│   └── Dockerfile        # Dockerfile for backend
-│
-├── frontend/             # React frontend project
-│   ├── src/              # Frontend source code
-│   ├── package.json      # npm configuration
-│   └── Dockerfile        # Dockerfile for frontend
-│
-├── docker-compose.yml    # Docker Compose configuration
-├── .gitignore            # Git ignore rules
-├── .dockerignore         # Docker ignore rules
-└── README.md             # Project documentation
-```
-
+* [Getting Started](/docs/getting-started.md): installation and setup
+* [Functionality](/docs/functionality.md): all functionality explained.
+* [Project structure & Architecture](/docs/structure-and-architecture.md)
+* [Backend API](/docs/structure-and-architecture.md#api-documentation): dot files, request and response messages
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
