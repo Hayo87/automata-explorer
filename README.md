@@ -8,7 +8,7 @@ The Automata Explores is a web-based tool to visualize differences and similarit
 
 This Automata Explores is developed in the context of automata learning and supports two kinds of automata's. A regular automata where the matching for the difference machine is based on the complete label. And the Mealy machine where the matching is based on input and output under the condition that labels are structured as *input/output*. The (backend) build and processing actions are standardized (type based) and therefore easy to extend to support new types or (gLTSDiff) build configurations.
 
-## Core Feature
+## Core features
 - **Input** two automata's in the [`.dot format`](https://graphviz.org/doc/info/lang.html) and visualize the difference machine. 
 - Select a **graph layout** that is most suitable for the visualization. 
 - Use **filters** and/or custom **processing actions** to investigate the result. 
