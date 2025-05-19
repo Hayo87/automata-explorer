@@ -70,7 +70,7 @@ This project uses Docker Compose to build and run both the frontend and backend 
 1. **Build and start both the frontend and backend containers**:
 
    ```bash
-   docker compose -f docker-compose.dev.yml up --build
+   docker compose -f docker-compose-dev.yml up --build
    ```
 
 2. **Access the frontend** at [http://localhost:3000](http://localhost:3000).
@@ -82,5 +82,5 @@ This project uses Docker Compose to build and run both the frontend and backend 
 To stop and remove the containers, use the following command:
 
    ```bash
-   docker compose -f docker-compose.dev.yml down
+   docker compose -f docker-compose-dev.yml down
    ```
