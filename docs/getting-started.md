@@ -11,22 +11,24 @@ The application consist of a a Spring Boot backend and a React frontend. The set
 - Browser installed. 
 
 
-### Pull the image
-Get the latest version from the Docker hub:
+### Download docker-compose.yml and run
 
    ```bash
-   docker pull hayo87/automata-explorer
-   ```
-
-### Start the app
-
-   ```bash
-   docker run -p 3000:3000 automata-explorer
+   curl -O https://raw.githubusercontent.com/Hayo87/automata-explorer/refs/heads/main/docker-compose.yml
+   docker compose up
    ```
 
 ### Access the app
 
  Open a browser and go to [http://localhost:3000](http://localhost:3000).
+
+ ### Stop the app
+
+ Use the following command:
+
+   ```bash
+   docker-compose down
+   ```
 
 ## 🛠️ For Developers
 
@@ -68,7 +70,7 @@ This project uses Docker Compose to build and run both the frontend and backend 
 1. **Build and start both the frontend and backend containers**:
 
    ```bash
-   docker-compose up --build
+   docker compose -f docker-compose.dev.yml up --build
    ```
 
 2. **Access the frontend** at [http://localhost:3000](http://localhost:3000).
@@ -79,6 +81,6 @@ This project uses Docker Compose to build and run both the frontend and backend 
 
 To stop and remove the containers, use the following command:
 
-```bash
-docker-compose down
-```
+   ```bash
+   docker compose -f docker-compose.dev.yml down
+   ```
