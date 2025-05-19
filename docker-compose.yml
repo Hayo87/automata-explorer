@@ -9,7 +9,7 @@ services:
       - app-network
 
   backend:
-      image: hayo87/automata-explorer-backend:latest
+    image: hayo87/automata-explorer-backend:latest
     ports:
       - "8080:8080"
     networks:
