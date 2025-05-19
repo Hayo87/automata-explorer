@@ -49,11 +49,11 @@ jobs:
       # Step 7: Build and push backend Docker image (only if tests pass)
       - name: Build and push backend image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend ./backend
-          docker push ${{ secrets.DOCKER_USERNAME }}/backend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/automata-explorer-backend ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/automata-explorer-backend
 
       # Step 8: Build and push frontend Docker image
       - name: Build and push frontend image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend ./frontend
-          docker push ${{ secrets.DOCKER_USERNAME }}/frontend
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/automata-explorer-frontend ./frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/automata-explorer-frontend
