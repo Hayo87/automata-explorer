@@ -1,6 +1,7 @@
 services:
   frontend:
-    image: hayo87/automata-explorer-frontend:latest
+    build:
+      context: ./frontend
     ports:
       - "3000:80"
     depends_on:
@@ -10,7 +11,7 @@ services:
 
   backend:
     build:
-      image: hayo87/automata-explorer-backend:latest
+      context: ./backend
     ports:
       - "8080:8080"
     networks:

@@ -48,10 +48,11 @@ jobs:
       - name: Build and push backend image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/automata-explorer-backend ./backend
-          docker push ${{ secrets.DOCKER_USERNAME }}/backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/automata-explorer-backend
 
       # Step 8: Build and push frontend Docker image
       - name: Build and push frontend image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/automata-explorer-frontend ./frontend
-          docker push ${{ secrets.DOCKER_USERNAME }}/frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/automata-explorer-frontend
+
