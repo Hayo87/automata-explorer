@@ -24,13 +24,9 @@ import io.github.Hayo87.domain.model.Mealy;
 import io.github.Hayo87.domain.model.MealyCombiner;
 import io.github.Hayo87.domain.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.domain.rules.LabelUtils;
-import io.github.Hayo87.domain.rules.ProcessingModel.Stage;
-import io.github.Hayo87.domain.rules.ProcessingModel.SubType;
-import io.github.Hayo87.domain.rules.ProcessingModel.Type;
 import io.github.Hayo87.dto.BuildDTO;
 import io.github.Hayo87.dto.BuildDTO.LabelEntry;
 import io.github.Hayo87.dto.BuildDTO.LabelType;
-import io.github.Hayo87.dto.ProcessingActionDTO;
 
 @Component
 public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
@@ -84,13 +80,8 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
         builder.setDiffAutomatonTransitionPropertyCombiner(new MealyCombiner());
         var comparator = builder.createComparator();
 
-        // First level matching
-        var result = comparator.compare(reference, subject);
-          
-        // Second level matching(merger)
-        List<ProcessingActionDTO> action = List.of(new ProcessingActionDTO(Stage.POST, Type.MERGER, SubType.INPUT, 0, null, null));
-
-        return applyProcessing(result, action);
+        // Return matching result
+        return comparator.compare(reference, subject);
     }
  
     @Override
