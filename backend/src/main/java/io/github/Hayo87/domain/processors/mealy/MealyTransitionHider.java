@@ -14,7 +14,6 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
 import io.github.Hayo87.domain.handlers.AbstractDiffHandler.ActionKey;
 import io.github.Hayo87.domain.model.Mealy;
-import io.github.Hayo87.domain.model.MergedMealy;
 import io.github.Hayo87.domain.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.domain.rules.ProcessingModel.SubType;
 import io.github.Hayo87.domain.rules.ProcessingModel.Type;
@@ -42,12 +41,12 @@ public class MealyTransitionHider implements DiffAutomatonProcessor<Mealy> {
 
         switch (subtype) {
             case INPUT -> {
-                extract = mealy -> List.of(mealy.input());
+                extract = mealy -> List.of(mealy.getInput().getProperty());
             }
             case OUTPUT -> {
-                extract = mealy -> (mealy instanceof MergedMealy merged)
-                    ? List.of(merged.output(), merged.addedOutput())     
-                    : List.of(mealy.output());
+                extract = mealy -> mealy.getOutput().stream()
+                    .map(DiffProperty::getProperty)
+                    .toList();
             }
             default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
         }

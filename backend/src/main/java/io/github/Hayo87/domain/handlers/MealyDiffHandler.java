@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,6 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
 import io.github.Hayo87.domain.model.Mealy;
 import io.github.Hayo87.domain.model.MealyCombiner;
-import io.github.Hayo87.domain.model.MergedMealy;
 import io.github.Hayo87.domain.processors.DiffAutomatonProcessor;
 import io.github.Hayo87.domain.rules.LabelUtils;
 import io.github.Hayo87.domain.rules.ProcessingModel.Stage;
@@ -69,7 +69,7 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
             automaton.addTransition(
                 new Transition<>(
                     stateMap.get(source),
-                    new DiffProperty<>(new Mealy(inputLabel, outputLabel), diffKind),
+                    new DiffProperty<>(new Mealy(inputLabel, outputLabel, diffKind), diffKind),
                     stateMap.get(target)
                 )
             );
@@ -120,9 +120,9 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
                 transition.getSource().getId(), 
                 transition.getTarget().getId(), 
                 new BuildDTO.EdgeAttributes(
-                    (mealy instanceof MergedMealy)? "COMBINED": transition.getProperty().getDiffKind().toString(),
+                    (mealy.isDualOutput())? "COMBINED": transition.getProperty().getDiffKind().toString(),
                     mealy.toString(), 
-                    toLabelEntries(mealy , transition.getProperty().getDiffKind())
+                    toLabelEntries(mealy)
                 ));
             })           
             .toList();
@@ -133,22 +133,20 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
     /**
      * Helper method to build the label entries.
      * @param mealy the mealy property
-     * @param diffkind the diffkind for the property
      * @return list of label entries
      */
-    private List<LabelEntry> toLabelEntries(Mealy mealy, DiffKind diffkind){
-        if(mealy instanceof MergedMealy merged) {
-            return List.of(
-                new BuildDTO.LabelEntry(LabelType.INPUT, merged.input(), DiffKind.UNCHANGED.toString()),
-                new BuildDTO.LabelEntry(LabelType.OUTPUT, merged.output(), DiffKind.REMOVED.toString()),
-                new BuildDTO.LabelEntry(LabelType.OUTPUT, merged.addedOutput(), DiffKind.ADDED.toString())
-            );
+    private List<LabelEntry> toLabelEntries(Mealy mealy) {
 
-        } else {
-            return List.of(
-                new BuildDTO.LabelEntry(LabelType.INPUT, mealy.input(), diffkind.toString()),
-                new BuildDTO.LabelEntry(LabelType.OUTPUT, mealy.output(), diffkind.toString())
-            );
-        }
+        List<LabelEntry> inputEntry = List.of(new LabelEntry(
+                                        LabelType.INPUT, 
+                                        mealy.getInput().getProperty(), 
+                                        mealy.getInput().getDiffKind().toString()));
+
+        List<LabelEntry> outputEntries = mealy.getOutput().stream()
+            .map(o -> new LabelEntry(LabelType.OUTPUT, o.getProperty(), o.getDiffKind().toString()))
+            .toList();
+        
+        return Stream.concat(inputEntry.stream(), outputEntries.stream()).toList();    
     }
 }
+

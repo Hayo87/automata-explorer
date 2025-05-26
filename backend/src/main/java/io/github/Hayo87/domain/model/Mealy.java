@@ -1,5 +1,12 @@
 package io.github.Hayo87.domain.model;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
+import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
+
 import io.github.Hayo87.domain.rules.LabelUtils;
 
 /**
@@ -8,23 +15,45 @@ import io.github.Hayo87.domain.rules.LabelUtils;
  * <p> This record can be used a transition property in {@code DiffAutomaton<Mealy>} </p>
  * 
  * @param input the input for the transition
- * @param output, the output for the transition
+ * @param outputs, the outputs for the transition
  */
 public class Mealy {
-    private final String input;
-    private final String output;
+    DiffProperty<String> input;
+    Set<DiffProperty<String>> output;
 
-    public Mealy(String input, String output) {
+    public Mealy(DiffProperty<String> input, Set<DiffProperty<String>> output) {
         this.input = input;
         this.output = output;
     }
 
-    public String input(){
+    public Mealy(DiffProperty<String> input, DiffProperty<String> output) {
+        this(input, new LinkedHashSet<>());
+        this.output.add(output);
+    }
+
+    public Mealy(String input, String output, DiffKind diffKind) {
+        this(new DiffProperty<>(input, diffKind), new LinkedHashSet<>());
+        this.output.add(new DiffProperty<>(output, diffKind));
+    }
+
+    public DiffProperty<String> getInput(){
         return input;
     }
 
-    public String output() {
+    public  Set<DiffProperty<String>> getOutput() {
         return output; 
+    }
+
+    public void setInput(DiffProperty<String> newInput){
+        this.input = newInput;
+    }
+
+    public void setOutput(Set<DiffProperty<String>> newOutput){
+        this.output = newOutput;
+    }
+
+    public boolean isDualOutput() {
+        return output.size() > 1;
     }
 
     /**
@@ -32,6 +61,20 @@ public class Mealy {
      */
     @Override
     public String toString() {
-        return LabelUtils.build(input, output);
+        String inputString = input.getProperty();
+        String outputString;
+
+        if(!isDualOutput()) {
+            outputString = output.stream()
+                .findFirst()
+                .map(DiffProperty:: getProperty)
+                .orElse("outputString"); 
+        }
+        else {
+            outputString = output.stream()
+                .map(p -> p.getProperty() + " [" + Character.toUpperCase(p.getDiffKind().name().charAt(0))+ "]")
+                .collect(Collectors.joining(" , "));
+        }
+        return LabelUtils.build(inputString, outputString);
     } 
 }

@@ -1,16 +1,12 @@
 package io.github.Hayo87.domain.processors.mealy;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.github.tno.gltsdiff.glts.Transition;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
-import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStateProperty;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
 import io.github.Hayo87.domain.handlers.AbstractDiffHandler.ActionKey;
@@ -41,41 +37,31 @@ public class SynonymRewriter implements DiffAutomatonProcessor<Mealy> {
         List<String> synonyms = action.values();
         SubType subtype = action.subtype();
 
-        Function<Mealy, String> extract;
-        BiFunction<Mealy, String, Mealy> replace;
 
-        switch (subtype) {
-            case INPUT -> {
-                extract = mealy -> mealy.input();
-                replace = (old, newVal) -> new Mealy(newVal, old.output());
-            }
-            case OUTPUT -> {
-                extract = mealy -> mealy.output();
-                replace = (old, newVal) -> new Mealy(old.input(), newVal);
-            }
-            default -> throw new IllegalStateException("Unexpected subtype: " + subtype);
-        }
-
-        List<Transition<DiffAutomatonStateProperty, DiffProperty<Mealy>>> toRemove = new ArrayList<>();
-        
         // Check all transitions, replace if needed
         for (var t : diffAutomaton.getTransitions()) {
-            Mealy oldLabel = t.getProperty().getProperty();
-            String currentValue = extract.apply(oldLabel);
-        
-            if (synonyms.contains(currentValue)) {
-                Mealy newLabel = replace.apply(oldLabel, LabelUtils.writeSynonymLabel(name));
+            Mealy m = t.getProperty().getProperty();
 
-                DiffProperty<Mealy> newProp = new DiffProperty<>(newLabel, t.getProperty().getDiffKind());
-        
-                diffAutomaton.addTransition(t.getSource(), newProp, t.getTarget());
-                toRemove.add(t);
+            // Input case
+            if(subtype == SubType.INPUT && synonyms.contains(m.getInput().getProperty())) {
+                m.setInput(new DiffProperty<>(name, m.getInput().getDiffKind()));
+            }
+
+            // Output case
+            if(subtype== SubType.OUTPUT) {
+                boolean hasMatch = m.getOutput().stream().anyMatch(o -> synonyms.contains(o.getProperty()));
+
+                if(hasMatch){
+                    Set<DiffProperty<String>> newOutputs = m.getOutput().stream()
+                        .map(o -> synonyms.contains(o.getProperty())
+                            ? new DiffProperty<>(LabelUtils.writeSynonymLabel(name), o.getDiffKind())
+                            : o)
+                        .collect(Collectors.toSet());  
+
+                    m.setOutput(newOutputs);
+                }
             }
         }
-        // Remove old transitions
-        toRemove.forEach(diffAutomaton::removeTransition);
-
         return diffAutomaton;
     }
 }
-
