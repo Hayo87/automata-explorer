@@ -1,385 +1,379 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  
-  color: #213547; 
-  background-color: #ffffff;
-  
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* 
+  index.css
+  Global styles for the Automata Explorer
+*/
 
-body {
-  background-color: #ffffff; 
-  color: #213547; 
-  margin: 0;
-}
+/* Defaults and base styling */
+  :root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    
+    color: #213547; 
+    background-color: #ffffff;
+    
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-a {
-  font-weight: 500;
-  color: #007bff; 
-  text-decoration: inherit;
-}
-a:hover {
-  color: #0056b3;
-}
+  body {
+    background-color: #ffffff; 
+    color: #213547; 
+    margin: 0;
+  }
 
-h1 {
-  font-size: 2.5rem;
-  line-height: 1.1;
-  color: #333; 
-}
+  a {
+    font-weight: 500;
+    color: #007bff; 
+    text-decoration: inherit;
+  }
 
-* {
-  caret-color: transparent;
-  user-select: none;        
-}
+  a:hover {
+    color: #0056b3;
+  }
 
-input, textarea, select, button {
-  caret-color: auto;
-  user-select: text;
-}
+  h1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+    color: #333; 
+  }
 
-/* Visualization page styling */
+  * {
+    caret-color: transparent;
+    user-select: none;        
+  }
 
-.page-container {
-  display: flex;
-  height: 100vh;
-  flex-direction: column;
-  flex: 1 1 auto; 
-  overflow: hidden;
-}
+  input, textarea, select, .button {
+    caret-color: auto;
+    user-select: text;
+  }
 
-.content-container {
-  display: flex;
-  flex: 1 1 auto; 
-  flex-direction: row;
-  flex-grow: 1;
-  overflow: hidden;
-}
+/* Base elements */
+  .button {
+    caret-color: transparent !important;
+    user-select: none !important;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    font-family: inherit;
+    background-color: #4CAF50; 
+    color: whitesmoke;
+    cursor: pointer;
+    transition: background-color 0.25s;
+    align-items: center;
+    justify-content: center;
+    display: inline-block;
+  }
 
-.graph-area {
-  flex: 1 1 auto; 
-  min-width: 0;   
-  min-height: 0; 
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.small-logo {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 250px; 
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.8);
-  border-top-right-radius: 8px; 
-}
-
-.expand-collapse-canvas {
-  display: none !important;
-}
+  .button:hover {
+    background-color: #388E3C; 
+  }
+  .button:focus,
+  .button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+  }
 
 /* Upload page styling */
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 10px 20px;
-  font-size: 1rem;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #4CAF50; 
-  color: white;
-  cursor: pointer;
-  transition: background-color 0.25s;
-}
-button:hover {
-  background-color: #388E3C; 
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
+  .upload-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    gap: 40px; 
+    width: 100%;
+    max-width: 800px;
+  }
 
-.button {
-  margin-top: 30px;
-  padding: 12px 24px;
-  background-color: #4CAF50; 
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-.button:hover {
-  background-color: #388E3C;
-}
+  .button--upload {
+    margin-top: 30px;
+    padding: 12px 24px;
+  }
 
-.upload-container {
-  display: flex;
-  justify-content: center; 
-  align-items: center; 
-  gap: 40px; 
-  width: 100%;
-  max-width: 800px;
-}
+  .logo {
+    width: 550px; 
+    height: auto; 
+    display: block;
+    margin: 0 auto 20px auto;
+  }
 
+  .drag-drop-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
 
-.logo {
-  width: 550px; 
-  height: auto; 
-  display: block;
-  margin: 0 auto 20px auto;
-}
+  .drag-drop-header {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 10px;
+  }
 
-.drag-drop-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-.drag-drop-header {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 10px;
-}
-.drop-zone {
-  width: 300px;
-  height: 150px;
-  min-height: 150px;
-  border: 2px dashed #ccc;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  cursor: pointer;
-  transition: border-color 0.3s, background-color 0.3s;
-  text-align: center;
-  background-color: #ffffff;
-}
-.drop-zone.drag-over {
-  border-color: #4CAF50;
-  background-color: #f9f9f9;
-}
-.drop-text {
-  color: #555;
-  font-size: 1rem;
-  padding: 0 10px;
-}
-.hidden-input {
-  display: none;
-}
-.file-label {
-  color: #4CAF50;
-  font-weight: bold;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 0.9rem;
-  margin-top: 10px;
-}
+  .drop-zone {
+    width: 300px;
+    height: 150px;
+    min-height: 150px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    cursor: pointer;
+    transition: border-color 0.3s, background-color 0.3s;
+    text-align: center;
+    background-color: #ffffff;
+  }
 
+  .drop-zone.drag-over {
+    border-color: #4CAF50;
+    background-color: #f9f9f9;
+  }
 
-.upload-page-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center; 
-  align-items: center;     
-  height: 100vh;           
-  width: 100%;
-}
+  .drop-text {
+    color: #555;
+    font-size: 1rem;
+    padding: 0 10px;
+  }
 
-/* Sidebar styling */
+  .hidden-input {
+    display: none;
+  }
 
-.sidebar {
-  width: 60px;
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.8) !important;
-  padding: 10px ;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  gap: 5px;
-}
+  .file-label {
+    color: #4CAF50;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
 
-.sidebar-button {
-  width: 40;
-  height: 40px;
-  min-width: 60px;
-  min-height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  font-size: 18px;
-  font-weight: bold;
-  color: whitesmoke;
-  border: none;
-  padding: none;
-  cursor: pointer;
-  font-size: 16px;
-  border-radius: 8%;
-  background: #4CAF50;
-}
+  .upload-page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;     
+    height: 100vh;           
+    width: 100%;
+  }
 
+  /* Toggle upload page */
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
 
-/* File name box styling */
+  .toggle-input {
+    display: none;
+  }
 
-.bottom-left-info {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  background: rgba(255, 255, 255, 0.8); /* Semi-transparent background for readability */
-  padding: 5px;
-  font-size: 0.7rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  z-index: 1000; 
-  border-top-right-radius: 8px;
-}
+  .toggle-slider {
+    width: 40px;
+    height: 20px;
+    background-color: #ccc;
+    border-radius: 9999px;
+    position: relative;
+    transition: background-color 0.2s ease-in-out;
+  }
 
-.reference-file-name {
-  color: red; 
-}
-.subject-file-name {
-  color: green;
-}
+  .toggle-slider::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease-in-out;
+  }
 
-.sidebar-label {
-  font-size: 0.7rem;
-  color: #888;
-  margin: 12px 0 4px 0;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-align: center;      
-  width: 100%;          
-}
+  .toggle-input:checked + .toggle-slider {
+    background-color: #4CAF50;
+  }
 
-.sidebar-button.active {
-  background-color: #9fc4a1 !important;
-  color: white;
-  border: 2px solid black;
-}
+  .toggle-input:checked + .toggle-slider::before {
+    transform: translateX(20px);
+  }
 
+/* Visualization page */
 
-/* Ensure the modal root exists and is on top */
-#modal-root {
-  position: relative;
-  z-index: 10000;
-}
+  .page-container {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    flex: 1 1 auto; 
+    overflow: hidden;
+  }
 
-/* Overlay styling for the modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10000;
-}
+  .content-container {
+    display: flex;
+    flex: 1 1 auto; 
+    flex-direction: row;
+    flex-grow: 1;
+    overflow: hidden;
+  }
 
-/* Content container styling (provided by react-modal) */
-.modal-content {
-  position: relative;
-  background: none;
-  border: none;
-  padding: 0;
-  outline: none;
-  overflow: visible;
-}
+  .graph-area {
+    flex: 1 1 auto; 
+    min-width: 0;   
+    min-height: 0; 
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #ffffff;
+    overflow: hidden;
+  }
 
-/* Inner modal content styling */
-.modal-inner-content {
-  background-color: white;
-  border: 1px solid #333;
-  padding: 20px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  width: 95%;
-  max-height: 80%;
-  overflow-y: hidden;
-  cursor: move;
-  position: relative;
-  z-index: 10001;
-  line-height: 1.0;
-}
+  .bottom-left-info {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    font-size: 0.7rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 1000; 
+    border-top-right-radius: 8px;
+  }
 
-/* Modal footer styling */
-.modal-footer {
-  text-align: center;
-  margin-top: 10px;
-}
+  .reference-file-name {
+    color: red; 
+  }
+  .subject-file-name {
+    color: green;
+  }
+
+  .small-logo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 250px; 
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.8);
+    border-top-right-radius: 8px; 
+  }
+
+  .expand-collapse-canvas {
+    display: none !important;
+  }
+
+  .button--sidebar {
+    width: 60;
+    height: 40px;
+    min-width: 60px;
+    min-height: 40px;
+    font-size: 16px;
+    padding: 0;
+  }
+
+  .button--sidebar.active {
+    background-color: #9fc4a1 !important;
+    border: 2px solid black;
+  }
+
+  .sidebar {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.8) !important;
+    padding: 10px ;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    gap: 5px;
+  }
 
 
-/* BuildInfo Modal styling */
-.buildInfo{
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
+  .sidebar-label {
+    font-size: 0.7rem;
+    color: #888;
+    margin: 12px 0 4px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;      
+    width: 100%;          
+  }
 
-.buildInfo-column {
-  flex: 1;
-  min-width: 280px;
-  line-height: 0.5;
-}
 
-.percentage {
-  font-size: 5rem;
-  font-weight: bold;
-  text-align: center;
-}
+/* Modal */
 
-/* Toggle upload page */
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
+  /* Ensure the modal root exists and is on top */
+  #modal-root {
+    position: relative;
+    z-index: 10000;
+  }
 
-.toggle-input {
-  display: none;
-}
+  /* Overlay styling for the modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+  }
 
-.toggle-slider {
-  width: 40px;
-  height: 20px;
-  background-color: #ccc;
-  border-radius: 9999px;
-  position: relative;
-  transition: background-color 0.2s ease-in-out;
-}
+  /* Content container styling*/
+  .modal-content {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 0;
+    outline: none;
+    overflow: visible;
+  }
 
-.toggle-slider::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 16px;
-  height: 16px;
-  background-color: white;
-  border-radius: 50%;
-  transition: transform 0.2s ease-in-out;
-}
+  /* Inner modal content styling */
+  .modal-inner-content {
+    background-color: white;
+    border: 1px solid #333;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    width: 95%;
+    max-height: 80%;
+    overflow-y: hidden;
+    cursor: move;
+    position: relative;
+    z-index: 10001;
+    line-height: 1.0;
+  }
 
-.toggle-input:checked + .toggle-slider {
-  background-color: #4CAF50;
-}
+  /* Modal footer styling */
+  .modal-footer {
+    text-align: center;
+    margin-top: 10px;
+  }
 
-.toggle-input:checked + .toggle-slider::before {
-  transform: translateX(20px);
-}
+
+  /* BuildInfo Modal styling */
+  .buildInfo{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .buildInfo-column {
+    flex: 1;
+    min-width: 280px;
+    line-height: 0.5;
+  }
+
+  .percentage {
+    font-size: 5rem;
+    font-weight: bold;
+    text-align: center;
+  }

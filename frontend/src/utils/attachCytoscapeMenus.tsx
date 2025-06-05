@@ -1,6 +1,13 @@
 import cytoscape from "cytoscape";
 import ElementInfo from '../components/ElementContent';
 
+/**
+ * @function attachCytoscapeMenus
+ * 
+ * Attaches the context menu to the cyInstance using the ctxmenu extension. Enables custom actions when 
+ * right clicking nodes or edges.  
+ */
+
 export function attachCytoscapeMenus(cyInstance: cytoscape.Core, openModal: (el: any) => void) {
       if (!cyInstance) return;
    

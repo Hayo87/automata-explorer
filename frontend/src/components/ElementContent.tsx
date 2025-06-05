@@ -1,5 +1,11 @@
 import cytoscape from 'cytoscape';
 
+/**
+ * @file ElementContent.tsx
+ * 
+ * Provides content used in the element information modal based on the element type: node or edge.
+ */
+
 interface ElementInfoProps {
   element: cytoscape.SingularElementReturnValue;
 }

@@ -1,5 +1,12 @@
 import type cytoscape from 'cytoscape';
 
+/**
+ * @file cytoscapeStyles.ts
+ *
+ * Defines and exports the array of Cytoscape stylesheet objects used for graph visualization styling.
+ * Includes node, edge, and state-based style rules.
+ */
+
 const cytoscapeStyles: cytoscape.Stylesheet[] = [
         {
           selector: "node",

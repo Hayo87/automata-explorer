@@ -2,6 +2,13 @@ import { useState } from "react";
 import { requestSession, requestBuild, requestSessionClose } from "../api/SessionApi";
 import { ProcessAction, ProcessOption } from '../api/RequestResponse';
 
+/**
+ * @file useSession.ts
+ * 
+ * Custom React hook for managing the session lifecycle with the backend. Handle starting, building and 
+ * terminating sessions, and provides the session state. 
+ */
+
 export const useSession = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [data, setData] = useState<any>(null);

@@ -1,20 +1,25 @@
 import React, { useEffect, useState, useRef, useContext} from 'react';
 import { useNavigate, useLocation, useParams  } from "react-router-dom";
 import { ModalContext } from '../App';
-import '../index.css';
-import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components/CytoscapeVisualization";
+import CytoscapeVisualization, { CytoscapeVisualizationRef } from "../components/CytoscapeCanvas";
 import { useSession} from '../hooks/useSession';
 import AboutContent from '../components/AboutContent';
 import ActionModal from '../components/ActionContent';
 import BuildInfo from '../components/BuildContent';
 import { ProcessAction, ProcessOption} from '../api/RequestResponse';
 
+/**
+ * @file VisualizationPage.tsx
+ * 
+ * Page component that allows users to explore the difference machine visualization. 
+ */
+
 const VisualizationPage: React.FC = () => {
   // Pull sessionId from URL parameter
   const { sessionId} = useParams<{ sessionId: string }>();
   
   // Get the state from navigate parameters
-  const { reference, subject, options } = (useLocation().state || {}) as {
+  const { reference, subject, options } = (useLocation().state ?? {}) as {
     reference: string;
     subject: string;
     options: ProcessOption[];
@@ -56,6 +61,7 @@ const VisualizationPage: React.FC = () => {
   };
 
   const openActionModal = () => {
+    if (!options) return; 
     openModal(
       <ActionModal
         setActions={activeActions}
@@ -127,7 +133,7 @@ const VisualizationPage: React.FC = () => {
     if (restore) {
       cyVizRef.current.unCollapseEdges();
     }
-    await cyVizRef.current.exportPDF(reference, subject);
+    cyVizRef.current.exportPDF(reference, subject);
 
     if (restore) {
       cyVizRef.current.collapseEdges();
@@ -135,15 +141,13 @@ const VisualizationPage: React.FC = () => {
   };
 
   const handleExit = async () => {
-    try {
-      if(sessionId){
-        await terminateSession(sessionId);
-      }
-    } catch (error) {
-      console.error("Failed to close session:", error);
-    } finally {
-      navigate("/");
+    if (!cyVizRef.current) return;
+    cyVizRef.current.clearVisualHelpers();
+
+    if(sessionId){
+      await terminateSession(sessionId);
     }
+    navigate("/");
   };
 
   // Trigger build including Modals
@@ -160,10 +164,19 @@ const VisualizationPage: React.FC = () => {
 
   // Update activeActions after build response 
   useEffect(() => {
-    if (data && data.filters) {
-      setActiveActions(data.filters);
-    }
+    setActiveActions(data?.filters?? []);
   }, [data]);
+
+  // Determine what to render bases on loading state and available data. 
+  let content: React.ReactNode;
+  if(loading) {
+    content = <p style={{ textAlign: "center" }} />;
+  } else if (data) {
+    content = (<CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
+    );
+  } else {
+    content = <p style={{ textAlign: "center" }}>No data available</p>
+  }
 
   return (
     <div className="page-container">
@@ -171,75 +184,67 @@ const VisualizationPage: React.FC = () => {
       
       <div className="content-container">
         <main className="graph-area">
-          {loading ? (
-            <p style={{ textAlign: "center" }}></p>
-          ) : data ? (
-            <CytoscapeVisualization ref={cyVizRef} data={data} layout={currentLayout} openModal={openModal} />
-          ) : (
-            <p style={{ textAlign: "center" }}>No data available</p>
-
-          )}
+          {content}
         </main>
 
-        <aside className="sidebar">
-        
+        <aside className="sidebar">     
           {/* Layout Section */}
           <p className="sidebar-label">Layout</p>
-          <button className={`sidebar-button ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre" onClick={() => setCurrentLayout("dagre")}>
+          <button className={`button button--sidebar ${currentLayout === "dagre" ? "active" : ""}`} title="Dagre" onClick={() => setCurrentLayout("dagre")}>
             <span className="material-icons">swap_horiz</span>
           </button> 
-          <button className={`sidebar-button ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular" onClick={() => setCurrentLayout("avsdf")}>
+          <button className={`button button--sidebar ${currentLayout === "avsdf" ? "active" : ""}`} title="Circular" onClick={() => setCurrentLayout("avsdf")}>
             <span className="material-icons">radio_button_unchecked</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "grid" ? "active" : ""}`} title="Grid" onClick={() => setCurrentLayout("grid")}>
+          <button className={`button button--sidebar ${currentLayout === "grid" ? "active" : ""}`} title="Grid" onClick={() => setCurrentLayout("grid")}>
             <span className="material-icons">grid_view</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
+          <button className={`button button--sidebar ${currentLayout === "breadthfirst" ? "active" : ""}`} title="Breadthfirst" onClick={() => setCurrentLayout("breadthfirst")}>
             <span className="material-icons">park</span>
           </button>
-          <button className={`sidebar-button ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="Elk Layered" onClick={() => setCurrentLayout("elk")}>
-            <span className="material-icons">park</span>
+          <button className={`button button--sidebar ${currentLayout === "cose-bilkent" ? "active" : ""}`} title="Elk Layered" onClick={() => setCurrentLayout("elk")}>
+            <span className="material-icons">layers</span>
           </button>
 
           {/* Filter Section */}
           <p className="sidebar-label">Filter</p>
-          <button className={`sidebar-button ${isCollapsed ? "active" : ""}`} title="Toggle collapse filter" onClick={handleCollapse}>
+          <button className={`button button--sidebar ${isCollapsed ? "active" : ""}`} title="Toggle collapse filter" onClick={handleCollapse}>
             <span className="material-icons"> {isCollapsed ? "unfold_more" : "unfold_less"} </span>
           </button>
-          <button className={`sidebar-button ${loopsHidden ? "active" : ""}`} title="Toggle Loop filter" onClick={handleLoop}>
+          <button className={`button button--sidebar ${loopsHidden ? "active" : ""}`} title="Toggle Loop filter" onClick={handleLoop}>
             <span className="material-icons"> {loopsHidden ? "sync_disabled" : "sync"} </span>
           </button>
-          <button className={`sidebar-button ${!refHidden ? "" : "active"}`} title="Reference on/off" onClick={handleRef} >
+          <button className={`button button--sidebar ${!refHidden ? "" : "active"}`} title="Reference on/off" onClick={handleRef} >
             {refHidden ? <s>REF</s> : "REF"}
           </button>
-          <button className={`sidebar-button ${!subjHidden ? "" : "active"}`} title="Subject on/off" onClick={handleSubj} >
+          <button className={`button button--sidebar ${!subjHidden ? "" : "active"}`} title="Subject on/off" onClick={handleSubj} >
             {subjHidden ? <s>SUB</s> : "SUB"}
           </button>
 
           {/* Modify Section */}
           <p className="sidebar-label">Modify</p>
-          <button className="sidebar-button" title="Open filters" onClick={openActionModal}>
+          <button className="button button--sidebar" title="Open filters" onClick={openActionModal}>
             <span className="material-icons">edit</span>
           </button>
 
 
           {/* Export Section */}
           <p className="sidebar-label">Export</p>
-          <button className="sidebar-button" title="Export as PNG image" onClick={handlePNGExport}>
+          <button className="button button--sidebar" title="Export as PNG image" onClick={handlePNGExport}>
             <span className="material-icons">image</span>
           </button>
-          <button className="sidebar-button" title="Export as PDF report" onClick = {handlePDFExport}>
+          <button className="button button--sidebar" title="Export as PDF report" onClick = {handlePDFExport}>
             <span className="material-icons">picture_as_pdf</span>
           </button>
 
           {/* About and Exit section */}
           <div style={{ marginTop: 'auto' }}>
           <p className="sidebar-label">About</p>
-            <button className="sidebar-button" title="About this app" onClick={() => openModal(<AboutContent/>)}>
+            <button className="button button--sidebar" title="About this app" onClick={() => openModal(<AboutContent/>)}>
               <span className="material-icons">info</span>
             </button>
             <p className="sidebar-label">Exit</p>
-            <button className="sidebar-button" title="Exit this visualization" onClick={handleExit}>
+            <button className="button button--sidebar" title="Exit this visualization" onClick={handleExit}>
               <span className="material-icons">exit_to_app</span>
             </button>
           </div>

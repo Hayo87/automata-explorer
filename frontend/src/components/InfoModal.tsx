@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
 
+/**
+ * @file InfoModal.txs
+ * 
+ * Provides a general purpose modal implementation to display informational content. This modal can receive different content 
+ * and can be reused for different modal types.
+ */
+
 interface InfoModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -9,7 +16,7 @@ interface InfoModalProps {
   showCloseButton?: boolean;
 }
 
-export function InfoModal({ isOpen, onClose, content, contentKey, showCloseButton= true }: InfoModalProps) {
+export function InfoModal({ isOpen, onClose, content, contentKey, showCloseButton= true }: Readonly<InfoModalProps>) {
   useEffect(() => {
     if (!isOpen) return;
     const disableContextMenu = (e: MouseEvent) => {
@@ -36,13 +43,14 @@ export function InfoModal({ isOpen, onClose, content, contentKey, showCloseButto
       <div onContextMenu={(e) => {
         e.preventDefault();
         e.stopPropagation();
-      }}>
+      }}
+      >
         <DraggableContainer>
           <div className="modal-inner-content">
             <div key = {contentKey}>{content}</div>
             <div className="modal-footer">
             {showCloseButton && (
-              <button onClick={onClose}>Close</button>
+              <button className='button' onClick={onClose}>Close</button>
             )}</div>
           </div>
         </DraggableContainer>

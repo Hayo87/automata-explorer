@@ -4,6 +4,12 @@ import DragAndDrop from "../components/DragAndDrop";
 import { useSession } from "../hooks/useSession"; 
 import "../index.css";
 
+/**
+ * @file UploadPage.tsx
+ * 
+ * Page component that allows users to upload the reference and subject files and initiate a session for comparison. 
+ */
+
 const UploadPage: React.FC = () => {
   const { startSession, loading } = useSession(); 
   const [file1, setFile1] = useState<File | null>(null);
@@ -15,19 +21,15 @@ const UploadPage: React.FC = () => {
     if (!file1 || !file2) return;
 
     const selectedType: "STRING" | "MEALY" = parseAsMealy ? "MEALY" : "STRING";
-
-    try {
-      const {sessionId, processingOptions } = await startSession(file1, file2,selectedType);
-      if (sessionId) {
-        navigate(`/visualization/${sessionId}`, {
-          state: {
-            reference: file1?.name,
-            subject: file2?.name,
-            options: processingOptions,
-          }
-        });
-      }
-    } catch (error) {
+    const {sessionId, processingOptions } = await startSession(file1, file2,selectedType);
+    if (sessionId) {
+      navigate(`/visualization/${sessionId}`, {
+        state: {
+          reference: file1?.name,
+          subject: file2?.name,
+          options: processingOptions,
+        }
+      });
     }
   };
 
@@ -47,12 +49,13 @@ const UploadPage: React.FC = () => {
           checked={parseAsMealy}
           onChange={(e) => setParseAsMealy(e.target.checked)}
           className="toggle-input"
+          aria-label="Process as Mealy"
         />
         <span className="toggle-slider" />
       </label>
 
       {file1 && file2 && (
-        <button onClick={handleContinue} className="button" disabled={loading}>
+        <button onClick={handleContinue} className="button button--upload" disabled={loading}>
           {loading ? "Processing..." : "Continue"}
         </button>
       )}

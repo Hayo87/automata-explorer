@@ -1,6 +1,5 @@
 import { useEffect, useRef, useImperativeHandle, forwardRef } from "react";
 import cytoscape from "cytoscape";
-import Core from 'cytoscape';
 
 //hooks
 import useTransformGraph from "../hooks/useTransform";
@@ -23,6 +22,13 @@ import cytoscapeStyles from '../utils/cytoscapeStyles';
 import { attachExpandCollapse } from '../utils/attachContextCollapse';
 import {exportPDF} from '../utils/exportPdf';
 
+/**
+ * @file CytoscapeCanvas.tsx
+ *
+ * Renders the main graph visualization using Cytoscape.js. Handles layout selection, user interaction, styling, and events.
+ * Passes the Cytoscape instance to parent or util components when needed.
+ */
+
 // Register extensions 
 cytoscape.use( elk );
 cytoscape.use( avsdf );
@@ -31,6 +37,38 @@ cytoscape.use( cxtmenu );
 cytoscape.use(expandCollapse);
 cytoscape.use(popper(popperFactory));
 
+interface CytoscapeVisualizationProps {
+  data: BuildResponse;
+  layout: string;
+  openModal: (modalContent: any) => void;
+  onCy?: (cy: cytoscape.Core) => void;
+}
+
+// Public methods exposed via ref
+export interface CytoscapeVisualizationRef {
+  exportPNG: () => string;
+  exportPDF: (reference?: string, subject?:string) => void;
+  collapseEdges: () => void;
+  unCollapseEdges: () => void;
+  hideLoops: () => void;
+  unHideLoops: () => void;
+  showRef: () => void;
+  hideRef: () => void;
+  showSub: () => void;
+  hideSub: () => void;
+  getStats: () => Stats;
+  clearVisualHelpers: () => void;
+}
+
+// Interface for build stats 
+export interface Stats {
+  totalEdges: number;
+  totalNodes: number;
+  unchangedEdges: number;
+  combinedEdges: number;
+}
+
+// Creates and returns a tooltip instance for a given node
 function popperFactory(ref: VirtualElement, content: HTMLElement): Instance<Props> {
   const dummyDomEle = document.createElement('div');
 
@@ -48,35 +86,6 @@ function popperFactory(ref: VirtualElement, content: HTMLElement): Instance<Prop
     zIndex: 10,       
   });
   return tip;
-}
-
-interface CytoscapeVisualizationProps {
-  data: BuildResponse;
-  layout: string;
-  openModal: (modalContent: any) => void;
-  onCy?: (cy: Core) => void;
-}
-
-export interface CytoscapeVisualizationRef {
-  exportPNG: () => string;
-  exportPDF: (reference?: string, subject?:string) => void;
-  collapseEdges: () => void;
-  unCollapseEdges: () => void;
-  hideLoops: () => void;
-  unHideLoops: () => void;
-  showRef: () => void;
-  hideRef: () => void;
-  showSub: () => void;
-  hideSub: () => void;
-  getStats: () => Stats
-}
-
-// Interface for build stats 
-export interface Stats {
-  totalEdges: number;
-  totalNodes: number;
-  unchangedEdges: number;
-  combinedEdges: number;
 }
 
 const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVisualizationProps>(
@@ -161,19 +170,18 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     switch (layout) {
 
     case "dagre":
-      {
-        cyInstance.layout({ name: 'dagre', 
-                            fit:true, 
-                            nodeSep:60,
-                            edgeSep: 20,
-                            rankSep: 100,
-                            rankdir: 'TB',
-                            ranker: 'tight-tree',
-                            padding: 20,
-                            spacingFactor: 1.1,
-                            nodeDimensionsIncludeLabels: true,         
-                          }).run();
-      }
+        cyInstance.layout({ 
+          name: 'dagre', 
+          fit:true, 
+          nodeSep:60,
+          edgeSep: 20,
+          rankSep: 100,
+          rankdir: 'TB',
+          ranker: 'tight-tree',
+          padding: 20,
+          spacingFactor: 1.1,
+          nodeDimensionsIncludeLabels: true,         
+          }).run();
       break;  
 
     case "avsdf":
@@ -199,13 +207,11 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
       break;  
 
     case "breadthfirst": 
-      {
-        cyInstance.layout({ 
-          name: 'breadthfirst', 
-          roots: '.start',
-          directed: true,
+      cyInstance.layout({ 
+        name: 'breadthfirst', 
+        roots: '.start',
+        directed: true,
         }).run();
-      }
       break;
 
     default:
@@ -214,9 +220,9 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   }
   }, [layout]);
 
-
+  // Exposes internal functions via ref
   useImperativeHandle(ref, () => ({
-    exportPNG: () => cyRef.current?.png({ full: true, bg: "white" }) || "",
+    exportPNG: () => cyRef.current?.png({ full: true, bg: "white" }) ?? "",
   
     exportPDF: async (reference?: string, subject?: string) => {
        exportPDF(cyRef.current, reference, subject);  
@@ -324,6 +330,17 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         combinedEdges,
       };
       return stats;
+    },
+
+    clearVisualHelpers: () => {
+      const cy = cyRef.current;
+      if (!cy) return;
+      cy.nodes().forEach((ele: cytoscape.SingularElementReturnValue) => {
+        const tip = ele.scratch('__tippy');
+        tip?.destroy?.();
+        ele.removeScratch('__tippy');
+        ele.removeData('tooltip');
+      });
     }
 
   }));

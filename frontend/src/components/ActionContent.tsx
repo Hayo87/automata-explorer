@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { ProcessAction, ProcessOption } from "../api/RequestResponse";
 
+/**
+ * @file ActionContent.tsx
+ * 
+ * Provides and processes the content used in the action modal. It includes loading the correct processing options
+ * for the automata type, removing/adding actions and displaying the current actions applied including the order. 
+ */
+
 interface ActionModalProps {
   setActions: ProcessAction[];
   options: ProcessOption[];
   onProcess: (filters: ProcessAction[]) => void;
-  onClose?: () => void;
 }
 
 const ActionModal: React.FC<ActionModalProps> = ({
@@ -37,7 +43,6 @@ const ActionModal: React.FC<ActionModalProps> = ({
     setActions(appliedActions);
   }, [appliedActions]);
 
-
   const handleAdd = () => {
     // Extract inputs 
     const splitValues = valueInput
@@ -62,7 +67,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
     }
     console.log(newEntry);
 
-    // Add enrty to actions
+    // Add entry to actions
     setActions([...actions, newEntry]);
 
     // Reset the input fields
@@ -113,7 +118,8 @@ const ActionModal: React.FC<ActionModalProps> = ({
                 {filter.values!.join(', ')}
                 {' (Order: ' + filter.order + ')'}
               </span>
-              <button
+              <button 
+                className='button'
                 onClick={() => handleRemove(index)}
                 style={{
                   background: 'transparent',
@@ -138,7 +144,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
         {/* Stage dropdown*/}
         <select
           value={String(newAction.stage)}
-          onChange={(e) => setNewAction({...newAction, stage: e.target.value as ProcessAction['stage'] })}              
+          onChange={(e) => setNewAction({...newAction, stage: e.target.value})}              
         >
           {allStages.map(stage => (
             <option key={stage} value={stage}>{stage}</option>
@@ -148,7 +154,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
         {/* Type dropdown*/}
         <select
           value={newAction.type}
-          onChange={(e) => { setNewAction({...newAction, type: e.target.value as ProcessAction['type'] });
+          onChange={(e) => { setNewAction({...newAction, type: e.target.value});
             setValueInput('');
           }}
         >
@@ -159,7 +165,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
 
         {/* Subtype dropdown*/}
         <select
-          value={newAction.subtype || ''}
+          value={newAction.subtype ?? ''}
           onChange={(e) => setNewAction({ ...newAction, subtype: e.target.value as ProcessAction['subtype'] })}
         >
           {allSubtypes.map((sub) => (
@@ -171,7 +177,7 @@ const ActionModal: React.FC<ActionModalProps> = ({
         <input
           type="text"
           placeholder="Name"
-          value={newAction.name || ''}
+          value={newAction.name ?? ''}
           onChange={(e) => setNewAction({ ...newAction, name: e.target.value })}
           style={{ width: '160px' }}
         />
@@ -185,11 +191,11 @@ const ActionModal: React.FC<ActionModalProps> = ({
           style={{ width: '160px' }}
         />
 
-        <button onClick={handleAdd}>Add</button>
+        <button className='button' onClick={handleAdd}>Add</button>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px' }}>
-        <button onClick={handleProcess}>Process</button>
+        <button className='button' onClick={handleProcess}>Process</button>
       </div>
     </div>
   );
