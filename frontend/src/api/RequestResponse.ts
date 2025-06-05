@@ -1,3 +1,9 @@
+/**
+ * @file RequestResponse.ts
+ * 
+ * Defines the interfaces used for request and response messages with the backend.
+ */
+
 // Interfaces for sessions
 export interface SessionRequest{
   type: "MEALY" | "STRING";
@@ -62,7 +68,7 @@ export interface LabelEntry {
 }
 
 export interface ProcessAction {
-    stage: String,
+    stage: string,
     type: string; 
     subtype?: string;
     order: number;

@@ -1,6 +1,14 @@
 import { useMemo } from "react";
 import { BuildResponse} from '../api/RequestResponse';
 
+/**
+ * @file useTransform.ts
+ * 
+ * Custom react hook that maps backend data into frontend ready format. 
+ * @param backendData the rad backend data
+ * @returns Cytoscape compatible nodes and edges
+ */
+
 const useTransformGraph = (backendData: BuildResponse | null) => {
   return useMemo(() => {
     if (!backendData) return { nodes: [], edges: [] };

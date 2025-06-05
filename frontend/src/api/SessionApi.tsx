@@ -1,10 +1,16 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 import { SessionRequest, SessionResponse, ProcessAction, BuildRequest, BuildResponse } from './RequestResponse';
 import axios from "axios";
 
+/**
+ * @file SessionApi.tsx
+ * 
+ * Provides functions to communicate with the backend API. Includes utilities for starting/closing a session,
+ * sending files, receiving responses and error handling. 
+ */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 const api = axios.create({ baseURL: API_BASE_URL });
 
-// Set API error handeling (400,500) and error message format
+// Set API error handling (400,500) and error message format
 export const setGlobalErrorHandler = (onError: (msg: React.ReactNode) => void) => {
   api.interceptors.response.use(
     res => res,

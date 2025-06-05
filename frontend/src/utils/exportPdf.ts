@@ -3,6 +3,14 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import orderBy from 'lodash/orderBy';
 
+/**
+ * @function exportPDF
+ * 
+ * Exports the current Cytoscape graph as a PDF using jsPDF and jsPDF-AutoTable.
+ * Includes metadata like the reference and subject filenames.
+ * 
+ */
+
 export async function exportPDF(cyInstance: cytoscape.Core, reference= 'Ref', subject = 'Sub') {
     if (!cyInstance) return;
 

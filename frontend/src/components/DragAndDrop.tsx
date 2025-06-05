@@ -1,5 +1,10 @@
 import React, { useState } from "react";
-import "../index.css"; 
+
+/**
+ * @file DragAndDrop.tsx
+ * 
+ *  Component that implements a drag and drop area to upload input files. 
+ */
 
 interface DragAndDropProps {
   setFile: (file: File | null) => void;
@@ -47,7 +52,7 @@ const DragAndDrop: React.FC<DragAndDropProps> = ({ setFile, label }) => {
         onDrop={handleDrop}
       >
         <p className="drop-text">
-          {uploadedFile ? uploadedFile.name : "Drag and drop a file here, or click to select one"}
+          {uploadedFile ? uploadedFile.name : "Drag and drop a .dot file here, or click to select one"}
         </p>
         <input type="file" accept=".dot" onChange={handleFileSelect} className="hidden-input" id={label} />
         <label htmlFor={label} className="file-label">

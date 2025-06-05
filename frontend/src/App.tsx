@@ -1,9 +1,16 @@
 import { Routes, Route } from 'react-router-dom';
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useMemo, useState } from "react";
 import UploadPage from './pages/UploadPage';
 import VisualizationPage from './pages/VisualizationPage';
 import { setGlobalErrorHandler } from './api/SessionApi';
 import InfoModal from './components/InfoModal';
+
+/**
+ * @file App.tsx
+ *
+ * Root component of the app, defines global context providers and sets up routing
+ * for the main pages: upload and visualization. 
+ */
 
 export const ModalContext = createContext<{
   openModal: (content: React.ReactNode, showCloseButton?: boolean) => void;
@@ -38,8 +45,10 @@ const App = () => {
     });
   }, []);
 
+  const modalContextValue = useMemo(() => ({ openModal, closeModal }), [openModal, closeModal]);
+
   return (
-    <ModalContext.Provider value={{ openModal, closeModal }}>
+    <ModalContext.Provider value={ modalContextValue}>
   <Routes>
     <Route path="/" element={<UploadPage />} />
     <Route path="/visualization/:sessionId" element={<VisualizationPage />} />

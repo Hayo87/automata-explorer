@@ -1,4 +1,11 @@
-import { Stats } from "../components/CytoscapeVisualization";
+import { Stats } from "./CytoscapeCanvas";
+
+/**
+ * @file BuildContent.tsx
+ * 
+ * Provides and processes the content used in the build result modal. It includes loading the meta information as well as
+ * calculation of some simple build statistics. 
+ */
 
 interface BuildInfoProps {
   stats: Stats
