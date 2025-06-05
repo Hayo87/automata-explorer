@@ -1,7 +1,6 @@
 # Functionality
 This page describes the functionality provide by the **AutomataExplorer** by page. 
 
-
 ## Upload Page
 <img src="img/UploadPage.png" alt="Upload Page" width="400"/>
 
@@ -44,15 +43,14 @@ Adjust the visualization using processing actions which modify the inputs or out
 - `Value`: the value(s) for the action. 
 
 #### Export
-- Export the visualization as a `.pgn`file.
-- Export the comparison result as a pfd report with the match results, image and table with transitions per type. 
+- Export the visualization as a `.pgn` image file.
+- Export the comparison result as a `.pdf` report with the match results, an image and a structured tabular with the edges. 
 
 #### About
 Display the about information.
 
 #### Exit
 Exit the visualization and return to the upload page. 
-
 
 ### Context Menu 
 On right click on nodes or edges a [context menu](https://github.com/cytoscape/cytoscape.js-cxtmenu) is presented.

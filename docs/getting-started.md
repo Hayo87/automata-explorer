@@ -1,6 +1,5 @@
 
 # Getting Started
-
 The application consist of a a Spring Boot backend and a React frontend. The setup is dockerized for easy deployment and usage. This guide will help you to run the Automata Explorer using Docker for regular users as well as developers.
 
 ## 👤 For Users

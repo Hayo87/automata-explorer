@@ -23,7 +23,6 @@ AutomataExplorer/
 └── README.md             # Root for project documentation
 ```
 
-
 ## Backend
 The Spring Boot backend exposes its functionality via a RESTfull api allowing clients to interact over HTTP using JSON. 
 
@@ -37,10 +36,8 @@ The Spring Boot backend exposes its functionality via a RESTfull api allowing cl
 
 A detailed API description for the backend services with all the endpoints and messages can be found [here](/docs/api.md).
 
-
 ### Controller
 The `restcontoller` handles all incoming HTTP request and acts as an entry point for the backend application. In the controller endpoints are mapped methods and request are orchestrated and delegated to the appropriate services. To decouple the internal (domain) model from the external API `Data Transfer Objects (DTOs)` are used. The `DTOs` define the JSON structures for the request and response messages used by the controller. 
-
 
 ### Services 
 The `service` layer contains the core logic for the Automata Explorer. The services generalized and designed with type-based components to support extensibility.
@@ -70,10 +67,8 @@ The `ProcessingModel` contains the enumeration types and data structures for the
 - The backend is equipped with an interactive Swagger UI for exploring and testing the REST API. The UI is available at `http://localhost:8080/swagger-ui/index.html#/`. This UI will show all available endpoints as well as all the request and response formats. The API can also be used from the browser directly. The openApi file can be downloaded via  `http://localhost:8080/v3/api-docs`. 
 - The backend the Grapviz dot tool to parse the input files. All files which conform to this specification will be parsed successfully.
 
-
 ### Tests 
 Automatic testing is part of the overall applications build pipeline using gitHub actions. About 60 test cases are crafted to validate the backend implementation. 
-
 - The controller is test using the `@webMvcTest`to validate the HTTPS request and response handling in isolation. 
 - The services are tested to validate the common business logic using `@SpringBootTest`, `Mockito` and `JUnit`. 
 - Integration test are performed to combine multiple behaviors to validate real workflows and edge cases. 
@@ -86,12 +81,11 @@ The frontend is built using React and Vite and written in typescript. The fronte
 2. The frontend sends the request to the backend and initiates the build without any processing actions.
 3. The frontend routes to the `VisualizationPage` loads the visualization and displays the build results. 
 4. The user can filter, change layout, select context menu actions and or modify the modal. 
-5. The user exits the application, the fronent sent a session close request to the backend.  
+5. The user exits the application, the frontend sent a session close request to the backend.  
 
 ### API
 - `SessionApi.tsx`: Utility for sending messages to the backend API and to enforce proper exception handling. 
 - `RequestResponse`: Contains all interfaces for the messages exchanged with the backend. 
-
 
 ### Hooks
 - `useSession`: Custom react hook that manages the state and encapsulates all communication with the backend API by leveraging the `sessionApi,tsx`. 
@@ -103,5 +97,5 @@ The frontend is built using React and Vite and written in typescript. The fronte
 
 ### Components
 - `InfoModal`: a general Modal to be used in the application which can handle different inner contents such as `AboutContent`, `ActionContent`, `BuildContent` and `ElementContent`.  
-- `CytoscapeVisualization`: The action visualization component. To prevent the file to be bloated congifuration are implemented in the utils classes `attachContextCollapse`, `attachCytoscapeMenus`, `cytoScapeStyles` and `exportPdfs`.  
+- `CytoscapeCanvas`: The action visualization component. To prevent the file to be bloated configuration are implemented in the utils classes `attachContextCollapse`, `attachCytoscapeMenus`, `cytoScapeStyles` and `exportPdfs`.  
 - `DragAndDrop`: a drag and drop file upload element to be used in the `UploadPage`.  
