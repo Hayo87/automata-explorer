@@ -11,7 +11,7 @@ const AboutContent: React.FC = () => {
     <div style={{maxWidth: "600px"}}> 
         <h2>About This Application</h2>
         <hr></hr>
-        <p>The Automata Explorer is a visualization tool is developed by <strong>Richard Koopmans</strong>{' '} and <strong>Marijn Verheul</strong>{''} 
+        <p>The Automata Explorer is a visualization tool is developed by <strong>Richard Koopmans</strong>{' '} and <strong>Marijn Verheul</strong>{' '} 
          as part of Bachelor graduation project. </p>
          
         <p> The tool offers a way to explore learned (finite) state machines with an 
