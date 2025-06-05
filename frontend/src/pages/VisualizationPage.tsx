@@ -61,6 +61,7 @@ const VisualizationPage: React.FC = () => {
   };
 
   const openActionModal = () => {
+    if (!options) return; 
     openModal(
       <ActionModal
         setActions={activeActions}
