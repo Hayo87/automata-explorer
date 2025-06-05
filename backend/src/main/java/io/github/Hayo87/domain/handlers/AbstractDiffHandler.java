@@ -26,7 +26,7 @@ public abstract class AbstractDiffHandler<T> implements DiffHandler<T> {
      * Builds the action registry by associating each supported pair
      * with the corresponing processor. 
      */
-    public AbstractDiffHandler(List<DiffAutomatonProcessor<T>> processors) {
+    protected AbstractDiffHandler(List<DiffAutomatonProcessor<T>> processors) {
         this.actionRegistry = processors.stream()
             .flatMap(p -> p.keys().stream().map(key -> Map.entry(key, p)))
             .collect(Collectors.toMap(
