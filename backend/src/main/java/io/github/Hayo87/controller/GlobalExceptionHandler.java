@@ -36,9 +36,6 @@ public class GlobalExceptionHandler {
             .body(new ErrorDTO("Invalid request: " + e.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }
 
-
-
-
     /**
     * Handles validation failures for request DTOs annotated with {@code @Valid}
     *
