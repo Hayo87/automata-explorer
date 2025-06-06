@@ -9,13 +9,13 @@ import { ProcessAction, ProcessOption } from "../api/RequestResponse";
  */
 
 interface ActionModalProps {
-  setActions: ProcessAction[];
+  appliedActions: ProcessAction[];
   options: ProcessOption[];
   onProcess: (filters: ProcessAction[]) => void;
 }
 
 const ActionModal: React.FC<ActionModalProps> = ({
-  setActions: appliedActions,
+  appliedActions,
   options,
   onProcess,
 }) => {
