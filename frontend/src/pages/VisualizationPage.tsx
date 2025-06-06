@@ -64,7 +64,7 @@ const VisualizationPage: React.FC = () => {
     if (!options) return; 
     openModal(
       <ActionModal
-        setActions={activeActions}
+        appliedActions={activeActions}
         options={options}
         onProcess={async (updatedActions) => {
           setActiveActions(updatedActions); 
@@ -164,7 +164,10 @@ const VisualizationPage: React.FC = () => {
 
   // Update activeActions after build response 
   useEffect(() => {
-    setActiveActions(data?.filters?? []);
+    if (data && data.filters) {
+      setActiveActions(data.filters);
+    }
+
   }, [data]);
 
   // Determine what to render bases on loading state and available data. 
