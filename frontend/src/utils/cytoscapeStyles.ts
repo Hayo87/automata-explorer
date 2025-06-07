@@ -223,7 +223,19 @@ const cytoscapeStyles: cytoscape.Stylesheet[] = [
             "underlay-padding": "4px",
             "underlay-opacity": 0.5
           }
-        },  
+        }, 
+        // Twin style
+         {
+          selector: 'node.twin-group.enabled, edge.twin-group.enabled',
+          style: {
+            'underlay-opacity': 0.8,
+          },
+        },
+        {
+          selector: 'node.twin-group, edge.twin-group',
+          style: {
+          },
+        }
     ];
   
   export default cytoscapeStyles;
