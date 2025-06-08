@@ -2,6 +2,8 @@ package io.github.Hayo87.dto;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * 
@@ -28,7 +30,7 @@ public record BuildDTO(
         String id,
         int source,
         int target,
-        EdgeAttributes attributes
+        @Nullable EdgeAttributes attributes
     ) {}
 
     public record EdgeAttributes(

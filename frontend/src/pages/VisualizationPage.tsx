@@ -45,6 +45,7 @@ const VisualizationPage: React.FC = () => {
   const [loopsHidden, setLoopsHidden] = useState(false);
   const [refHidden, setRefHidden] = useState(false);
   const [subjHidden, setSubjHidden] = useState(false);
+  const [helperActive, setHelperActive] = useState(false);
    
 
   const waitForVizRef = async (): Promise<CytoscapeVisualizationRef> => {
@@ -113,6 +114,11 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
+  const handleHelper = () => {
+    cyVizRef.current?.toggleHelper();
+    setHelperActive(prev => !prev);
+  };
+    
   const handlePNGExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
@@ -223,13 +229,15 @@ const VisualizationPage: React.FC = () => {
           <button className={`button button--sidebar ${!subjHidden ? "" : "active"}`} title="Subject on/off" onClick={handleSubj} >
             {subjHidden ? <s>SUB</s> : "SUB"}
           </button>
+          <button className={`button button--sidebar ${helperActive ? "active" : ""}`} title="Twin helper" onClick={handleHelper}>
+            <span className="material-icons">explore</span>
+          </button>
 
           {/* Modify Section */}
           <p className="sidebar-label">Modify</p>
           <button className="button button--sidebar" title="Open filters" onClick={openActionModal}>
             <span className="material-icons">edit</span>
           </button>
-
 
           {/* Export Section */}
           <p className="sidebar-label">Export</p>

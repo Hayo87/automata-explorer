@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type cytoscape from 'cytoscape';
 import { BuildResponse} from '../api/RequestResponse';
 
 /**
@@ -11,7 +12,7 @@ import { BuildResponse} from '../api/RequestResponse';
 
 const useTransformGraph = (backendData: BuildResponse | null) => {
   return useMemo(() => {
-    if (!backendData) return { nodes: [], edges: [] };
+    if (!backendData) return { nodes: [], edges: [], dynamicTwinStyles: []};
     const { build: graphData } = backendData;
 
     let nodes = graphData.nodes.map((node) => {
@@ -52,8 +53,37 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
         : "",
       };
     });
-    
-    return { nodes, edges };
+
+  // Assign the classes to the (twin) groups
+  let dynamicTwinStyles: cytoscape.Stylesheet[] = [];
+  backendData.analysis?.groupedTwins.forEach(({ members, causes }, index) => {
+    const className = `twin-${index}`;
+    const hue = (index * 47) % 360;
+    const fullClass = `twin-group ${className}`;
+
+    // style
+    dynamicTwinStyles.push({
+          selector: `.${className}`,
+          style: {
+            'underlay-color': `hsl(${hue}, 70%, 60%)`,
+            'underlay-padding': '4px',
+          },
+        });
+
+    members.forEach((id: number) => {
+      const node = nodes.find(n => n.data.id === id);
+      if (node) node.classes += ` ${fullClass}`;
+    })
+
+    causes.forEach(({ source, target, id }) => {
+      const edge = edges.find(
+        e => e.data.source === source && e.data.target === target && e.data.label === id
+      );
+      if (edge) edge.classes += ` ${fullClass}`;
+    });
+  });
+
+    return { nodes, edges, dynamicTwinStyles };
   }, [backendData]);
 };
 
