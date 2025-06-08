@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.Hayo87.domain.rules.AutomataType;
+import io.github.Hayo87.dto.AnalysisDTO;
 import io.github.Hayo87.dto.BuildDTO;
 import io.github.Hayo87.dto.BuildResponseDTO;
 import io.github.Hayo87.dto.SessionResponseDTO;
@@ -195,7 +196,7 @@ public class ExplorerControllerTest {
         String json = loadJson("build-valid-action.json");
 
         given(buildservice.buildDiff(eq("abc-123"), any()))
-            .willReturn(new BuildResponseDTO(AutomataType.STRING, new BuildDTO(List.of(), List.of()), List.of()));
+            .willReturn(new BuildResponseDTO(AutomataType.STRING, new BuildDTO(List.of(), List.of()),new AnalysisDTO(List.of(), List.of()) ,List.of()));
 
         mockMvc.perform(post("/api/session/abc-123/build")
             .contentType(MediaType.APPLICATION_JSON)
@@ -223,7 +224,7 @@ public class ExplorerControllerTest {
         String json = loadJson("build-empty-request.json");
 
         given(buildservice.buildDiff(eq("abc-123"), any()))
-            .willReturn(new BuildResponseDTO(AutomataType.STRING, new BuildDTO(List.of(), List.of()), List.of()));
+            .willReturn(new BuildResponseDTO(AutomataType.STRING, new BuildDTO(List.of(), List.of()),new AnalysisDTO(List.of(), List.of()) ,List.of()));
 
         mockMvc.perform(post("/api/session/abc-123/build")
             .contentType(MediaType.APPLICATION_JSON)
@@ -237,7 +238,7 @@ public class ExplorerControllerTest {
         String json = loadJson("build-invalid-action.json");
 
         given(buildservice.buildDiff(eq("abc-123"), any()))
-            .willReturn(new BuildResponseDTO(AutomataType.STRING, new BuildDTO(List.of(), List.of()), List.of()));
+            .willReturn(new BuildResponseDTO(AutomataType.STRING, new BuildDTO(List.of(), List.of()),new AnalysisDTO(List.of(), List.of()) ,List.of()));
 
         mockMvc.perform(post("/api/session/abc-123/build")
             .contentType(MediaType.APPLICATION_JSON)
