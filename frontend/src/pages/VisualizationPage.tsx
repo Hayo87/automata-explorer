@@ -83,6 +83,11 @@ const VisualizationPage: React.FC = () => {
       cyVizRef.current?.collapseEdges();
     }
     setIsCollapsed(prev => !prev);
+    if (loopsHidden){
+      cyVizRef.current?.hideLoops();
+    } else{
+      cyVizRef.current?.unHideLoops();
+    }
   };
 
   const handleLoop = () => {
