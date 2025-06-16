@@ -109,6 +109,7 @@ public class Analyzer<T> {
         DiffKind twinDiff = (leftState.getProperty().getStateDiffKind() != DiffKind.UNCHANGED)? 
                                 leftState.getProperty().getStateDiffKind() : rightState.getProperty().getStateDiffKind();
 
+        // Only outgoing transitions are relevant
         Set<Transition<DiffAutomatonStateProperty, DiffProperty<T>>> transitions = diffAutomaton.getTransitions(t ->
             (t.getSource().equals(leftState) || t.getSource().equals(rightState)));
 
@@ -130,8 +131,6 @@ public class Analyzer<T> {
         return (t1 != t2)   && (
                (t1.getTarget().getId() == t1.getSource().getId() && t2.getTarget().getId() == t2.getSource().getId())   // loop rule
             || (t1.getTarget().getId() == t2.getTarget().getId())                                                       // same target rule) 
-            || (t1.getSource().getId() == t2.getSource().getId())                                                       // same source rule
-
         ) && propertyCombiner.areCombinable(t1.getProperty(), t2.getProperty());
     }
 
