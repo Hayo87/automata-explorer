@@ -32,6 +32,7 @@ Filters adjust the visualization without modifying the actual model or inputs.
 - Show / hide edges where the source node is the target (loop).  
 - Show hide the elements which have the reference type.
 - Show hide the elements which have the subject type.
+- Show how red and green nodes are related (clusters) and detect divergence causes. 
 
 #### Modify
 Adjust the visualization using processing actions which modify the inputs or output. The available options depend on the automata type as selected at the upload page. The available options are loaded automatically in the Modify Modal. All actions have:
