@@ -6,7 +6,7 @@ import { BuildResponse} from '../api/RequestResponse';
  * @file useTransform.ts
  * 
  * Custom react hook that maps backend data into frontend ready format. 
- * @param backendData the rad backend data
+ * @param backendData the raw backend data
  * @returns Cytoscape compatible nodes and edges
  */
 
@@ -24,6 +24,7 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
           NodeType:typeof node.attributes?.diffkind === "string"
           ? node.attributes.diffkind.toLowerCase()
           : "",
+          parent: undefined as number | undefined,
         },
         selectable: true,
         grabbable: true,
@@ -56,12 +57,12 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
 
   // Assign the classes to the (twin) groups
   let dynamicTwinStyles: cytoscape.Stylesheet[] = [];
-  backendData.analysis?.groupedTwins.forEach(({ members, causes }, index) => {
+  backendData.analysis?.groupedTwins.forEach(({ causes }, index) => {
     const className = `twin-${index}`;
     const hue = (index * 47) % 360;
     const fullClass = `twin-group ${className}`;
 
-    // style
+    // Push style for each index (cluster)
     dynamicTwinStyles.push({
           selector: `.${className}`,
           style: {
@@ -70,16 +71,41 @@ const useTransformGraph = (backendData: BuildResponse | null) => {
           },
         });
 
-    members.forEach((id: number) => {
-      const node = nodes.find(n => n.data.id === id);
-      if (node) node.classes += ` ${fullClass}`;
-    })
-
+    // Assign style to edges based on causes    
     causes.forEach(({ source, target, id }) => {
       const edge = edges.find(
         e => e.data.source === source && e.data.target === target && e.data.label === id
       );
       if (edge) edge.classes += ` ${fullClass}`;
+    });
+  });
+
+  // Create and assign the parent nodes
+  backendData.analysis?.groupedTwins?.forEach(({ members }, index) => {
+    const clusterId = index + 10000;
+
+    // Add the parent node
+    nodes.push({
+      group: 'nodes',
+      data: {
+        id: clusterId,
+        label: `Cluster ${index + 1}`,
+        NodeType: 'cluster',
+        parent: undefined,
+      },
+      selectable: true,
+      grabbable: true,
+      locked: false,
+      pannable: false,
+      classes: 'hidden'
+    });
+
+    // Assign the parent node to the member nodes
+    members.forEach((memberId) => {
+      const memberNode = nodes.find((n) => n.data.id === memberId);
+      if (memberNode) {
+        memberNode.data.parent = clusterId;
+      }
     });
   });
 

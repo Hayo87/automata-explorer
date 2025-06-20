@@ -149,9 +149,9 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     attachExpandCollapse(cyInstance);
 
     // Style start nodes
-    const startNodes = cyInstance.nodes().roots();
-    startNodes.forEach((n: cytoscape.NodeSingular) => 
-      n.addClass('start'));
+    cyInstance.nodes().roots().filter('node:childless').forEach((n: cytoscape.NodeSingular) => {
+      n.addClass('start');
+    });
 
     if (onCy) {
       onCy(cyInstance);
@@ -321,7 +321,10 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     toggleHelper: () =>{
       const cy = cyRef.current;
       if (!cy) return;
+      const api = (cy as any).expandCollapse('get');
+      api.expandAll();
       cy.elements('node.twin-group, edge.twin-group').toggleClass('enabled');
+      cy.elements('node:parent').toggleClass('hidden');
     },
 
     getStats: () => {
