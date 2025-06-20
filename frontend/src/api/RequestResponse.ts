@@ -29,6 +29,7 @@ export interface BuildRequest{
 export interface BuildResponse  {
   type: string;
   build: Build;
+  analysis: Analysis;
   actions: ProcessAction[];
 }
 
@@ -65,6 +66,22 @@ export interface LabelEntry {
   type: 'input' | 'output' | 'label';
   value: string;
   diffkind?: 'UNCHANGED' | 'ADDED' | 'REMOVED'; 
+}
+
+export interface Analysis {
+  twins: TwinAnalysis[];
+  groupedTwins: GroupedTwinAnalysis[]
+}
+
+export interface TwinAnalysis {
+  left: number,
+  right: number,
+  causes: Edge[]
+}
+
+export interface GroupedTwinAnalysis{
+  members: number[],
+  causes: Edge[]
 }
 
 export interface ProcessAction {

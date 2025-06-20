@@ -56,6 +56,7 @@ export interface CytoscapeVisualizationRef {
   hideRef: () => void;
   showSub: () => void;
   hideSub: () => void;
+  toggleHelper: () => void;
   getStats: () => Stats;
   clearVisualHelpers: () => void;
 }
@@ -98,6 +99,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
   const refHidden = useRef(false);
   const subHidden = useRef(false);
   const collapsed = useRef(false);
+  const styles = [...cytoscapeStyles, ...transformedData.dynamicTwinStyles];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -105,7 +107,7 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     const cyInstance = cytoscape({
       container: containerRef.current,
       elements: [],
-      style: cytoscapeStyles ,
+      style: styles ,
       zoom: 1,
       pan: { x: 0, y: 0 },
       minZoom: 1e-50,
@@ -147,9 +149,9 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
     attachExpandCollapse(cyInstance);
 
     // Style start nodes
-    const startNodes = cyInstance.nodes().roots();
-    startNodes.forEach((n: cytoscape.NodeSingular) => 
-      n.addClass('start'));
+    cyInstance.nodes().roots().filter('node:childless').forEach((n: cytoscape.NodeSingular) => {
+      n.addClass('start');
+    });
 
     if (onCy) {
       onCy(cyInstance);
@@ -314,6 +316,15 @@ const CytoscapeVisualization = forwardRef<CytoscapeVisualizationRef, CytoscapeVi
         const isLoop = ele.isEdge() && ele.source().id() === ele.target().id();
         if (!loopsHidden.current || !isLoop) ele.show();
       });
+    },
+
+    toggleHelper: () =>{
+      const cy = cyRef.current;
+      if (!cy) return;
+      const api = (cy as any).expandCollapse('get');
+      api.expandAll();
+      cy.elements('node.twin-group, edge.twin-group').toggleClass('enabled');
+      cy.elements('node:parent').toggleClass('hidden');
     },
 
     getStats: () => {

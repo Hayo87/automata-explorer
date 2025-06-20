@@ -229,7 +229,7 @@
     height: 100%;
     position: relative;
     background: #ffffff;
-    overflow: hidden;
+    overflow: hidden; 
   }
 
   .bottom-left-info {
@@ -263,9 +263,10 @@
     border-top-right-radius: 8px; 
   }
 
-  .expand-collapse-canvas {
-    display: none !important;
-  }
+.expand-collapse-canvas {
+  display: block !important;
+}
+
 
   .button--sidebar {
     width: 60;

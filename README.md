@@ -12,6 +12,7 @@ This Automata Explores is developed in the context of automata learning and supp
 - **Input** two automata's in the [`.dot format`](https://graphviz.org/doc/info/lang.html) and visualize the difference machine. 
 - Select a **layout algorithm** that is most suitable for the visualization. 
 - Use **filters** and/or custom **processing actions** to investigate the result. 
+- Use **clustering** to identify related nodes and detect **divergence causes**. 
 - Use the **context menu** options on visualization elements analyze the automata or to get detailed element information. 
 - **Export** the result as a `.pgn` or comprehensive `.pdf` report. 
 

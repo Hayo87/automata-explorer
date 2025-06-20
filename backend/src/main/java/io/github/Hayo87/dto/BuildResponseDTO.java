@@ -12,6 +12,7 @@ import io.github.Hayo87.domain.rules.AutomataType;
 public record BuildResponseDTO (
     AutomataType type,
     BuildDTO build,
+    AnalysisDTO analysis,
     @JsonInclude(JsonInclude.Include.NON_EMPTY) List<ProcessingActionDTO> actions
 ){}
   

@@ -109,7 +109,7 @@ public class BuildService {
             List<ProcessingActionDTO> postProcessingActions = filterByStage(actions, Stage.POST);
             result = handler.postProcessing(result, postProcessingActions);
 
-            return new BuildResponseDTO(session.getType(), handler.serialize(result), actions);
+            return new BuildResponseDTO(session.getType(), handler.serialize(result), handler.analyze(result), actions);
    
         } catch (Exception e) {
             throw new RuntimeException("Build failed: " + e.getMessage(),e);

@@ -12,7 +12,7 @@ export function attachCytoscapeMenus(cyInstance: cytoscape.Core, openModal: (el:
       if (!cyInstance) return;
    
     cyInstance.cxtmenu({
-            selector: "node",
+            selector: "node:childless",
             commands: [
             {
                 content: '<span class="fa fa-check-circle-o fa-2x"></span>',

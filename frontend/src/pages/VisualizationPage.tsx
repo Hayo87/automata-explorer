@@ -45,6 +45,7 @@ const VisualizationPage: React.FC = () => {
   const [loopsHidden, setLoopsHidden] = useState(false);
   const [refHidden, setRefHidden] = useState(false);
   const [subjHidden, setSubjHidden] = useState(false);
+  const [helperActive, setHelperActive] = useState(false);
    
 
   const waitForVizRef = async (): Promise<CytoscapeVisualizationRef> => {
@@ -79,9 +80,17 @@ const VisualizationPage: React.FC = () => {
     if (isCollapsed) {
       cyVizRef.current?.unCollapseEdges();
     } else {
+      if(helperActive){
+        handleHelper()
+      }
       cyVizRef.current?.collapseEdges();
     }
     setIsCollapsed(prev => !prev);
+    if (loopsHidden){
+      cyVizRef.current?.hideLoops();
+    } else{
+      cyVizRef.current?.unHideLoops();
+    }
   };
 
   const handleLoop = () => {
@@ -113,6 +122,14 @@ const VisualizationPage: React.FC = () => {
     }
   };
 
+  const handleHelper = () => {
+    if(isCollapsed) {
+      handleCollapse()
+    }
+    cyVizRef.current?.toggleHelper();
+    setHelperActive(prev => !prev);
+  };
+    
   const handlePNGExport = () => {
     if (!cyVizRef.current) return;
     const pngDataUrl = cyVizRef.current.exportPNG();
@@ -162,12 +179,17 @@ const VisualizationPage: React.FC = () => {
     })}
   }, [sessionId]);
 
-  // Update activeActions after build response 
+  // Update activeActions and filterbuttons after build response 
   useEffect(() => {
     if (data && data.filters) {
       setActiveActions(data.filters);
     }
-
+    // reset button status
+    setIsCollapsed(false);
+    setLoopsHidden(false);
+    setRefHidden(false);
+    setSubjHidden(false);
+    setHelperActive(false);
   }, [data]);
 
   // Determine what to render bases on loading state and available data. 
@@ -211,25 +233,27 @@ const VisualizationPage: React.FC = () => {
 
           {/* Filter Section */}
           <p className="sidebar-label">Filter</p>
-          <button className={`button button--sidebar ${isCollapsed ? "active" : ""}`} title="Toggle collapse filter" onClick={handleCollapse}>
+          <button className={`button button--sidebar ${isCollapsed ? "active" : ""}`} title="Toggle edge collapse " onClick={handleCollapse}>
             <span className="material-icons"> {isCollapsed ? "unfold_more" : "unfold_less"} </span>
           </button>
-          <button className={`button button--sidebar ${loopsHidden ? "active" : ""}`} title="Toggle Loop filter" onClick={handleLoop}>
+          <button className={`button button--sidebar ${loopsHidden ? "active" : ""}`} title="Show/hide loops" onClick={handleLoop}>
             <span className="material-icons"> {loopsHidden ? "sync_disabled" : "sync"} </span>
           </button>
-          <button className={`button button--sidebar ${!refHidden ? "" : "active"}`} title="Reference on/off" onClick={handleRef} >
+          <button className={`button button--sidebar ${!refHidden ? "" : "active"}`} title="Show/hide reference" onClick={handleRef} >
             {refHidden ? <s>REF</s> : "REF"}
           </button>
-          <button className={`button button--sidebar ${!subjHidden ? "" : "active"}`} title="Subject on/off" onClick={handleSubj} >
+          <button className={`button button--sidebar ${!subjHidden ? "" : "active"}`} title="Show/hide subject" onClick={handleSubj} >
             {subjHidden ? <s>SUB</s> : "SUB"}
+          </button>
+          <button className={`button button--sidebar ${helperActive ? "active" : ""}`} title="Toggle clustering & causes" onClick={handleHelper}>
+            <span className="material-icons">explore</span>
           </button>
 
           {/* Modify Section */}
           <p className="sidebar-label">Modify</p>
-          <button className="button button--sidebar" title="Open filters" onClick={openActionModal}>
+          <button className="button button--sidebar" title="Open actions" onClick={openActionModal}>
             <span className="material-icons">edit</span>
           </button>
-
 
           {/* Export Section */}
           <p className="sidebar-label">Export</p>
@@ -247,7 +271,7 @@ const VisualizationPage: React.FC = () => {
               <span className="material-icons">info</span>
             </button>
             <p className="sidebar-label">Exit</p>
-            <button className="button button--sidebar" title="Exit this visualization" onClick={handleExit}>
+            <button className="button button--sidebar" title="Exit visualization" onClick={handleExit}>
               <span className="material-icons">exit_to_app</span>
             </button>
           </div>

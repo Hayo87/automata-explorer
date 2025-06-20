@@ -11,8 +11,11 @@ import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomata;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
+import com.github.tno.gltsdiff.operators.combiners.EqualityCombiner;
 
+import io.github.Hayo87.domain.analyzer.Analyzer;
 import io.github.Hayo87.domain.processors.DiffAutomatonProcessor;
+import io.github.Hayo87.dto.AnalysisDTO;
 import io.github.Hayo87.dto.BuildDTO;
 
 @Component
@@ -74,5 +77,11 @@ public class StringDiffHandler extends AbstractDiffHandler<String> {
             .toList();
 
         return new BuildDTO(nodes, edges); 
+    }
+
+    @Override
+    public AnalysisDTO analyze(DiffAutomaton<String> automaton){
+        Analyzer<String> analyzer = new Analyzer<>(new EqualityCombiner<>());
+        return analyzer.analyze(automaton);
     }
 }

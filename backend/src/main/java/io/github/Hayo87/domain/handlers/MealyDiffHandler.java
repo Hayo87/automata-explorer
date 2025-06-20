@@ -19,6 +19,7 @@ import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomatonStatePropert
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffKind;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffProperty;
 
+import io.github.Hayo87.domain.analyzer.Analyzer;
 import io.github.Hayo87.domain.model.Mealy;
 import io.github.Hayo87.domain.model.MealyCombiner;
 import io.github.Hayo87.domain.model.MergedMealy;
@@ -27,6 +28,7 @@ import io.github.Hayo87.domain.rules.LabelUtils;
 import io.github.Hayo87.domain.rules.ProcessingModel.Stage;
 import io.github.Hayo87.domain.rules.ProcessingModel.SubType;
 import io.github.Hayo87.domain.rules.ProcessingModel.Type;
+import io.github.Hayo87.dto.AnalysisDTO;
 import io.github.Hayo87.dto.BuildDTO;
 import io.github.Hayo87.dto.BuildDTO.LabelEntry;
 import io.github.Hayo87.dto.BuildDTO.LabelType;
@@ -150,5 +152,11 @@ public class MealyDiffHandler extends  AbstractDiffHandler<Mealy> {
                 new BuildDTO.LabelEntry(LabelType.OUTPUT, mealy.output(), diffkind.toString())
             );
         }
+    }
+    
+    @Override
+    public AnalysisDTO analyze(DiffAutomaton<Mealy> automaton){
+        Analyzer<Mealy> analyzer = new Analyzer<>(new MealyCombiner());
+        return analyzer.analyze(automaton);
     }
 }

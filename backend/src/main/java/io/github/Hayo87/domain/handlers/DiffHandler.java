@@ -5,6 +5,7 @@ import java.util.List;
 import com.github.tno.gltsdiff.glts.lts.automaton.Automaton;
 import com.github.tno.gltsdiff.glts.lts.automaton.diff.DiffAutomaton;
 
+import io.github.Hayo87.dto.AnalysisDTO;
 import io.github.Hayo87.dto.BuildDTO;
 import io.github.Hayo87.dto.ProcessingActionDTO;
 
@@ -104,4 +105,11 @@ public interface DiffHandler<T> {
      * Actual serialization logic to be implemented by concrete handlers is wrapped in {@link #serialize}.
      */
     BuildDTO serializeInternal(DiffAutomaton<T> automaton);
+
+    /**
+     * Analyzes DiffAutomaton to identify interesting patterns like divergence.
+     * @param automaton
+     * @return analysis result in {@link AnalysisDTO}.
+     */
+    AnalysisDTO analyze(DiffAutomaton<T> automaton);
 }
